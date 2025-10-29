@@ -317,18 +317,14 @@ export default function TicketDetailsScreen() {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
-          <View style={[styles.dateHeader, { backgroundColor: colors.card }]}>
-            <Text style={[styles.dateText, { color: colors.text }]}>
-              {formatDate(event.date)}
-            </Text>
-            <Text style={[styles.timeText, { color: colors.text }]}>
-              {formatTime(event.date)}
-            </Text>
-          </View>
-
           <View style={[styles.eventInfo, { backgroundColor: colors.card }]}>
             <Image source={{ uri: event.image }} style={styles.eventImage} />
-            <Text style={[styles.eventTitle, { color: colors.text }]}>{event.title}</Text>
+            <View style={styles.eventTitleContainer}>
+              <Text style={[styles.eventTitle, { color: colors.text }]}>{event.title}</Text>
+              <Text style={[styles.eventDateTime, { color: colors.textSecondary }]}>
+                {formatDate(event.date)} · {formatTime(event.date)}
+              </Text>
+            </View>
           </View>
 
           <ScrollView
@@ -680,32 +676,13 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 40,
   },
-  dateHeader: {
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    marginHorizontal: 16,
-    marginBottom: 16,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  dateText: {
-    fontSize: 18,
-    fontWeight: '600' as const,
-    marginBottom: 4,
-  },
-  timeText: {
-    fontSize: 16,
-  },
   eventInfo: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingVertical: 16,
     marginHorizontal: 16,
+    marginTop: 0,
     marginBottom: 24,
     borderRadius: 12,
     gap: 16,
@@ -720,10 +697,16 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 8,
   },
+  eventTitleContainer: {
+    flex: 1,
+    gap: 6,
+  },
   eventTitle: {
     fontSize: 20,
     fontWeight: 'bold' as const,
-    flex: 1,
+  },
+  eventDateTime: {
+    fontSize: 14,
   },
   ticketCarousel: {
     marginBottom: 16,
