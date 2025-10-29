@@ -12,12 +12,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
   Check, 
   X, 
-  Eye, 
   Calendar,
   MapPin,
   DollarSign,
   User,
   Clock,
+  ChevronRight,
+  Users,
 } from 'lucide-react-native';
 import { COLORS } from '@/constants/colors';
 import { useUser } from '@/hooks/user-context';
@@ -25,6 +26,7 @@ import { useTheme } from '@/hooks/theme-context';
 import AuthGuard from '@/components/AuthGuard';
 import CreateEvent from '@/app/create-event';
 import { router } from 'expo-router';
+import QRCode from '@/components/QRCode';
 
 interface PendingAd {
   id: string;
@@ -71,28 +73,31 @@ interface UserTicket {
   purchaseDate: string;
   qrCode: string;
   isUsed: boolean;
+  friendsGoing?: number;
 }
 
 function NormalUserTicketsContent() {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   const [selectedTab, setSelectedTab] = useState<'upcoming' | 'past'>('upcoming');
+  const [selectedQRTicket, setSelectedQRTicket] = useState<string | null>(null);
   
   const [userTickets] = useState<UserTicket[]>([
     {
       id: 't1',
       eventId: '1',
-      eventTitle: 'Arctic Monkeys',
-      eventImage: 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=800',
-      eventDate: '2025-11-15T21:00:00',
-      venue: 'Coliseu dos Recreios',
-      city: 'Lisboa',
-      ticketType: 'Plateia',
+      eventTitle: 'The Purple Fridays',
+      eventImage: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800',
+      eventDate: '2025-10-31T19:00:00',
+      venue: 'Estalagem Da Ponta Do Sol',
+      city: 'Ponta do Sol',
+      ticketType: 'Geral',
       quantity: 2,
-      totalPrice: 90,
+      totalPrice: 45,
       purchaseDate: '2025-10-10T14:30:00',
-      qrCode: 'QR123456',
+      qrCode: 'TPF2025103100001',
       isUsed: false,
+      friendsGoing: 3,
     },
     {
       id: 't2',
@@ -106,23 +111,25 @@ function NormalUserTicketsContent() {
       quantity: 1,
       totalPrice: 65,
       purchaseDate: '2025-10-12T10:15:00',
-      qrCode: 'QR789012',
+      qrCode: 'SS2025122200001',
       isUsed: false,
+      friendsGoing: 1,
     },
     {
       id: 't3',
       eventId: '3',
-      eventTitle: 'The Weeknd - After Hours Tour',
-      eventImage: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800',
-      eventDate: '2026-01-20T22:00:00',
-      venue: 'MEO Arena',
-      city: 'Lisboa',
+      eventTitle: 'IN DA CLUB - STG X PUSH OFF',
+      eventImage: 'https://images.unsplash.com/photo-1540039155733-5bb30b53aa14?w=800',
+      eventDate: '2025-11-08T22:00:00',
+      venue: 'Jin Garden',
+      city: 'Funchal',
       ticketType: 'VIP',
-      quantity: 2,
-      totalPrice: 180,
+      quantity: 1,
+      totalPrice: 35,
       purchaseDate: '2025-10-15T16:45:00',
-      qrCode: 'QR345678',
+      qrCode: 'IDC2025110800001',
       isUsed: false,
+      friendsGoing: 1,
     },
   ]);
 
@@ -130,137 +137,252 @@ function NormalUserTicketsContent() {
   const upcomingTickets = userTickets.filter(t => new Date(t.eventDate) >= now && !t.isUsed);
   const pastTickets = userTickets.filter(t => new Date(t.eventDate) < now || t.isUsed);
 
-  const TicketCard = ({ ticket }: { ticket: UserTicket }) => (
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+    return `${months[date.getMonth()]} ${date.getDate()}`;
+  };
+
+  const formatTime = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('pt-PT', { hour: '2-digit', minute: '2-digit' }).toLowerCase();
+  };
+
+  const UpcomingTicketCard = ({ ticket }: { ticket: UserTicket }) => (
+    <View style={[styles.upcomingCard, { backgroundColor: colors.background }]}>
+      <View style={styles.upcomingCardHeader}>
+        <View style={styles.dateTimeContainer}>
+          <Text style={[styles.dateMonth, { color: colors.text }]}>{formatDate(ticket.eventDate)}</Text>
+          <Text style={[styles.dateTime, { color: colors.text }]}>{formatTime(ticket.eventDate)}</Text>
+        </View>
+        <TouchableOpacity 
+          style={styles.qrContainer}
+          onPress={() => setSelectedQRTicket(selectedQRTicket === ticket.id ? null : ticket.id)}
+        >
+          <Text style={[styles.qrCount, { color: colors.text }]}>{ticket.quantity}</Text>
+          <View style={styles.qrIcon}>
+            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
+            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
+            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
+            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
+          </View>
+        </TouchableOpacity>
+      </View>
+
+      <Text style={[styles.upcomingTitle, { color: colors.text }]}>{ticket.eventTitle}</Text>
+      <Text style={[styles.upcomingVenue, { color: colors.textSecondary }]}>
+        {ticket.venue} · {ticket.city}
+      </Text>
+
+      <Image source={{ uri: ticket.eventImage }} style={styles.upcomingImage} />
+
+      {ticket.friendsGoing && ticket.friendsGoing > 0 && (
+        <TouchableOpacity style={styles.friendsContainer}>
+          <View style={styles.friendsAvatars}>
+            <View style={[styles.friendAvatar, { backgroundColor: colors.border }]}>
+              <User size={12} color={colors.textSecondary} />
+            </View>
+            <View style={[styles.friendAvatar, { backgroundColor: colors.border, marginLeft: -8 }]}>
+              <User size={12} color={colors.textSecondary} />
+            </View>
+            {ticket.friendsGoing > 2 && (
+              <View style={[styles.friendAvatar, { backgroundColor: colors.border, marginLeft: -8 }]}>
+                <User size={12} color={colors.textSecondary} />
+              </View>
+            )}
+          </View>
+          <Text style={[styles.friendsText, { color: colors.text }]}>
+            Confira se os seus amigos estão indo também
+          </Text>
+          <ChevronRight size={20} color={colors.textSecondary} />
+        </TouchableOpacity>
+      )}
+
+      {selectedQRTicket === ticket.id && (
+        <View style={[styles.qrCodeContainer, { backgroundColor: colors.card }]}>
+          <QRCode value={ticket.qrCode} size={200} />
+          <Text style={[styles.qrCodeText, { color: colors.textSecondary }]}>{ticket.qrCode}</Text>
+        </View>
+      )}
+    </View>
+  );
+
+  const ComingTicketCard = ({ ticket }: { ticket: UserTicket }) => (
     <TouchableOpacity
-      style={[styles.ticketCard, { backgroundColor: colors.card }]}
+      style={[styles.comingCard, { backgroundColor: colors.background }]}
       onPress={() => router.push(`/event/${ticket.eventId}` as any)}
     >
-      <Image source={{ uri: ticket.eventImage }} style={styles.ticketImage} />
-      <View style={styles.ticketContent}>
-        <View style={styles.ticketHeader}>
-          <Text style={[styles.ticketTitle, { color: colors.text }]} numberOfLines={2}>
+      <View style={styles.comingCardHeader}>
+        <View style={styles.comingDateContainer}>
+          <Text style={[styles.comingMonth, { color: colors.text }]}>{formatDate(ticket.eventDate)}</Text>
+          <Text style={[styles.comingTime, { color: colors.text }]}>{formatTime(ticket.eventDate)}</Text>
+        </View>
+        <TouchableOpacity 
+          style={styles.comingQrContainer}
+          onPress={(e) => {
+            e.stopPropagation();
+            setSelectedQRTicket(selectedQRTicket === ticket.id ? null : ticket.id);
+          }}
+        >
+          <Text style={[styles.comingQrCount, { color: colors.text }]}>{ticket.quantity}</Text>
+          <View style={styles.comingQrIcon}>
+            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
+            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
+            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
+            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
+          </View>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.comingContent}>
+        <View style={[styles.comingThumbnail, { backgroundColor: colors.primary }]}>
+          <Image source={{ uri: ticket.eventImage }} style={styles.comingThumbnailImage} />
+        </View>
+        <View style={styles.comingInfo}>
+          <Text style={[styles.comingTitle, { color: colors.text }]} numberOfLines={1}>
             {ticket.eventTitle}
           </Text>
-          {ticket.isUsed && (
-            <View style={[styles.usedBadge, { backgroundColor: colors.textSecondary }]}>
-              <Text style={styles.usedBadgeText}>Usado</Text>
-            </View>
-          )}
+          <Text style={[styles.comingVenue, { color: colors.textSecondary }]} numberOfLines={1}>
+            {ticket.venue} · {ticket.city}
+          </Text>
         </View>
-        
-        <View style={styles.ticketDetails}>
-          <View style={styles.ticketDetailRow}>
-            <Calendar size={14} color={colors.textSecondary} />
-            <Text style={[styles.ticketDetailText, { color: colors.textSecondary }]}>
-              {new Date(ticket.eventDate).toLocaleDateString('pt-PT', {
-                weekday: 'long',
-                day: 'numeric',
-                month: 'long',
-                year: 'numeric',
-              })}
-            </Text>
-          </View>
-          
-          <View style={styles.ticketDetailRow}>
-            <Clock size={14} color={colors.textSecondary} />
-            <Text style={[styles.ticketDetailText, { color: colors.textSecondary }]}>
-              {new Date(ticket.eventDate).toLocaleTimeString('pt-PT', {
-                hour: '2-digit',
-                minute: '2-digit',
-              })}
-            </Text>
-          </View>
-          
-          <View style={styles.ticketDetailRow}>
-            <MapPin size={14} color={colors.textSecondary} />
-            <Text style={[styles.ticketDetailText, { color: colors.textSecondary }]}>
-              {ticket.venue}, {ticket.city}
-            </Text>
-          </View>
-        </View>
-
-        <View style={[styles.ticketFooter, { borderTopColor: colors.border }]}>
-          <View>
-            <Text style={[styles.ticketType, { color: colors.text }]}>{ticket.ticketType}</Text>
-            <Text style={[styles.ticketQuantity, { color: colors.textSecondary }]}>{ticket.quantity}x bilhete(s)</Text>
-          </View>
-          <Text style={[styles.ticketPrice, { color: colors.primary }]}>€{ticket.totalPrice}</Text>
-        </View>
-
-        {!ticket.isUsed && new Date(ticket.eventDate) >= now && (
-          <TouchableOpacity
-            style={[styles.viewQRButton, { backgroundColor: colors.primary }]}
-            onPress={() => Alert.alert('QR Code', `Código: ${ticket.qrCode}`)}
-          >
-            <Eye size={16} color={colors.white} />
-            <Text style={[styles.viewQRButtonText, { color: colors.white }]}>Ver QR Code</Text>
-          </TouchableOpacity>
-        )}
       </View>
+
+      {ticket.friendsGoing && ticket.friendsGoing > 0 && (
+        <View style={styles.comingFriends}>
+          <View style={[styles.comingFriendIcon, { backgroundColor: colors.card }]}>
+            <Users size={12} color={colors.textSecondary} />
+          </View>
+          <Text style={[styles.comingFriendsText, { color: colors.textSecondary }]}>
+            {ticket.friendsGoing} {ticket.friendsGoing === 1 ? 'amigo indo' : 'amigos indo'}
+          </Text>
+        </View>
+      )}
+
+      {selectedQRTicket === ticket.id && (
+        <View style={[styles.qrCodeContainer, { backgroundColor: colors.card }]}>
+          <QRCode value={ticket.qrCode} size={200} />
+          <Text style={[styles.qrCodeText, { color: colors.textSecondary }]}>{ticket.qrCode}</Text>
+        </View>
+      )}
     </TouchableOpacity>
   );
 
-  const TabButton = ({ tab, title, count }: { tab: 'upcoming' | 'past'; title: string; count: number }) => (
+  const PastTicketCard = ({ ticket }: { ticket: UserTicket }) => (
     <TouchableOpacity
-      style={[
-        styles.ticketTabButton,
-        { backgroundColor: selectedTab === tab ? colors.primary : colors.border }
-      ]}
-      onPress={() => setSelectedTab(tab)}
+      style={[styles.pastCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+      onPress={() => router.push(`/event/${ticket.eventId}` as any)}
     >
-      <Text style={[
-        styles.ticketTabText,
-        { color: selectedTab === tab ? colors.white : colors.textSecondary }
-      ]}>
-        {title} ({count})
-      </Text>
+      <View style={styles.pastContent}>
+        <Image source={{ uri: ticket.eventImage }} style={styles.pastImage} />
+        <View style={styles.pastInfo}>
+          <Text style={[styles.pastTitle, { color: colors.textSecondary }]} numberOfLines={2}>
+            {ticket.eventTitle}
+          </Text>
+          <View style={styles.pastDetailRow}>
+            <Calendar size={12} color={colors.textSecondary} />
+            <Text style={[styles.pastDetailText, { color: colors.textSecondary }]}>
+              {formatDate(ticket.eventDate)}
+            </Text>
+          </View>
+          <View style={styles.pastDetailRow}>
+            <MapPin size={12} color={colors.textSecondary} />
+            <Text style={[styles.pastDetailText, { color: colors.textSecondary }]} numberOfLines={1}>
+              {ticket.venue}
+            </Text>
+          </View>
+        </View>
+      </View>
     </TouchableOpacity>
   );
 
   const currentTickets = selectedTab === 'upcoming' ? upcomingTickets : pastTickets;
+  const comingTickets = upcomingTickets.slice(1);
 
   return (
     <View style={[styles.container, { paddingTop: insets.top, backgroundColor: colors.background }]}>
-      <View style={styles.ticketHeader}>
-        <Text style={[styles.ticketHeaderTitle, { color: colors.text }]}>Os Meus Bilhetes</Text>
-        <Text style={[styles.ticketHeaderSubtitle, { color: colors.textSecondary }]}>
-          {userTickets.length} {userTickets.length === 1 ? 'bilhete' : 'bilhetes'}
-        </Text>
+      <View style={[styles.header, { backgroundColor: colors.background }]}>
+        <Text style={[styles.headerTitle, { color: colors.text }]}>Ingressos</Text>
       </View>
 
-      <View style={styles.ticketTabContainer}>
-        <TabButton tab="upcoming" title="Próximos" count={upcomingTickets.length} />
-        <TabButton tab="past" title="Passados" count={pastTickets.length} />
+      <View style={[styles.tabContainer, { backgroundColor: colors.background }]}>
+        <TouchableOpacity
+          style={[
+            styles.tab,
+            selectedTab === 'upcoming' && [styles.tabActive, { borderBottomColor: colors.primary }]
+          ]}
+          onPress={() => setSelectedTab('upcoming')}
+        >
+          <Text style={[
+            styles.tabText,
+            { color: selectedTab === 'upcoming' ? colors.text : colors.textSecondary }
+          ]}>
+            Próximos
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.tab,
+            selectedTab === 'past' && [styles.tabActive, { borderBottomColor: colors.primary }]
+          ]}
+          onPress={() => setSelectedTab('past')}
+        >
+          <Text style={[
+            styles.tabText,
+            { color: selectedTab === 'past' ? colors.text : colors.textSecondary }
+          ]}>
+            Passado
+          </Text>
+        </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        <View style={styles.ticketsContent}>
-          {currentTickets.length > 0 ? (
-            currentTickets.map(ticket => (
-              <TicketCard key={ticket.id} ticket={ticket} />
-            ))
-          ) : (
-            <View style={styles.emptyState}>
-              <Calendar size={64} color={colors.textSecondary} />
-              <Text style={[styles.emptyTicketsTitle, { color: colors.text }]}>
-                {selectedTab === 'upcoming' ? 'Nenhum bilhete próximo' : 'Nenhum bilhete passado'}
-              </Text>
-              <Text style={[styles.emptyTicketsSubtitle, { color: colors.textSecondary }]}>
-                {selectedTab === 'upcoming'
-                  ? 'Explora eventos e compra os teus bilhetes'
-                  : 'Os teus bilhetes usados aparecerão aqui'}
-              </Text>
-              {selectedTab === 'upcoming' && (
+        {selectedTab === 'upcoming' ? (
+          <View style={styles.content}>
+            {upcomingTickets.length > 0 && <UpcomingTicketCard ticket={upcomingTickets[0]} />}
+            
+            {comingTickets.length > 0 && (
+              <>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>Chegando</Text>
+                {comingTickets.map(ticket => (
+                  <ComingTicketCard key={ticket.id} ticket={ticket} />
+                ))}
+              </>
+            )}
+
+            {upcomingTickets.length === 0 && (
+              <View style={styles.emptyState}>
+                <Calendar size={64} color={colors.textSecondary} />
+                <Text style={[styles.emptyTitle, { color: colors.text }]}>Nenhum ingresso próximo</Text>
+                <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
+                  Explore eventos e compre seus ingressos
+                </Text>
                 <TouchableOpacity
                   style={[styles.exploreButton, { backgroundColor: colors.primary }]}
                   onPress={() => router.push('/(tabs)')}
                 >
-                  <Text style={[styles.exploreButtonText, { color: colors.white }]}>Explorar Eventos</Text>
+                  <Text style={styles.exploreButtonText}>Explorar Eventos</Text>
                 </TouchableOpacity>
-              )}
-            </View>
-          )}
-        </View>
+              </View>
+            )}
+          </View>
+        ) : (
+          <View style={styles.content}>
+            {pastTickets.length > 0 ? (
+              pastTickets.map(ticket => (
+                <PastTicketCard key={ticket.id} ticket={ticket} />
+              ))
+            ) : (
+              <View style={styles.emptyState}>
+                <Calendar size={64} color={colors.textSecondary} />
+                <Text style={[styles.emptyTitle, { color: colors.text }]}>Nenhum ingresso passado</Text>
+                <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
+                  Seus ingressos usados aparecerão aqui
+                </Text>
+              </View>
+            )}
+          </View>
+        )}
       </ScrollView>
     </View>
   );
@@ -286,38 +408,6 @@ function AdminApprovalsContent() {
       submittedAt: '2024-01-15T10:30:00Z',
       status: 'pending'
     },
-    {
-      id: '2',
-      promoterId: 'p2',
-      promoterName: 'Maria Santos',
-      eventId: 'e2',
-      eventTitle: 'Concerto de Jazz',
-      eventDate: '2024-06-20',
-      eventLocation: 'Porto',
-      adType: 'banner',
-      price: 75,
-      duration: 3,
-      imageUrl: 'https://images.unsplash.com/photo-1415201364774-f6f0bb35f28f?w=400',
-      description: 'Noite especial de jazz com músicos locais',
-      submittedAt: '2024-01-14T15:45:00Z',
-      status: 'pending'
-    },
-    {
-      id: '3',
-      promoterId: 'p3',
-      promoterName: 'Carlos Oliveira',
-      eventId: 'e3',
-      eventTitle: 'Teatro Clássico',
-      eventDate: '2024-08-10',
-      eventLocation: 'Coimbra',
-      adType: 'spotlight',
-      price: 200,
-      duration: 10,
-      imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400',
-      description: 'Peça clássica interpretada por companhia local',
-      submittedAt: '2024-01-13T09:15:00Z',
-      status: 'pending'
-    }
   ]);
 
   const getAdTypeLabel = (type: string) => {
@@ -448,67 +538,16 @@ function AdminApprovalsContent() {
           </TouchableOpacity>
         </View>
       )}
-
-      {ad.status !== 'pending' && (
-        <View style={[
-          styles.statusBadge,
-          { backgroundColor: ad.status === 'approved' ? colors.success + '20' : colors.error + '20' }
-        ]}>
-          <Text style={[
-            styles.statusText,
-            { color: ad.status === 'approved' ? colors.success : colors.error }
-          ]}>
-            {ad.status === 'approved' ? 'Aprovada' : 'Rejeitada'}
-          </Text>
-        </View>
-      )}
     </View>
   );
-
-  const pendingCount = pendingAds.filter(ad => ad.status === 'pending').length;
-  const approvedCount = pendingAds.filter(ad => ad.status === 'approved').length;
-  const rejectedCount = pendingAds.filter(ad => ad.status === 'rejected').length;
 
   return (
     <View style={[styles.container, { paddingTop: insets.top, backgroundColor: colors.background }]}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        <View style={styles.content}>
-          <View style={[styles.statsContainer, { backgroundColor: colors.card }]}>
-            <View style={styles.statItem}>
-              <Text style={[styles.statValue, { color: colors.primary }]}>{pendingCount}</Text>
-              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Pendentes</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={[styles.statValue, { color: colors.success }]}>{approvedCount}</Text>
-              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Aprovadas</Text>
-            </View>
-            <View style={styles.statItem}>
-              <Text style={[styles.statValue, { color: colors.error }]}>{rejectedCount}</Text>
-              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Rejeitadas</Text>
-            </View>
-          </View>
-
-          <View style={styles.section}>
-            <Text style={[styles.sectionTitle, { color: colors.text }]}>Publicidades Pendentes</Text>
-            {pendingAds.filter(ad => ad.status === 'pending').map(ad => (
-              <AdCard key={ad.id} ad={ad} />
-            ))}
-            {pendingCount === 0 && (
-              <View style={styles.emptyState}>
-                <Eye size={48} color={colors.textSecondary} />
-                <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>Nenhuma publicidade pendente</Text>
-              </View>
-            )}
-          </View>
-
-          {(approvedCount > 0 || rejectedCount > 0) && (
-            <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>Decisões Recentes</Text>
-              {pendingAds.filter(ad => ad.status !== 'pending').map(ad => (
-                <AdCard key={ad.id} ad={ad} />
-              ))}
-            </View>
-          )}
+        <View style={styles.adminContent}>
+          {pendingAds.map(ad => (
+            <AdCard key={ad.id} ad={ad} />
+          ))}
         </View>
       </ScrollView>
     </View>
@@ -526,7 +565,32 @@ export default function TicketsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+  },
+  header: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+  },
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: '700' as const,
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E0E0E0',
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  tabActive: {
+    borderBottomWidth: 3,
+  },
+  tabText: {
+    fontSize: 16,
+    fontWeight: '600' as const,
   },
   scrollView: {
     flex: 1,
@@ -534,43 +598,247 @@ const styles = StyleSheet.create({
   content: {
     padding: 20,
   },
-  statsContainer: {
-    flexDirection: 'row',
-    backgroundColor: COLORS.white,
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 20,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  statItem: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  statValue: {
-    fontSize: 24,
-    fontWeight: 'bold' as const,
-    color: COLORS.primary,
-    marginBottom: 5,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-  },
-  section: {
+  upcomingCard: {
     marginBottom: 30,
   },
-  sectionTitle: {
+  upcomingCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  dateTimeContainer: {
+    flex: 1,
+  },
+  dateMonth: {
+    fontSize: 14,
+    fontWeight: '400' as const,
+  },
+  dateTime: {
+    fontSize: 14,
+    fontWeight: '400' as const,
+  },
+  qrContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  qrCount: {
     fontSize: 20,
-    fontWeight: 'bold' as const,
-    color: COLORS.text,
-    marginBottom: 15,
+    fontWeight: '600' as const,
+  },
+  qrIcon: {
+    width: 28,
+    height: 28,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 2,
+  },
+  qrSquare: {
+    width: 12,
+    height: 12,
+    borderWidth: 2,
+    borderRadius: 2,
+  },
+  upcomingTitle: {
+    fontSize: 24,
+    fontWeight: '700' as const,
+    marginBottom: 4,
+  },
+  upcomingVenue: {
+    fontSize: 14,
+    marginBottom: 16,
+  },
+  upcomingImage: {
+    width: '100%',
+    height: 220,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  friendsContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: 'rgba(0, 0, 0, 0.03)',
+    borderRadius: 100,
+    gap: 12,
+  },
+  friendsAvatars: {
+    flexDirection: 'row',
+  },
+  friendAvatar: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  friendsText: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: '500' as const,
+  },
+  qrCodeContainer: {
+    marginTop: 16,
+    padding: 20,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  qrCodeText: {
+    marginTop: 12,
+    fontSize: 12,
+    fontWeight: '500' as const,
+  },
+  sectionTitle: {
+    fontSize: 24,
+    fontWeight: '700' as const,
+    marginTop: 20,
+    marginBottom: 16,
+  },
+  comingCard: {
+    marginBottom: 20,
+  },
+  comingCardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+    marginBottom: 12,
+  },
+  comingDateContainer: {
+    flex: 1,
+  },
+  comingMonth: {
+    fontSize: 14,
+    fontWeight: '400' as const,
+  },
+  comingTime: {
+    fontSize: 14,
+    fontWeight: '400' as const,
+  },
+  comingQrContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  comingQrCount: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+  },
+  comingQrIcon: {
+    width: 24,
+    height: 24,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 2,
+  },
+  comingContent: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 8,
+  },
+  comingThumbnail: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    overflow: 'hidden',
+  },
+  comingThumbnailImage: {
+    width: '100%',
+    height: '100%',
+  },
+  comingInfo: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  comingTitle: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+    marginBottom: 4,
+  },
+  comingVenue: {
+    fontSize: 14,
+  },
+  comingFriends: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 4,
+  },
+  comingFriendIcon: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  comingFriendsText: {
+    fontSize: 12,
+  },
+  pastCard: {
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 12,
+    marginBottom: 12,
+  },
+  pastContent: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  pastImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+  },
+  pastInfo: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  pastTitle: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    marginBottom: 6,
+  },
+  pastDetailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 2,
+  },
+  pastDetailText: {
+    fontSize: 12,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 60,
+  },
+  emptyTitle: {
+    fontSize: 20,
+    fontWeight: '700' as const,
+    marginTop: 16,
+    textAlign: 'center',
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    marginTop: 8,
+    textAlign: 'center',
+    lineHeight: 20,
+  },
+  exploreButton: {
+    marginTop: 20,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 100,
+  },
+  exploreButtonText: {
+    color: '#FFFFFF',
+    fontSize: 15,
+    fontWeight: '600' as const,
+  },
+  adminContent: {
+    padding: 20,
   },
   adCard: {
-    backgroundColor: COLORS.white,
     borderRadius: 12,
     padding: 15,
     marginBottom: 15,
@@ -592,7 +860,6 @@ const styles = StyleSheet.create({
   eventTitle: {
     fontSize: 18,
     fontWeight: 'bold' as const,
-    color: COLORS.text,
     marginBottom: 5,
   },
   adTypeBadge: {
@@ -608,7 +875,6 @@ const styles = StyleSheet.create({
   priceText: {
     fontSize: 20,
     fontWeight: 'bold' as const,
-    color: COLORS.success,
   },
   adImage: {
     width: '100%',
@@ -626,24 +892,20 @@ const styles = StyleSheet.create({
   },
   detailText: {
     fontSize: 14,
-    color: COLORS.textSecondary,
     marginLeft: 8,
   },
   description: {
     fontSize: 14,
-    color: COLORS.text,
     lineHeight: 20,
     marginBottom: 10,
   },
   submissionInfo: {
     borderTopWidth: 1,
-    borderTopColor: COLORS.border,
     paddingTop: 10,
     marginBottom: 15,
   },
   submissionText: {
     fontSize: 12,
-    color: COLORS.textSecondary,
     fontStyle: 'italic' as const,
   },
   actionButtons: {
@@ -659,192 +921,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     gap: 8,
   },
-  rejectButton: {
-    backgroundColor: COLORS.error,
-  },
-  approveButton: {
-    backgroundColor: COLORS.success,
-  },
   actionButtonText: {
-    color: COLORS.white,
     fontSize: 16,
     fontWeight: 'bold' as const,
-  },
-  statusBadge: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  statusText: {
-    fontSize: 14,
-    fontWeight: 'bold' as const,
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: 40,
-  },
-  emptyStateText: {
-    fontSize: 16,
-    color: COLORS.textSecondary,
-    marginTop: 10,
-  },
-  ticketHeader: {
-    padding: 20,
-    paddingBottom: 10,
-  },
-  ticketHeaderTitle: {
-    fontSize: 28,
-    fontWeight: 'bold' as const,
-    color: COLORS.text,
-    marginBottom: 4,
-  },
-  ticketHeaderSubtitle: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-  },
-  ticketTabContainer: {
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-    paddingBottom: 15,
-    gap: 10,
-  },
-  ticketTabButton: {
-    flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    backgroundColor: COLORS.border,
-    alignItems: 'center',
-  },
-  ticketTabButtonActive: {
-    backgroundColor: COLORS.primary,
-  },
-  ticketTabText: {
-    fontSize: 15,
-    color: COLORS.textSecondary,
-    fontWeight: '500' as const,
-  },
-  ticketTabTextActive: {
-    color: COLORS.white,
-    fontWeight: '600' as const,
-  },
-  ticketsContent: {
-    padding: 20,
-  },
-  ticketCard: {
-    backgroundColor: COLORS.white,
-    borderRadius: 12,
-    marginBottom: 15,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  ticketImage: {
-    width: '100%',
-    height: 150,
-    resizeMode: 'cover',
-  },
-  ticketContent: {
-    padding: 15,
-  },
-  ticketTitle: {
-    fontSize: 18,
-    fontWeight: 'bold' as const,
-    color: COLORS.text,
-    flex: 1,
-    marginRight: 10,
-  },
-  usedBadge: {
-    backgroundColor: COLORS.textSecondary,
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 4,
-  },
-  usedBadgeText: {
-    color: COLORS.white,
-    fontSize: 11,
-    fontWeight: '600' as const,
-  },
-  ticketDetails: {
-    marginBottom: 12,
-    gap: 6,
-  },
-  ticketDetailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  ticketDetailText: {
-    fontSize: 13,
-    color: COLORS.textSecondary,
-    flex: 1,
-  },
-  ticketFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
-    marginBottom: 12,
-  },
-  ticketType: {
-    fontSize: 14,
-    fontWeight: '600' as const,
-    color: COLORS.text,
-  },
-  ticketQuantity: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
-    marginTop: 2,
-  },
-  ticketPrice: {
-    fontSize: 20,
-    fontWeight: 'bold' as const,
-    color: COLORS.primary,
-  },
-  viewQRButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: COLORS.primary,
-    paddingVertical: 12,
-    borderRadius: 8,
-    gap: 8,
-  },
-  viewQRButtonText: {
-    color: COLORS.white,
-    fontSize: 15,
-    fontWeight: '600' as const,
-  },
-  emptyTicketsTitle: {
-    fontSize: 20,
-    fontWeight: 'bold' as const,
-    color: COLORS.text,
-    marginTop: 16,
-    textAlign: 'center',
-  },
-  emptyTicketsSubtitle: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
-    marginTop: 8,
-    textAlign: 'center',
-    lineHeight: 20,
-  },
-  exploreButton: {
-    marginTop: 20,
-    backgroundColor: COLORS.primary,
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  exploreButtonText: {
-    color: COLORS.white,
-    fontSize: 15,
-    fontWeight: '600' as const,
   },
 });
