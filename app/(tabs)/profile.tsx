@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Alert,
   Image,
+  Switch,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
@@ -22,13 +23,17 @@ import {
   Users,
   Eye,
   Euro,
+  Moon,
+  Sun,
 } from 'lucide-react-native';
 import { useUser } from '@/hooks/user-context';
+import { useTheme } from '@/hooks/theme-context';
 import { router } from 'expo-router';
 import { COLORS } from '@/constants/colors';
 
 export default function ProfileScreen() {
   const { user, logout } = useUser();
+  const { theme, isDark, changeTheme } = useTheme();
   const insets = useSafeAreaInsets();
   const [tapCount, setTapCount] = useState(0);
   const tapTimeoutRef = useRef<number | null>(null);
@@ -271,6 +276,23 @@ export default function ProfileScreen() {
         title="Histórico"
         onPress={() => Alert.alert('Histórico', 'Funcionalidade em desenvolvimento')}
       />
+
+      <View style={styles.themeMenuItem}>
+        <View style={styles.themeLeft}>
+          {isDark ? (
+            <Moon size={20} color={COLORS.text} />
+          ) : (
+            <Sun size={20} color={COLORS.text} />
+          )}
+          <Text style={styles.menuText}>Modo Noturno</Text>
+        </View>
+        <Switch
+          value={theme === 'dark' || (theme === 'system' && isDark)}
+          onValueChange={(value) => changeTheme(value ? 'dark' : 'light')}
+          trackColor={{ false: '#767577', true: COLORS.primary }}
+          thumbColor={isDark ? '#fff' : '#f4f3f4'}
+        />
+      </View>
       
       <View style={styles.separator} />
     </>
@@ -380,6 +402,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 16,
     fontWeight: '500' as const,
+  },
+  themeMenuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+  },
+  themeLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
   },
   separator: {
     height: 1,
