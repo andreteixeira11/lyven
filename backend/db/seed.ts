@@ -1,5 +1,5 @@
 import { db } from './index';
-import { promoters, events, users, promoterAuth, promoterProfiles } from './schema';
+import { promoters, events, users, promoterAuth, promoterProfiles, following } from './schema';
 import { mockEvents } from '@/mocks/events';
 
 export async function seedDatabase() {
@@ -488,5 +488,69 @@ export async function seedDatabase() {
   }
   console.log('✅ Demo events seeded');
 
+  const testUser = {
+    id: 'user-teste-app',
+    name: 'João Silva',
+    email: 'joao@teste.com',
+    userType: 'normal' as const,
+    interests: JSON.stringify(['music', 'festivals', 'dance']),
+    locationLatitude: 38.7223,
+    locationLongitude: -9.1393,
+    locationCity: 'Lisboa',
+    locationRegion: 'Lisboa',
+    preferencesNotifications: true,
+    preferencesLanguage: 'pt' as const,
+    preferencesPriceMin: 0,
+    preferencesPriceMax: 200,
+    preferencesEventTypes: JSON.stringify(['music', 'festivals', 'dance']),
+    isOnboardingComplete: true,
+  };
+
+  try {
+    await db.insert(users).values(testUser).onConflictDoUpdate({
+      target: users.email,
+      set: testUser,
+    });
+    console.log('✅ Test user created/updated:', testUser.email);
+  } catch (error) {
+    console.error('❌ Error creating test user:', error);
+  }
+
+  const testFollows = [
+    {
+      id: 'follow-1',
+      userId: testUser.id,
+      promoterId: 'p1',
+      artistId: null,
+      friendId: null,
+    },
+    {
+      id: 'follow-2',
+      userId: testUser.id,
+      promoterId: 'p2',
+      artistId: null,
+      friendId: null,
+    },
+    {
+      id: 'follow-3',
+      userId: testUser.id,
+      promoterId: 'p5',
+      artistId: null,
+      friendId: null,
+    },
+  ];
+
+  for (const follow of testFollows) {
+    try {
+      await db.insert(following).values(follow).onConflictDoNothing();
+    } catch (error) {
+      console.log('Follow já existe ou erro:', follow.id);
+    }
+  }
+  console.log('✅ Test user follows seeded');
+
   console.log('🎉 Database seeding completed!');
+  console.log('\n📝 Test credentials:');
+  console.log('Test User: joao@teste.com');
+  console.log('This user follows promoters: Live Nation Portugal, Everything is New, Porto Music Events');
 }

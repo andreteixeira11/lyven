@@ -4,6 +4,7 @@ import { cors } from "hono/cors";
 import { appRouter } from "./trpc/app-router";
 import { createContext } from "./trpc/create-context";
 import { initDatabase } from "./db/init";
+import { seedDatabase } from "./db/seed";
 
 console.log('🚀 Initializing backend server...');
 
@@ -102,6 +103,18 @@ app.post("/api/test-login", async (c) => {
   } catch (error) {
     console.error('❌ [TEST] Erro:', error);
     return c.json({ error: 'Failed to parse body' }, 400);
+  }
+});
+
+app.post("/seed", async (c) => {
+  console.log('🌱 Seed endpoint accessed');
+  try {
+    await seedDatabase();
+    console.log('✅ Database seeded successfully');
+    return c.text('Database seeded successfully!');
+  } catch (error) {
+    console.error('❌ Seed error:', error);
+    return c.json({ error: error instanceof Error ? error.message : String(error) }, 500);
   }
 });
 

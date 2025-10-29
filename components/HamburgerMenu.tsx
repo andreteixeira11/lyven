@@ -16,6 +16,7 @@ import {
   Bell,
   HelpCircle,
   X,
+  TestTube,
 } from 'lucide-react-native';
 import { useUser } from '@/hooks/user-context';
 import { router } from 'expo-router';
@@ -90,6 +91,29 @@ export default function HamburgerMenu({ visible, onClose }: HamburgerMenuProps) 
     </>
   );
 
+  const renderDevelopmentMenuItems = () => (
+    <>
+      <Text style={styles.sectionTitle}>Desenvolvimento</Text>
+      <TouchableOpacity
+        style={styles.menuItem}
+        onPress={() => handleMenuItemPress('/test-seed')}
+      >
+        <TestTube size={20} color={COLORS.white} />
+        <Text style={styles.menuText}>Testar Seed</Text>
+      </TouchableOpacity>
+      
+      <TouchableOpacity
+        style={styles.menuItem}
+        onPress={() => handleMenuItemPress('/login-teste')}
+      >
+        <User size={20} color={COLORS.white} />
+        <Text style={styles.menuText}>Login de Teste</Text>
+      </TouchableOpacity>
+      
+      <View style={styles.separator} />
+    </>
+  );
+
   const renderCommonMenuItems = () => (
     <>
       <TouchableOpacity
@@ -150,6 +174,7 @@ export default function HamburgerMenu({ visible, onClose }: HamburgerMenuProps) 
             
             <View style={styles.menuItems}>
               {renderUserMenuItems()}
+              {renderDevelopmentMenuItems()}
               {renderCommonMenuItems()}
             </View>
           </TouchableOpacity>
@@ -272,5 +297,14 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginLeft: 16,
     fontWeight: 'bold' as const,
+  },
+  sectionTitle: {
+    color: COLORS.textSecondary,
+    fontSize: 12,
+    fontWeight: '600' as const,
+    marginLeft: 20,
+    marginTop: 12,
+    marginBottom: 8,
+    textTransform: 'uppercase' as const,
   },
 });
