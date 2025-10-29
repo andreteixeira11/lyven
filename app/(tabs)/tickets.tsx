@@ -109,6 +109,21 @@ function NormalUserTicketsContent() {
       qrCode: 'QR789012',
       isUsed: false,
     },
+    {
+      id: 't3',
+      eventId: '3',
+      eventTitle: 'The Weeknd - After Hours Tour',
+      eventImage: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800',
+      eventDate: '2025-03-20T22:00:00',
+      venue: 'MEO Arena',
+      city: 'Lisboa',
+      ticketType: 'VIP',
+      quantity: 2,
+      totalPrice: 180,
+      purchaseDate: '2025-01-15T16:45:00',
+      qrCode: 'QR345678',
+      isUsed: false,
+    },
   ]);
 
   const now = new Date();
