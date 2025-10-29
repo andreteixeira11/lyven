@@ -280,7 +280,7 @@ export default function EventDetailScreen() {
         <View style={styles.heroContainer}>
           <Image source={{ uri: event.image }} style={styles.heroImage} />
           <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.6)']}
+            colors={['transparent', 'rgba(0,0,0,0.8)']}
             style={styles.heroGradient}
           />
           
@@ -307,19 +307,26 @@ export default function EventDetailScreen() {
               </TouchableOpacity>
             </View>
           </SafeAreaView>
+          
+          {/* Title and Date Overlay */}
+          <View style={styles.heroOverlay}>
+            <Text style={styles.heroTitle}>{event.title}</Text>
+            <View style={styles.heroDateRow}>
+              <Calendar size={16} color="#fff" />
+              <Text style={styles.heroDate}>{formatDate(event.date)}</Text>
+            </View>
+          </View>
         </View>
 
         {/* Content */}
         <View style={[styles.content, { backgroundColor: colors.background }]}>
-          {/* Title and Category */}
-          <View style={styles.titleSection}>
-            <Text style={[styles.title, { color: colors.primary }]}>{event.title}</Text>
-            {event.isSoldOut && (
+          {event.isSoldOut && (
+            <View style={styles.titleSection}>
               <View style={[styles.soldOutBadge, { backgroundColor: colors.primary }]}>
                 <Text style={styles.soldOutText}>ESGOTADO</Text>
               </View>
-            )}
-          </View>
+            </View>
+          )}
 
           {/* Artists */}
           {event.artists.length > 1 && (
@@ -336,14 +343,6 @@ export default function EventDetailScreen() {
 
           {/* Event Info */}
           <View style={[styles.infoSection, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <View style={styles.infoItem}>
-              <Calendar size={20} color={colors.primary} />
-              <View style={styles.infoContent}>
-                <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Data e Hora</Text>
-                <Text style={[styles.infoText, { color: colors.text }]}>{formatDate(event.date)}</Text>
-              </View>
-            </View>
-            
             <View style={styles.infoItem}>
               <MapPin size={20} color={colors.primary} />
               <View style={styles.infoContent}>
@@ -583,7 +582,34 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    height: 100,
+    height: 150,
+  },
+  heroOverlay: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
+  },
+  heroTitle: {
+    fontSize: 28,
+    fontWeight: 'bold' as const,
+    color: '#fff',
+    marginBottom: 8,
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 8,
+  },
+  heroDateRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  heroDate: {
+    fontSize: 14,
+    color: '#fff',
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 4,
   },
   headerActions: {
     position: 'absolute',
