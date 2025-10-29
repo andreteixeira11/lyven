@@ -9,6 +9,7 @@ import { useFavorites } from "@/hooks/favorites-context";
 import { useCalendar } from "@/hooks/calendar-context";
 import { shareEvent as shareEventUtil } from '@/lib/share-utils';
 import * as Haptics from 'expo-haptics';
+import { useTheme } from '@/hooks/theme-context';
 
 const { height } = Dimensions.get('window');
 
@@ -18,6 +19,7 @@ export default function EventDetailScreen() {
   const { addToCart } = useCart();
   const { isFavorite, addToFavorites, removeFromFavorites } = useFavorites();
   const { addToCalendar, setReminder, hasReminder, isEventInCalendar } = useCalendar();
+  const { colors, isDark } = useTheme();
   const [selectedTickets, setSelectedTickets] = useState<{ [key: string]: number }>({});
   const [isLiked, setIsLiked] = useState(false);
 
@@ -30,8 +32,8 @@ export default function EventDetailScreen() {
 
   if (!event) {
     return (
-      <View style={styles.container}>
-        <Text style={styles.errorText}>Evento não encontrado</Text>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <Text style={[styles.errorText, { color: colors.text }]}>Evento não encontrado</Text>
       </View>
     );
   }
@@ -261,7 +263,7 @@ export default function EventDetailScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Stack.Screen options={{ headerShown: false }} />
       <ScrollView showsVerticalScrollIndicator={false} bounces={false}>
         {/* Hero Image */}
@@ -298,12 +300,12 @@ export default function EventDetailScreen() {
         </View>
 
         {/* Content */}
-        <View style={styles.content}>
+        <View style={[styles.content, { backgroundColor: colors.background }]}>
           {/* Title and Category */}
           <View style={styles.titleSection}>
-            <Text style={styles.title}>{event.title}</Text>
+            <Text style={[styles.title, { color: colors.primary }]}>{event.title}</Text>
             {event.isSoldOut && (
-              <View style={styles.soldOutBadge}>
+              <View style={[styles.soldOutBadge, { backgroundColor: colors.primary }]}>
                 <Text style={styles.soldOutText}>ESGOTADO</Text>
               </View>
             )}
@@ -312,40 +314,40 @@ export default function EventDetailScreen() {
           {/* Artists */}
           {event.artists.length > 1 && (
             <View style={styles.artistsSection}>
-              <Text style={styles.sectionTitle}>Artistas</Text>
+              <Text style={[styles.sectionTitle, { color: colors.primary }]}>Artistas</Text>
               {event.artists.map(artist => (
                 <View key={artist.id} style={styles.artistItem}>
-                  <Text style={styles.artistName}>{artist.name}</Text>
-                  <Text style={styles.artistGenre}>{artist.genre}</Text>
+                  <Text style={[styles.artistName, { color: colors.text }]}>{artist.name}</Text>
+                  <Text style={[styles.artistGenre, { color: colors.textSecondary }]}>{artist.genre}</Text>
                 </View>
               ))}
             </View>
           )}
 
           {/* Event Info */}
-          <View style={styles.infoSection}>
+          <View style={[styles.infoSection, { backgroundColor: colors.card, borderColor: colors.border }]}>
             <View style={styles.infoItem}>
-              <Calendar size={20} color="#0099a8" />
+              <Calendar size={20} color={colors.primary} />
               <View style={styles.infoContent}>
-                <Text style={styles.infoLabel}>Data e Hora</Text>
-                <Text style={styles.infoText}>{formatDate(event.date)}</Text>
+                <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Data e Hora</Text>
+                <Text style={[styles.infoText, { color: colors.text }]}>{formatDate(event.date)}</Text>
               </View>
             </View>
             
             <View style={styles.infoItem}>
-              <MapPin size={20} color="#0099a8" />
+              <MapPin size={20} color={colors.primary} />
               <View style={styles.infoContent}>
-                <Text style={styles.infoLabel}>Local</Text>
-                <Text style={styles.infoText}>{event.venue.name}</Text>
-                <Text style={styles.infoSubtext}>{event.venue.address}, {event.venue.city}</Text>
+                <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Local</Text>
+                <Text style={[styles.infoText, { color: colors.text }]}>{event.venue.name}</Text>
+                <Text style={[styles.infoSubtext, { color: colors.textSecondary }]}>{event.venue.address}, {event.venue.city}</Text>
               </View>
             </View>
             
             <View style={styles.infoItem}>
-              <Users size={20} color="#0099a8" />
+              <Users size={20} color={colors.primary} />
               <View style={styles.infoContent}>
-                <Text style={styles.infoLabel}>Capacidade</Text>
-                <Text style={styles.infoText}>{event.venue.capacity} pessoas</Text>
+                <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Capacidade</Text>
+                <Text style={[styles.infoText, { color: colors.text }]}>{event.venue.capacity} pessoas</Text>
               </View>
             </View>
           </View>
@@ -355,13 +357,15 @@ export default function EventDetailScreen() {
             <TouchableOpacity 
               style={[
                 styles.quickActionButton,
-                isEventInCalendar(event.id) && styles.quickActionButtonActive
+                { backgroundColor: colors.background, borderColor: colors.primary },
+                isEventInCalendar(event.id) && { ...styles.quickActionButtonActive, backgroundColor: colors.primary, borderColor: colors.primary }
               ]}
               onPress={handleAddToCalendar}
             >
-              <Calendar size={20} color={isEventInCalendar(event.id) ? "#fff" : "#0099a8"} />
+              <Calendar size={20} color={isEventInCalendar(event.id) ? "#fff" : colors.primary} />
               <Text style={[
                 styles.quickActionText,
+                { color: isEventInCalendar(event.id) ? "#fff" : colors.primary },
                 isEventInCalendar(event.id) && styles.quickActionTextActive
               ]}>
                 {isEventInCalendar(event.id) ? 'No Calendário' : 'Adicionar ao Calendário'}
@@ -371,13 +375,15 @@ export default function EventDetailScreen() {
             <TouchableOpacity 
               style={[
                 styles.quickActionButton,
-                hasReminder(event.id) && styles.quickActionButtonActive
+                { backgroundColor: colors.background, borderColor: colors.primary },
+                hasReminder(event.id) && { ...styles.quickActionButtonActive, backgroundColor: colors.primary, borderColor: colors.primary }
               ]}
               onPress={handleSetReminder}
             >
-              <Bell size={20} color={hasReminder(event.id) ? "#fff" : "#0099a8"} />
+              <Bell size={20} color={hasReminder(event.id) ? "#fff" : colors.primary} />
               <Text style={[
                 styles.quickActionText,
+                { color: hasReminder(event.id) ? "#fff" : colors.primary },
                 hasReminder(event.id) && styles.quickActionTextActive
               ]}>
                 {hasReminder(event.id) ? 'Lembrete Ativo' : 'Definir Lembrete'}
@@ -388,11 +394,11 @@ export default function EventDetailScreen() {
           {/* Social Actions */}
           <View style={styles.socialActionsSection}>
             <TouchableOpacity 
-              style={styles.socialActionButton}
+              style={[styles.socialActionButton, { backgroundColor: colors.background, borderColor: colors.primary }]}
               onPress={handleInviteFriends}
             >
-              <UserPlus size={20} color="#0099a8" />
-              <Text style={styles.socialActionText}>Convidar Amigos</Text>
+              <UserPlus size={20} color={colors.primary} />
+              <Text style={[styles.socialActionText, { color: colors.primary }]}>Convidar Amigos</Text>
             </TouchableOpacity>
           </View>
           
@@ -400,28 +406,28 @@ export default function EventDetailScreen() {
           {event.duration && (
             <View style={styles.detailsSection}>
               <View style={styles.detailItem}>
-                <Clock size={16} color="#999" />
-                <Text style={styles.detailText}>Duração: {event.duration} minutos</Text>
+                <Clock size={16} color={colors.textSecondary} />
+                <Text style={[styles.detailText, { color: colors.textSecondary }]}>Duração: {event.duration} minutos</Text>
               </View>
             </View>
           )}
           
           {/* Promoter Info */}
           <View style={styles.promoterSection}>
-            <Text style={styles.sectionTitle}>Promotor</Text>
-            <View style={styles.promoterCard}>
+            <Text style={[styles.sectionTitle, { color: colors.primary }]}>Promotor</Text>
+            <View style={[styles.promoterCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
               <Image source={{ uri: event.promoter.image }} style={styles.promoterImage} />
               <View style={styles.promoterInfo}>
                 <View style={styles.promoterHeader}>
-                  <Text style={styles.promoterName}>{event.promoter.name}</Text>
+                  <Text style={[styles.promoterName, { color: colors.primary }]}>{event.promoter.name}</Text>
                   {event.promoter.verified && (
                     <View style={styles.verifiedBadge}>
                       <Text style={styles.verifiedText}>✓</Text>
                     </View>
                   )}
                 </View>
-                <Text style={styles.promoterDescription}>{event.promoter.description}</Text>
-                <Text style={styles.promoterFollowers}>
+                <Text style={[styles.promoterDescription, { color: colors.textSecondary }]}>{event.promoter.description}</Text>
+                <Text style={[styles.promoterFollowers, { color: colors.textSecondary }]}>
                   {event.promoter.followersCount.toLocaleString()} seguidores
                 </Text>
               </View>
@@ -431,24 +437,24 @@ export default function EventDetailScreen() {
           {/* Social Links */}
           {event.socialLinks && (
             <View style={styles.socialSection}>
-              <Text style={styles.sectionTitle}>Redes Sociais</Text>
+              <Text style={[styles.sectionTitle, { color: colors.primary }]}>Redes Sociais</Text>
               <View style={styles.socialLinks}>
                 {event.socialLinks.instagram && (
-                  <TouchableOpacity style={styles.socialButton}>
+                  <TouchableOpacity style={[styles.socialButton, { backgroundColor: colors.card, borderColor: colors.border }]}>
                     <Instagram size={20} color="#E4405F" />
-                    <Text style={styles.socialButtonText}>Instagram</Text>
+                    <Text style={[styles.socialButtonText, { color: colors.primary }]}>Instagram</Text>
                   </TouchableOpacity>
                 )}
                 {event.socialLinks.facebook && (
-                  <TouchableOpacity style={styles.socialButton}>
+                  <TouchableOpacity style={[styles.socialButton, { backgroundColor: colors.card, borderColor: colors.border }]}>
                     <Facebook size={20} color="#1877F2" />
-                    <Text style={styles.socialButtonText}>Facebook</Text>
+                    <Text style={[styles.socialButtonText, { color: colors.primary }]}>Facebook</Text>
                   </TouchableOpacity>
                 )}
                 {event.socialLinks.website && (
-                  <TouchableOpacity style={styles.socialButton}>
-                    <Globe size={20} color="#999" />
-                    <Text style={styles.socialButtonText}>Website</Text>
+                  <TouchableOpacity style={[styles.socialButton, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                    <Globe size={20} color={colors.textSecondary} />
+                    <Text style={[styles.socialButtonText, { color: colors.primary }]}>Website</Text>
                   </TouchableOpacity>
                 )}
               </View>
@@ -457,11 +463,11 @@ export default function EventDetailScreen() {
           
           {/* Tags */}
           <View style={styles.tagsSection}>
-            <Text style={styles.sectionTitle}>Tags</Text>
+            <Text style={[styles.sectionTitle, { color: colors.primary }]}>Tags</Text>
             <View style={styles.tags}>
               {event.tags.map((tag, index) => (
-                <View key={index} style={styles.tag}>
-                  <Text style={styles.tagText}>#{tag}</Text>
+                <View key={index} style={[styles.tag, { backgroundColor: colors.card, borderColor: colors.primary }]}>
+                  <Text style={[styles.tagText, { color: colors.primary }]}>#{tag}</Text>
                 </View>
               ))}
             </View>
@@ -469,22 +475,22 @@ export default function EventDetailScreen() {
 
           {/* Description */}
           <View style={styles.descriptionSection}>
-            <Text style={styles.sectionTitle}>Sobre o Evento</Text>
-            <Text style={styles.description}>{event.description}</Text>
+            <Text style={[styles.sectionTitle, { color: colors.primary }]}>Sobre o Evento</Text>
+            <Text style={[styles.description, { color: colors.text }]}>{event.description}</Text>
           </View>
 
           {/* Tickets */}
           {!event.isSoldOut && (
             <View style={styles.ticketsSection}>
-              <Text style={styles.sectionTitle}>Ingressos</Text>
+              <Text style={[styles.sectionTitle, { color: colors.primary }]}>Ingressos</Text>
               {event.ticketTypes.map(ticket => (
-                <View key={ticket.id} style={styles.ticketCard}>
+                <View key={ticket.id} style={[styles.ticketCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
                   <View style={styles.ticketInfo}>
-                    <Text style={styles.ticketName}>{ticket.name}</Text>
+                    <Text style={[styles.ticketName, { color: colors.primary }]}>{ticket.name}</Text>
                     {ticket.description && (
-                      <Text style={styles.ticketDescription}>{ticket.description}</Text>
+                      <Text style={[styles.ticketDescription, { color: colors.textSecondary }]}>{ticket.description}</Text>
                     )}
-                    <Text style={styles.ticketPrice}>€{ticket.price}</Text>
+                    <Text style={[styles.ticketPrice, { color: colors.primary }]}>€{ticket.price}</Text>
                     {ticket.available < 50 && (
                       <Text style={styles.ticketAvailable}>
                         Apenas {ticket.available} disponíveis
@@ -494,21 +500,21 @@ export default function EventDetailScreen() {
                   
                   <View style={styles.ticketActions}>
                     {ticket.available === 0 ? (
-                      <Text style={styles.soldOutTicket}>Esgotado</Text>
+                      <Text style={[styles.soldOutTicket, { color: colors.primary }]}>Esgotado</Text>
                     ) : (
-                      <View style={styles.quantitySelector}>
+                      <View style={[styles.quantitySelector, { backgroundColor: colors.background, borderColor: colors.border }]}>
                         <TouchableOpacity 
-                          style={styles.quantityButton}
+                          style={[styles.quantityButton, { backgroundColor: colors.primary }]}
                           onPress={() => handleTicketChange(ticket.id, -1)}
                           disabled={!selectedTickets[ticket.id]}
                         >
                           <Text style={styles.quantityButtonText}>−</Text>
                         </TouchableOpacity>
-                        <Text style={styles.quantityText}>
+                        <Text style={[styles.quantityText, { color: colors.primary }]}>
                           {selectedTickets[ticket.id] || 0}
                         </Text>
                         <TouchableOpacity 
-                          style={styles.quantityButton}
+                          style={[styles.quantityButton, { backgroundColor: colors.primary }]}
                           onPress={() => handleTicketChange(ticket.id, 1)}
                           disabled={selectedTickets[ticket.id] >= ticket.maxPerPerson}
                         >
@@ -526,13 +532,13 @@ export default function EventDetailScreen() {
 
       {/* Footer */}
       {getTotalTickets() > 0 && (
-        <View style={styles.footer}>
+        <View style={[styles.footer, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
           <View style={styles.footerInfo}>
-            <Text style={styles.footerTickets}>{getTotalTickets()} ingresso(s)</Text>
-            <Text style={styles.footerPrice}>€{getTotalPrice()}</Text>
+            <Text style={[styles.footerTickets, { color: colors.textSecondary }]}>{getTotalTickets()} ingresso(s)</Text>
+            <Text style={[styles.footerPrice, { color: colors.primary }]}>€{getTotalPrice()}</Text>
           </View>
           <TouchableOpacity 
-            style={styles.addToCartButton}
+            style={[styles.addToCartButton, { backgroundColor: colors.primary }]}
             onPress={handleAddToCart}
           >
             <Text style={styles.addToCartText}>Adicionar ao Carrinho</Text>

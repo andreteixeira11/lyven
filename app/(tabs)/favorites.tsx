@@ -1,12 +1,14 @@
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'react-native';
-import { Heart, Calendar, Bell, Clock, MapPin, Star, Share2 } from 'lucide-react-native';
+import { Heart, Calendar, Bell, Clock, MapPin, Star, Share2, ChevronLeft } from 'lucide-react-native';
 import { useFavorites } from '@/hooks/favorites-context';
 import { mockEvents } from '@/mocks/events';
-import { router } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import { useMemo } from 'react';
+import { useTheme } from '@/hooks/theme-context';
 
 export default function FavoritesScreen() {
   const { favorites, isFavorite, removeFromFavorites, hasReminder, shareEvent, addToCalendar } = useFavorites();
+  const { colors, isDark } = useTheme();
   
   const favoriteEvents = useMemo(() => {
     return mockEvents.filter(event => isFavorite(event.id));
@@ -57,15 +59,22 @@ export default function FavoritesScreen() {
 
   if (favoriteEvents.length === 0) {
     return (
-      <View style={styles.container}>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <Stack.Screen 
+          options={{
+            title: 'Favoritos',
+            headerStyle: { backgroundColor: colors.background },
+            headerTintColor: colors.text,
+          }} 
+        />
         <View style={styles.emptyState}>
-          <Heart size={64} color="#333" />
-          <Text style={styles.emptyStateTitle}>Nenhum evento favorito</Text>
-          <Text style={styles.emptyStateText}>
+          <Heart size={64} color={colors.textSecondary} />
+          <Text style={[styles.emptyStateTitle, { color: colors.text }]}>Nenhum evento favorito</Text>
+          <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>
             Adicione eventos aos favoritos para os ver aqui e receber lembretes
           </Text>
           <TouchableOpacity 
-            style={styles.exploreButton}
+            style={[styles.exploreButton, { backgroundColor: colors.primary }]}
             onPress={() => router.push('/(tabs)/search')}
           >
             <Text style={styles.exploreButtonText}>Explorar Eventos</Text>
@@ -76,63 +85,76 @@ export default function FavoritesScreen() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <Stack.Screen 
+        options={{
+          title: 'Favoritos',
+          headerStyle: { backgroundColor: colors.background },
+          headerTintColor: colors.text,
+        }} 
+      />
       <ScrollView showsVerticalScrollIndicator={false}>
         {/* Upcoming Events */}
         {upcomingEvents.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Próximos Eventos</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Próximos Eventos</Text>
             {upcomingEvents.map(event => (
               <TouchableOpacity
                 key={event.id}
-                style={styles.eventCard}
+                style={[styles.eventCard, { backgroundColor: colors.card, borderColor: colors.border }]}
                 onPress={() => router.push(`/event/${event.id}`)}
                 activeOpacity={0.9}
               >
                 <Image source={{ uri: event.image }} style={styles.eventImage} />
                 <View style={styles.eventContent}>
                   <View style={styles.eventHeader}>
-                    <Text style={styles.eventTitle}>{event.title}</Text>
+                    <Text style={[styles.eventTitle, { color: colors.text }]} numberOfLines={2}>{event.title}</Text>
                     <View style={styles.eventActions}>
                       {hasReminder(event.id) && (
-                        <Bell size={16} color="#FF385C" fill="#FF385C" />
+                        <Bell size={16} color={colors.notification} fill={colors.notification} />
                       )}
                       <TouchableOpacity onPress={() => handleRemoveFromFavorites(event.id)}>
-                        <Heart size={16} color="#FF385C" fill="#FF385C" />
+                        <Heart size={16} color={colors.notification} fill={colors.notification} />
                       </TouchableOpacity>
                     </View>
                   </View>
                   
                   <View style={styles.eventDetails}>
                     <View style={styles.eventDetailRow}>
-                      <Calendar size={14} color="#999" />
-                      <Text style={styles.eventDetailText}>{formatDate(event.date)}</Text>
+                      <Calendar size={14} color={colors.textSecondary} />
+                      <Text style={[styles.eventDetailText, { color: colors.textSecondary }]} numberOfLines={1}>
+                        {formatDate(event.date)}
+                      </Text>
                     </View>
                     <View style={styles.eventDetailRow}>
-                      <MapPin size={14} color="#999" />
-                      <Text style={styles.eventDetailText}>{event.venue.name}, {event.venue.city}</Text>
+                      <MapPin size={14} color={colors.textSecondary} />
+                      <Text style={[styles.eventDetailText, { color: colors.textSecondary }]} numberOfLines={1}>
+                        {event.venue.name}, {event.venue.city}
+                      </Text>
                     </View>
                     {event.duration && (
                       <View style={styles.eventDetailRow}>
-                        <Clock size={14} color="#999" />
-                        <Text style={styles.eventDetailText}>{event.duration} min</Text>
+                        <Clock size={14} color={colors.textSecondary} />
+                        <Text style={[styles.eventDetailText, { color: colors.textSecondary }]}>
+                          {event.duration} min
+                        </Text>
                       </View>
                     )}
                   </View>
                   
                   <View style={styles.eventFooter}>
-                    <Text style={styles.eventPrice}>
+                    <Text style={[styles.eventPrice, { color: colors.primary }]}>
                       A partir de €{Math.min(...event.ticketTypes.map(t => t.price))}
                     </Text>
                     <View style={styles.eventQuickActions}>
                       <TouchableOpacity 
-                        style={styles.quickAction}
+                        style={[styles.quickAction, { backgroundColor: colors.primary }]}
                         onPress={() => handleAddToCalendar(event.id)}
                       >
                         <Calendar size={16} color="#fff" />
                       </TouchableOpacity>
                       <TouchableOpacity 
-                        style={styles.quickAction}
+                        style={[styles.quickAction, { backgroundColor: colors.primary }]}
                         onPress={() => handleShare(event.id, event.title)}
                       >
                         <Share2 size={16} color="#fff" />
@@ -148,44 +170,46 @@ export default function FavoritesScreen() {
         {/* Past Events */}
         {pastEvents.length > 0 && (
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Eventos Anteriores</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Eventos Anteriores</Text>
             {pastEvents.map(event => (
               <TouchableOpacity
                 key={event.id}
-                style={[styles.eventCard, styles.pastEventCard]}
+                style={[styles.eventCard, styles.pastEventCard, { backgroundColor: colors.card, borderColor: colors.border }]}
                 onPress={() => router.push(`/event/${event.id}`)}
                 activeOpacity={0.9}
               >
                 <Image source={{ uri: event.image }} style={[styles.eventImage, styles.pastEventImage]} />
                 <View style={styles.eventContent}>
                   <View style={styles.eventHeader}>
-                    <Text style={[styles.eventTitle, styles.pastEventTitle]}>{event.title}</Text>
+                    <Text style={[styles.eventTitle, styles.pastEventTitle, { color: colors.textSecondary }]} numberOfLines={2}>
+                      {event.title}
+                    </Text>
                     <TouchableOpacity onPress={() => handleRemoveFromFavorites(event.id)}>
-                      <Heart size={16} color="#666" fill="#666" />
+                      <Heart size={16} color={colors.textSecondary} fill={colors.textSecondary} />
                     </TouchableOpacity>
                   </View>
                   
                   <View style={styles.eventDetails}>
                     <View style={styles.eventDetailRow}>
-                      <Calendar size={14} color="#666" />
-                      <Text style={[styles.eventDetailText, styles.pastEventText]}>
+                      <Calendar size={14} color={colors.textSecondary} />
+                      <Text style={[styles.eventDetailText, styles.pastEventText, { color: colors.textSecondary }]} numberOfLines={1}>
                         {formatDate(event.date)}
                       </Text>
                     </View>
                     <View style={styles.eventDetailRow}>
-                      <MapPin size={14} color="#666" />
-                      <Text style={[styles.eventDetailText, styles.pastEventText]}>
+                      <MapPin size={14} color={colors.textSecondary} />
+                      <Text style={[styles.eventDetailText, styles.pastEventText, { color: colors.textSecondary }]} numberOfLines={1}>
                         {event.venue.name}, {event.venue.city}
                       </Text>
                     </View>
                   </View>
                   
                   <View style={styles.ratingSection}>
-                    <Text style={styles.ratingText}>Como foi o evento?</Text>
+                    <Text style={[styles.ratingText, { color: colors.textSecondary }]}>Como foi o evento?</Text>
                     <View style={styles.stars}>
                       {[1, 2, 3, 4, 5].map(star => (
                         <TouchableOpacity key={star}>
-                          <Star size={20} color="#333" />
+                          <Star size={20} color={colors.textSecondary} />
                         </TouchableOpacity>
                       ))}
                     </View>
@@ -251,13 +275,14 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
     marginBottom: 16,
+    borderWidth: 1,
   },
   pastEventCard: {
     opacity: 0.7,
   },
   eventImage: {
     width: 100,
-    height: 120,
+    height: 140,
   },
   pastEventImage: {
     opacity: 0.6,
@@ -265,6 +290,7 @@ const styles = StyleSheet.create({
   eventContent: {
     flex: 1,
     padding: 12,
+    justifyContent: 'space-between',
   },
   eventHeader: {
     flexDirection: 'row',
@@ -285,19 +311,22 @@ const styles = StyleSheet.create({
   eventActions: {
     flexDirection: 'row',
     gap: 8,
+    alignItems: 'center',
   },
   eventDetails: {
     gap: 4,
-    marginBottom: 12,
+    marginBottom: 8,
   },
   eventDetailRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
+    flex: 1,
   },
   eventDetailText: {
     fontSize: 13,
     color: '#999',
+    flex: 1,
   },
   pastEventText: {
     color: '#666',
