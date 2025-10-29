@@ -99,14 +99,15 @@ export const [ThemeProvider, useTheme] = createContextHook(() => {
     return theme as 'light' | 'dark';
   }, [theme, colorScheme]);
 
-  const isDark = getActiveColorScheme() === 'dark';
-  const colors: ThemeColors = isDark ? darkColors : lightColors;
+  const activeColorScheme = getActiveColorScheme();
+  const isDark = activeColorScheme === 'dark';
+  const colors: ThemeColors = useMemo(() => isDark ? darkColors : lightColors, [isDark]);
 
   return useMemo(() => ({
     theme,
     colors,
     isDark,
     changeTheme,
-    activeColorScheme: getActiveColorScheme(),
-  }), [theme, colors, isDark, changeTheme, getActiveColorScheme]);
+    activeColorScheme,
+  }), [theme, colors, isDark, changeTheme, activeColorScheme]);
 });

@@ -9,6 +9,8 @@ import { FavoritesContext } from "@/hooks/favorites-context";
 import { CalendarProvider } from "@/hooks/calendar-context";
 import { SocialProvider } from "@/hooks/social-context";
 import { NotificationsContext } from "@/hooks/notifications-context";
+import { ThemeProvider } from "@/hooks/theme-context";
+import { OfflineProvider } from "@/hooks/offline-context";
 import { COLORS } from "@/constants/colors";
 import { trpc, trpcReactClient } from "@/lib/trpc";
 
@@ -288,6 +290,13 @@ function RootLayoutNav() {
           presentation: 'card'
         }} 
       />
+      <Stack.Screen 
+        name="theme-settings" 
+        options={{ 
+          title: 'Tema',
+          presentation: 'card'
+        }} 
+      />
     </Stack>
   );
 }
@@ -302,21 +311,25 @@ export default function RootLayout() {
   return (
     <trpc.Provider client={trpcReactClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <UserProvider>
-          <NotificationsContext>
-            <FavoritesContext>
-              <CalendarProvider>
-                <SocialProvider>
-                  <CartProvider>
-                    <GestureHandlerRootView style={styles.container}>
-                      <RootLayoutNav />
-                    </GestureHandlerRootView>
-                  </CartProvider>
-                </SocialProvider>
-              </CalendarProvider>
-            </FavoritesContext>
-          </NotificationsContext>
-        </UserProvider>
+        <ThemeProvider>
+          <OfflineProvider>
+            <UserProvider>
+              <NotificationsContext>
+                <FavoritesContext>
+                  <CalendarProvider>
+                    <SocialProvider>
+                      <CartProvider>
+                        <GestureHandlerRootView style={styles.container}>
+                          <RootLayoutNav />
+                        </GestureHandlerRootView>
+                      </CartProvider>
+                    </SocialProvider>
+                  </CalendarProvider>
+                </FavoritesContext>
+              </NotificationsContext>
+            </UserProvider>
+          </OfflineProvider>
+        </ThemeProvider>
       </QueryClientProvider>
     </trpc.Provider>
   );

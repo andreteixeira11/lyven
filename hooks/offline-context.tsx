@@ -162,6 +162,8 @@ export const [OfflineProvider, useOffline] = createContextHook(() => {
     return Math.round((ticketsSize + eventsSize) / 1024);
   }, [cachedTickets, cachedEvents]);
 
+  const cacheSize = getCacheSize();
+
   return useMemo(() => ({
     isOnline,
     cachedTickets,
@@ -171,7 +173,7 @@ export const [OfflineProvider, useOffline] = createContextHook(() => {
     removeCachedTicket,
     removeCachedEvent,
     clearCache,
-    cacheSize: getCacheSize(),
+    cacheSize,
   }), [
     isOnline,
     cachedTickets,
@@ -181,6 +183,6 @@ export const [OfflineProvider, useOffline] = createContextHook(() => {
     removeCachedTicket,
     removeCachedEvent,
     clearCache,
-    getCacheSize,
+    cacheSize,
   ]);
 });
