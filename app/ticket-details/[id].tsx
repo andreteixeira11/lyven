@@ -27,7 +27,8 @@ import {
   Send,
   Mail,
   X as CloseIcon,
-  RefreshCcw
+  RefreshCcw,
+  Wallet
 } from 'lucide-react-native';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useTheme } from '@/hooks/theme-context';
@@ -375,15 +376,11 @@ export default function TicketDetailsScreen() {
           </View>
 
           <TouchableOpacity 
-            style={[styles.walletButton, { backgroundColor: colors.text }]}
+            style={[styles.walletButton, { backgroundColor: '#000000' }]}
             onPress={handleAddToWallet}
           >
-            <View style={styles.walletIcon}>
-              <View style={[styles.walletCard, { backgroundColor: '#FF6B6B' }]} />
-              <View style={[styles.walletCard, { backgroundColor: '#4ECDC4' }]} />
-              <View style={[styles.walletCard, { backgroundColor: '#95E1D3' }]} />
-            </View>
-            <Text style={[styles.walletButtonText, { color: colors.background }]}>
+            <Wallet size={20} color="#FFFFFF" strokeWidth={2.5} />
+            <Text style={styles.walletButtonText}>
               Adicionar à Apple Wallet
             </Text>
           </TouchableOpacity>
@@ -757,24 +754,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginHorizontal: 32,
-    paddingVertical: 16,
-    borderRadius: 30,
+    paddingVertical: 14,
+    borderRadius: 8,
     marginBottom: 24,
-    gap: 12,
-  },
-  walletIcon: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  walletCard: {
-    width: 20,
-    height: 14,
-    borderRadius: 2,
-    marginLeft: -6,
+    gap: 10,
   },
   walletButtonText: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600' as const,
+    color: '#FFFFFF',
+    letterSpacing: 0.3,
   },
   section: {
     marginHorizontal: 16,
