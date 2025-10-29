@@ -19,6 +19,7 @@ import {
   Clock,
   ChevronRight,
   Users,
+  Ticket,
 } from 'lucide-react-native';
 import { COLORS } from '@/constants/colors';
 import { useUser } from '@/hooks/user-context';
@@ -239,12 +240,7 @@ function NormalUserTicketsContent() {
           onPress={() => setSelectedQRTicket(selectedQRTicket === ticket.id ? null : ticket.id)}
         >
           <Text style={[styles.qrCount, { color: colors.text }]}>{ticket.quantity}</Text>
-          <View style={styles.qrIcon}>
-            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
-            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
-            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
-            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
-          </View>
+          <Ticket size={24} color={colors.text} />
         </TouchableOpacity>
       </View>
 
@@ -298,12 +294,7 @@ function NormalUserTicketsContent() {
         </View>
         <View style={styles.comingQrContainer}>
           <Text style={[styles.comingQrCount, { color: colors.text }]}>{ticket.quantity}</Text>
-          <View style={styles.comingQrIcon}>
-            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
-            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
-            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
-            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
-          </View>
+          <Ticket size={20} color={colors.text} />
         </View>
       </View>
 
