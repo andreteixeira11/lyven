@@ -464,18 +464,6 @@ export default function EventDetailScreen() {
             </View>
           )}
           
-          {/* Tags */}
-          <View style={styles.tagsSection}>
-            <Text style={[styles.sectionTitle, { color: colors.primary }]}>Tags</Text>
-            <View style={styles.tags}>
-              {event.tags.map((tag, index) => (
-                <View key={index} style={[styles.tag, { backgroundColor: colors.card, borderColor: colors.primary }]}>
-                  <Text style={[styles.tagText, { color: colors.primary }]}>#{tag}</Text>
-                </View>
-              ))}
-            </View>
-          </View>
-
           {/* Description */}
           <View style={styles.descriptionSection}>
             <Text style={[styles.sectionTitle, { color: colors.primary }]}>Sobre o Evento</Text>
@@ -844,26 +832,6 @@ const styles = StyleSheet.create({
   },
   socialButtonText: {
     fontSize: 14,
-    color: '#0099a8',
-  },
-  tagsSection: {
-    marginBottom: 24,
-  },
-  tags: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-  },
-  tag: {
-    backgroundColor: '#F0F9FA',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#0099a8',
-  },
-  tagText: {
-    fontSize: 12,
     color: '#0099a8',
   },
   descriptionSection: {
