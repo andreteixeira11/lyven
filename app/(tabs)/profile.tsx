@@ -15,7 +15,7 @@ import {
   Settings,
   LogOut,
   Heart,
-  History,
+
   Shield,
   HelpCircle,
   Calendar,
@@ -268,12 +268,6 @@ export default function ProfileScreen() {
         icon={Heart}
         title="Favoritos"
         onPress={() => handleMenuItemPress('/(tabs)/favorites')}
-      />
-      
-      <MenuItem
-        icon={History}
-        title="Histórico"
-        onPress={() => Alert.alert('Histórico', 'Funcionalidade em desenvolvimento')}
       />
 
       <View style={styles.themeMenuItem}>
