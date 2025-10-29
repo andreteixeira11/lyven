@@ -166,19 +166,42 @@ export default function LoginScreen() {
         }
         
         try {
-          await trpcClient.auth.sendVerificationCode.mutate({
+          console.log('📧 Enviando código de verificação para:', email);
+          
+          const result = await trpcClient.auth.sendVerificationCode.mutate({
             email,
             name,
             password,
           });
+          
+          console.log('✅ Código enviado com sucesso:', result);
           
           router.push({
             pathname: '/verify-email',
             params: { email, name, password },
           });
         } catch (error: any) {
-          console.error('Erro ao enviar código:', error);
-          setErrorMessage(error.message || 'Erro ao enviar código de verificação. Este email pode já estar registado.');
+          console.error('❌ Erro ao enviar código:', error);
+          console.error('❌ Error type:', typeof error);
+          console.error('❌ Error name:', error?.name);
+          console.error('❌ Error message:', error?.message);
+          console.error('❌ Error stack:', error?.stack);
+          
+          let errorMsg = 'Erro ao enviar código de verificação.';
+          
+          if (error?.message) {
+            if (error.message.includes('JSON Parse error') || error.message.includes('Unexpected character')) {
+              errorMsg = 'Erro de conexão com o servidor. Por favor, verifique a sua ligação à internet e tente novamente.';
+            } else {
+              errorMsg = error.message;
+            }
+          } else if (error?.data?.message) {
+            errorMsg = error.data.message;
+          } else if (typeof error === 'string') {
+            errorMsg = error;
+          }
+          
+          setErrorMessage(errorMsg);
         }
       }
     } catch (error) {

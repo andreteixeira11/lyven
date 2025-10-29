@@ -41,7 +41,18 @@ export const trpcClient = createTRPCClient<AppRouter>({
           
           if (!response.ok) {
             const text = await response.clone().text();
-            console.error('❌ Response error body:', text.substring(0, 200));
+            console.error('❌ Response error body:', text.substring(0, 500));
+            
+            if (!contentType?.includes('application/json')) {
+              console.error('❌ Resposta não é JSON! Content-Type:', contentType);
+              throw new Error('O servidor não retornou uma resposta JSON válida. Verifique se o backend está a funcionar corretamente.');
+            }
+          }
+          
+          if (response.ok && contentType && !contentType.includes('application/json')) {
+            const text = await response.clone().text();
+            console.error('❌ Resposta bem-sucedida mas não é JSON:', text.substring(0, 500));
+            throw new Error('O servidor retornou uma resposta inválida.');
           }
           
           return response;

@@ -53,7 +53,7 @@ export const sendVerificationCodeProcedure = publicProcedure
     try {
       const resend = new Resend(RESEND_API_KEY);
       
-      await resend.emails.send({
+      const result = await resend.emails.send({
         from: 'Lyven <noreply@lyven.pt>',
         to: input.email,
         subject: 'Código de Verificação - Lyven',
@@ -88,10 +88,20 @@ export const sendVerificationCodeProcedure = publicProcedure
         `,
       });
       
-      console.log('✅ [VERIFICATION] Email enviado com sucesso');
-    } catch (error) {
+      console.log('✅ [VERIFICATION] Email enviado com sucesso:', result);
+    } catch (error: any) {
       console.error('❌ [VERIFICATION] Erro ao enviar email:', error);
-      throw new Error('Erro ao enviar código de verificação. Por favor, tente novamente.');
+      console.error('❌ [VERIFICATION] Error details:', JSON.stringify(error, null, 2));
+      
+      if (error.statusCode === 422) {
+        throw new Error('Email inválido. Por favor, verifique o endereço de email.');
+      }
+      
+      if (error.statusCode === 429) {
+        throw new Error('Demasiadas tentativas. Por favor, aguarde alguns minutos e tente novamente.');
+      }
+      
+      throw new Error('Erro ao enviar código de verificação. Por favor, tente novamente mais tarde.');
     }
 
     return {
