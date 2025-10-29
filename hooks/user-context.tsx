@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { User, UserType, PromoterProfile } from '@/types/user';
 import { createDefaultUser } from '@/constants/onboarding';
+import { trpcClient } from '@/lib/trpc';
 
 export const [UserProvider, useUser] = createContextHook(() => {
   const [user, setUser] = useState<User | null>(null);
@@ -91,11 +92,34 @@ export const [UserProvider, useUser] = createContextHook(() => {
   const completeOnboarding = useCallback(async (userData: Partial<User>) => {
     if (!user) return;
     
+    console.log('📝 Completando onboarding com dados:', userData);
+    
     const updatedUser = {
       ...user,
       ...userData,
       isOnboardingComplete: true,
     };
+    
+    try {
+      await trpcClient.users.updateOnboarding.mutate({
+        id: user.id,
+        phone: userData.phone,
+        interests: userData.interests,
+        locationCity: userData.locationCity,
+        locationRegion: userData.locationRegion,
+        locationLatitude: userData.location?.latitude,
+        locationLongitude: userData.location?.longitude,
+        preferencesNotifications: userData.preferences?.notifications,
+        preferencesLanguage: userData.preferences?.language,
+        preferencesPriceMin: userData.preferences?.priceRange?.min,
+        preferencesPriceMax: userData.preferences?.priceRange?.max,
+        preferencesEventTypes: userData.preferences?.eventTypes,
+      });
+      
+      console.log('✅ Onboarding atualizado no backend');
+    } catch (error) {
+      console.error('❌ Erro ao atualizar onboarding no backend:', error);
+    }
     
     await saveUser(updatedUser);
   }, [user]);
