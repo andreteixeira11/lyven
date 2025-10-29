@@ -24,6 +24,7 @@ import {
   Euro,
   Moon,
   Sun,
+  Bell,
 } from 'lucide-react-native';
 import { useUser } from '@/hooks/user-context';
 import { useTheme } from '@/hooks/theme-context';
@@ -273,6 +274,12 @@ export default function ProfileScreen() {
         icon={Users}
         title="A seguir"
         onPress={() => handleMenuItemPress('/following')}
+      />
+
+      <MenuItem
+        icon={Bell}
+        title="Notificações"
+        onPress={() => handleMenuItemPress('/notifications')}
       />
 
       <View style={styles.themeMenuItem}>
