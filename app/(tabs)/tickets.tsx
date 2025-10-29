@@ -787,6 +787,13 @@ const styles = StyleSheet.create({
   },
   comingCard: {
     marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+    borderRadius: 12,
+    padding: 16,
   },
   comingCardHeader: {
     flexDirection: 'row',
