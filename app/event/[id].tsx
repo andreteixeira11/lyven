@@ -7,7 +7,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useCart } from "@/hooks/cart-context";
 import { useFavorites } from "@/hooks/favorites-context";
 import { useCalendar } from "@/hooks/calendar-context";
-import { useSocial } from "@/hooks/social-context";
+import { shareEvent as shareEventUtil } from '@/lib/share-utils';
 import * as Haptics from 'expo-haptics';
 
 const { height } = Dimensions.get('window');
@@ -18,7 +18,6 @@ export default function EventDetailScreen() {
   const { addToCart } = useCart();
   const { isFavorite, addToFavorites, removeFromFavorites } = useFavorites();
   const { addToCalendar, setReminder, hasReminder, isEventInCalendar } = useCalendar();
-  const { shareEvent } = useSocial();
   const [selectedTickets, setSelectedTickets] = useState<{ [key: string]: number }>({});
   const [isLiked, setIsLiked] = useState(false);
 
@@ -131,6 +130,7 @@ export default function EventDetailScreen() {
         {
           options: shareOptions,
           cancelButtonIndex: shareOptions.length - 1,
+          title: 'Partilhar Evento'
         },
         async (buttonIndex) => {
           if (buttonIndex === shareOptions.length - 1) return;
@@ -139,12 +139,46 @@ export default function EventDetailScreen() {
             'whatsapp', 'facebook', 'instagram', 'twitter', 'copy'
           ];
           
-          await shareEvent(event.id, event.title, platforms[buttonIndex]);
+          await shareEventUtil({
+            eventId: event.id,
+            eventTitle: event.title,
+            platform: platforms[buttonIndex]
+          });
         }
       );
+    } else if (Platform.OS === 'android') {
+      Alert.alert(
+        'Partilhar Evento',
+        'Escolhe onde queres partilhar:',
+        [
+          {
+            text: 'WhatsApp',
+            onPress: () => shareEventUtil({ eventId: event.id, eventTitle: event.title, platform: 'whatsapp' })
+          },
+          {
+            text: 'Facebook',
+            onPress: () => shareEventUtil({ eventId: event.id, eventTitle: event.title, platform: 'facebook' })
+          },
+          {
+            text: 'Instagram',
+            onPress: () => shareEventUtil({ eventId: event.id, eventTitle: event.title, platform: 'instagram' })
+          },
+          {
+            text: 'Twitter/X',
+            onPress: () => shareEventUtil({ eventId: event.id, eventTitle: event.title, platform: 'twitter' })
+          },
+          {
+            text: 'Copiar Link',
+            onPress: () => shareEventUtil({ eventId: event.id, eventTitle: event.title, platform: 'copy' })
+          },
+          {
+            text: 'Cancelar',
+            style: 'cancel'
+          }
+        ]
+      );
     } else {
-      // Android fallback - just share to WhatsApp for now
-      await shareEvent(event.id, event.title, 'whatsapp');
+      await shareEventUtil({ eventId: event.id, eventTitle: event.title });
     }
   };
   

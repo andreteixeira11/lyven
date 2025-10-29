@@ -72,6 +72,8 @@ import { isFollowingProcedure } from "./routes/social/is-following";
 import { sendTestEmailProcedure } from "./routes/emails/test";
 import { createEventWebhookProcedure } from "./routes/webhooks/create-event";
 import { loginProcedure } from "./routes/auth/login";
+import { getSmartRecommendationsProcedure } from "./routes/recommendations/get-smart-recommendations";
+import { getAIRecommendationsProcedure } from "./routes/recommendations/get-ai-recommendations";
 
 export const appRouter = createTRPCRouter({
   example: createTRPCRouter({
@@ -172,6 +174,11 @@ export const appRouter = createTRPCRouter({
   
   auth: createTRPCRouter({
     login: loginProcedure,
+  }),
+  
+  recommendations: createTRPCRouter({
+    smart: getSmartRecommendationsProcedure,
+    ai: getAIRecommendationsProcedure,
   }),
 });
 
