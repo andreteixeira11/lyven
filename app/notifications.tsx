@@ -27,12 +27,13 @@ import { COLORS } from '@/constants/colors';
 
 interface Notification {
   id: string;
-  type: 'event' | 'follower' | 'ticket' | 'promotion' | 'system';
+  type: 'event' | 'follower' | 'ticket' | 'promotion' | 'system' | 'new_promoter_event';
   title: string;
   message: string;
   timestamp: Date;
   read: boolean;
   actionable?: boolean;
+  data?: any;
 }
 
 export default function Notifications() {
@@ -89,6 +90,8 @@ export default function Notifications() {
   const getNotificationIcon = (type: Notification['type']) => {
     switch (type) {
       case 'event':
+        return <Calendar size={20} color={COLORS.primary} />;
+      case 'new_promoter_event':
         return <Calendar size={20} color={COLORS.primary} />;
       case 'follower':
         return <Users size={20} color={COLORS.info} />;
@@ -295,7 +298,12 @@ export default function Notifications() {
                   styles.notificationItem,
                   !notification.read && styles.unreadNotification
                 ]}
-                onPress={() => markAsRead(notification.id)}
+                onPress={() => {
+                  markAsRead(notification.id);
+                  if (notification.type === 'new_promoter_event' && notification.data?.eventId) {
+                    router.push(`/event/${notification.data.eventId}`);
+                  }
+                }}
               >
                 <View style={styles.notificationLeft}>
                   <View style={styles.notificationIcon}>

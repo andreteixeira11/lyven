@@ -156,7 +156,7 @@ export const pushTokens = sqliteTable('push_tokens', {
 export const notifications = sqliteTable('notifications', {
   id: text('id').primaryKey(),
   userId: text('user_id').notNull().references(() => users.id),
-  type: text('type', { enum: ['event_approved', 'ad_approved', 'ticket_sold', 'event_reminder', 'follower', 'system'] }).notNull(),
+  type: text('type', { enum: ['event_approved', 'ad_approved', 'ticket_sold', 'event_reminder', 'follower', 'system', 'new_promoter_event'] }).notNull(),
   title: text('title').notNull(),
   message: text('message').notNull(),
   data: text('data'),

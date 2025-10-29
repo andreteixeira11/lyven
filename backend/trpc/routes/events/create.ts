@@ -1,7 +1,8 @@
 import { publicProcedure } from '../../create-context';
 import { z } from 'zod';
-import { db, events, promoters } from '@/backend/db';
+import { db, events, promoters, following } from '@/backend/db';
 import { sendEventPendingEmail } from '@/backend/lib/send-email';
+import { sendNotification } from '@/backend/lib/send-notification';
 import { eq } from 'drizzle-orm';
 
 const mapCategoryToDb = (category: string): 'music' | 'theater' | 'comedy' | 'dance' | 'festival' | 'other' => {

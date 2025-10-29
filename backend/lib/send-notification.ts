@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm';
 
 interface NotificationPayload {
   userId: string;
-  type: 'event_approved' | 'ad_approved' | 'ticket_sold' | 'event_reminder' | 'follower' | 'system';
+  type: 'event_approved' | 'ad_approved' | 'ticket_sold' | 'event_reminder' | 'follower' | 'system' | 'new_promoter_event';
   title: string;
   message: string;
   data?: Record<string, any>;
