@@ -7,13 +7,13 @@ import {
   TextInput,
   KeyboardAvoidingView,
   Platform,
-  Alert,
+  Modal,
   Animated,
   TouchableWithoutFeedback,
   Keyboard,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Mail } from 'lucide-react-native';
+import { Mail, CheckCircle } from 'lucide-react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { COLORS } from '@/constants/colors';
 import { useUser } from '@/hooks/user-context';
@@ -22,7 +22,6 @@ export default function VerifyEmailScreen() {
   const params = useLocalSearchParams();
   const email = params.email as string;
   const name = params.name as string;
-  const password = params.password as string;
   const { createUser } = useUser();
 
   const [code, setCode] = useState(['', '', '', '', '', '']);
@@ -30,6 +29,7 @@ export default function VerifyEmailScreen() {
   const [errorMessage, setErrorMessage] = useState('');
   const [canResend, setCanResend] = useState(false);
   const [resendTimer, setResendTimer] = useState(60);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const inputRefs = useRef<TextInput[]>([]);
 
@@ -102,9 +102,13 @@ export default function VerifyEmailScreen() {
         await createUser(email, name);
         
         console.log('✅ Utilizador criado com sucesso');
-        Alert.alert('Sucesso', 'Email verificado com sucesso!');
         
-        router.replace('/onboarding');
+        setShowSuccessModal(true);
+        
+        setTimeout(() => {
+          setShowSuccessModal(false);
+          router.replace('/onboarding');
+        }, 2000);
       } else {
         setErrorMessage('Código inválido. Use 000000');
         setCode(['', '', '', '', '', '']);
@@ -130,7 +134,6 @@ export default function VerifyEmailScreen() {
 
     try {
       console.log('📧 Código reenviado (modo temporário). Use: 000000');
-      Alert.alert('Código Reenviado', 'Use o código: 000000');
       setCanResend(false);
       setResendTimer(60);
     } catch (error: any) {
@@ -143,6 +146,24 @@ export default function VerifyEmailScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      <Modal
+        visible={showSuccessModal}
+        transparent
+        animationType="fade"
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalIconContainer}>
+              <CheckCircle size={64} color={COLORS.primary} strokeWidth={2} />
+            </View>
+            <Text style={styles.modalTitle}>Email Verificado!</Text>
+            <Text style={styles.modalDescription}>
+              O seu email foi verificado com sucesso
+            </Text>
+          </View>
+        </View>
+      </Modal>
+
       <View style={styles.gradient}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -336,5 +357,36 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontSize: 16,
     fontWeight: 'bold' as const,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    backgroundColor: COLORS.white,
+    borderRadius: 24,
+    padding: 40,
+    alignItems: 'center',
+    width: '90%',
+    maxWidth: 400,
+  },
+  modalIconContainer: {
+    marginBottom: 24,
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: 'bold' as const,
+    color: COLORS.text,
+    marginBottom: 12,
+    textAlign: 'center',
+  },
+  modalDescription: {
+    fontSize: 16,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    lineHeight: 22,
   },
 });
