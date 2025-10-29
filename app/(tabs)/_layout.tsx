@@ -4,11 +4,12 @@ import React, { useEffect, useRef } from "react";
 import { View, Text, StyleSheet, Animated } from "react-native";
 import { useCart } from "@/hooks/cart-context";
 import { useUser } from "@/hooks/user-context";
-import { COLORS } from "@/constants/colors";
+import { useTheme } from "@/hooks/theme-context";
 
 export default function TabLayout() {
   const { getTotalItems } = useCart();
   const { user } = useUser();
+  const { colors } = useTheme();
   const totalItems = getTotalItems();
   const isPromoter = user?.userType === 'promoter';
   const isAdmin = user?.email === 'geral@lyven.pt';
@@ -92,11 +93,11 @@ export default function TabLayout() {
       <Tabs
         screenOptions={{
           headerShown: false,
-          tabBarActiveTintColor: COLORS.tabBarActive,
-          tabBarInactiveTintColor: COLORS.tabBarInactive,
+          tabBarActiveTintColor: colors.primary,
+          tabBarInactiveTintColor: colors.textSecondary,
           tabBarStyle: {
-            backgroundColor: COLORS.tabBar,
-            borderTopColor: COLORS.border,
+            backgroundColor: colors.card,
+            borderTopColor: colors.border,
             borderTopWidth: 1,
           },
         }}
@@ -178,11 +179,11 @@ export default function TabLayout() {
       <Tabs
         screenOptions={{
           headerShown: false,
-          tabBarActiveTintColor: COLORS.tabBarActive,
-          tabBarInactiveTintColor: COLORS.tabBarInactive,
+          tabBarActiveTintColor: colors.primary,
+          tabBarInactiveTintColor: colors.textSecondary,
           tabBarStyle: {
-            backgroundColor: COLORS.tabBar,
-            borderTopColor: COLORS.border,
+            backgroundColor: colors.card,
+            borderTopColor: colors.border,
             borderTopWidth: 1,
           },
         }}
@@ -259,11 +260,11 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: COLORS.tabBarActive,
-        tabBarInactiveTintColor: COLORS.tabBarInactive,
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.textSecondary,
         tabBarStyle: {
-          backgroundColor: COLORS.tabBar,
-          borderTopColor: COLORS.border,
+          backgroundColor: colors.card,
+          borderTopColor: colors.border,
           borderTopWidth: 1,
         },
       }}
@@ -296,8 +297,8 @@ export default function TabLayout() {
           tabBarIcon: ({ color, focused }) => (
             <AnimatedTabIcon Icon={Ticket} color={color} focused={focused}>
               {totalItems > 0 && (
-                <View style={styles.badge}>
-                  <Text style={styles.badgeText}>{totalItems}</Text>
+                <View style={[styles.badge, { backgroundColor: colors.error }]}>
+                  <Text style={[styles.badgeText, { color: colors.white }]}>{totalItems}</Text>
                 </View>
               )}
             </AnimatedTabIcon>
@@ -351,7 +352,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: -8,
     top: -4,
-    backgroundColor: COLORS.error,
     borderRadius: 10,
     minWidth: 20,
     height: 20,
@@ -360,7 +360,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   badgeText: {
-    color: COLORS.white,
     fontSize: 12,
     fontWeight: 'bold' as const,
   },

@@ -11,7 +11,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import AuthGuard from "@/components/AuthGuard";
 import PromoterDashboard from "@/components/PromoterDashboard";
 import { useUser } from "@/hooks/user-context";
-import { COLORS } from "@/constants/colors";
+import { useTheme } from "@/hooks/theme-context";
 import { router } from 'expo-router';
 import { mockEvents } from '@/mocks/events';
 import { Event } from '@/types/event';
@@ -37,6 +37,7 @@ interface AdminStats {
 
 function NormalUserExploreContent() {
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
 
   const featuredEvents = mockEvents.filter((e: Event) => e.isFeatured);
   const upcomingEvents = mockEvents.filter(
@@ -45,17 +46,17 @@ function NormalUserExploreContent() {
 
   const EventCard = ({ event }: { event: Event }) => (
       <TouchableOpacity
-        style={styles.eventCard}
+        style={[styles.eventCard, { backgroundColor: colors.card }]}
         onPress={() => router.push(`/event/${event.id}` as any)}
       >
         <Image source={{ uri: event.image }} style={styles.eventCardImage} />
         <View style={styles.eventCardContent}>
-          <Text style={styles.eventCardTitle} numberOfLines={1}>
+          <Text style={[styles.eventCardTitle, { color: colors.text }]} numberOfLines={1}>
             {event.title}
           </Text>
           <View style={styles.eventCardInfo}>
-            <Calendar size={14} color={COLORS.textSecondary} />
-            <Text style={styles.eventCardDate}>
+            <Calendar size={14} color={colors.textSecondary} />
+            <Text style={[styles.eventCardDate, { color: colors.textSecondary }]}>
               {new Date(event.date).toLocaleDateString('pt-PT', {
                 day: 'numeric',
                 month: 'short',
@@ -63,8 +64,8 @@ function NormalUserExploreContent() {
             </Text>
           </View>
           <View style={styles.eventCardInfo}>
-            <MapPin size={14} color={COLORS.textSecondary} />
-            <Text style={styles.eventCardLocation} numberOfLines={1}>
+            <MapPin size={14} color={colors.textSecondary} />
+            <Text style={[styles.eventCardLocation, { color: colors.textSecondary }]} numberOfLines={1}>
               {event.venue.name}
             </Text>
           </View>
@@ -73,17 +74,17 @@ function NormalUserExploreContent() {
   );
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container, { paddingTop: insets.top, backgroundColor: colors.background }]}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.exploreContent}>
           <View style={styles.exploreHeader}>
-            <Text style={styles.exploreTitle}>Explorar Eventos</Text>
-            <Text style={styles.exploreSubtitle}>Descobre os melhores eventos perto de ti</Text>
+            <Text style={[styles.exploreTitle, { color: colors.text }]}>Explorar Eventos</Text>
+            <Text style={[styles.exploreSubtitle, { color: colors.textSecondary }]}>Descobre os melhores eventos perto de ti</Text>
           </View>
 
           {featuredEvents.length > 0 && (
             <View style={styles.exploreSection}>
-              <Text style={styles.exploreSectionTitle}>Em Destaque</Text>
+              <Text style={[styles.exploreSectionTitle, { color: colors.text }]}>Em Destaque</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 {featuredEvents.map((event: Event) => (
                   <EventCard key={event.id} event={event} />
@@ -93,21 +94,21 @@ function NormalUserExploreContent() {
           )}
 
           <View style={styles.exploreSection}>
-            <Text style={styles.exploreSectionTitle}>Próximos Eventos</Text>
+            <Text style={[styles.exploreSectionTitle, { color: colors.text }]}>Próximos Eventos</Text>
             {upcomingEvents.slice(0, 10).map((event: Event) => (
               <TouchableOpacity
                 key={event.id}
-                style={styles.eventListItem}
+                style={[styles.eventListItem, { backgroundColor: colors.card }]}
                 onPress={() => router.push(`/event/${event.id}` as any)}
               >
                 <Image source={{ uri: event.image }} style={styles.eventListImage} />
                 <View style={styles.eventListContent}>
-                  <Text style={styles.eventListTitle} numberOfLines={1}>
+                  <Text style={[styles.eventListTitle, { color: colors.text }]} numberOfLines={1}>
                     {event.title}
                   </Text>
                   <View style={styles.eventListInfo}>
-                    <Calendar size={12} color={COLORS.textSecondary} />
-                    <Text style={styles.eventListText}>
+                    <Calendar size={12} color={colors.textSecondary} />
+                    <Text style={[styles.eventListText, { color: colors.textSecondary }]}>
                       {new Date(event.date).toLocaleDateString('pt-PT', {
                         day: 'numeric',
                         month: 'long',
@@ -115,8 +116,8 @@ function NormalUserExploreContent() {
                     </Text>
                   </View>
                   <View style={styles.eventListInfo}>
-                    <MapPin size={12} color={COLORS.textSecondary} />
-                    <Text style={styles.eventListText} numberOfLines={1}>
+                    <MapPin size={12} color={colors.textSecondary} />
+                    <Text style={[styles.eventListText, { color: colors.textSecondary }]} numberOfLines={1}>
                       {event.venue.name}
                     </Text>
                   </View>
@@ -133,6 +134,7 @@ function NormalUserExploreContent() {
 function IndexContent() {
   const insets = useSafeAreaInsets();
   const { user } = useUser();
+  const { colors } = useTheme();
   const [stats] = useState<AdminStats>({
     totalUsers: 1247,
     totalPromoters: 89,
@@ -148,7 +150,7 @@ function IndexContent() {
     title, 
     value, 
     icon: Icon, 
-    color = COLORS.primary,
+    color = colors.primary,
     onPress 
   }: {
     title: string;
@@ -158,14 +160,14 @@ function IndexContent() {
     onPress?: () => void;
   }) => (
     <TouchableOpacity 
-      style={[styles.statCard, { borderLeftColor: color }]}
+      style={[styles.statCard, { borderLeftColor: color, backgroundColor: colors.card }]}
       onPress={onPress}
       activeOpacity={0.7}
     >
       <View style={styles.statCardContent}>
         <View style={styles.statCardLeft}>
-          <Text style={styles.statValue}>{value}</Text>
-          <Text style={styles.statTitle}>{title}</Text>
+          <Text style={[styles.statValue, { color: colors.text }]}>{value}</Text>
+          <Text style={[styles.statTitle, { color: colors.textSecondary }]}>{title}</Text>
         </View>
         <View style={[styles.statIconContainer, { backgroundColor: color + '20' }]}>
           <Icon size={24} color={color} />
@@ -176,23 +178,23 @@ function IndexContent() {
 
   if (user?.email === 'geral@lyven.pt') {
     return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
+      <View style={[styles.container, { paddingTop: insets.top, backgroundColor: colors.background }]}>
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           <View style={styles.content}>
             <View style={styles.header}>
-              <Text style={styles.welcomeText}>Bem-vindo, Admin</Text>
-              <Text style={styles.subtitleText}>Painel de Controlo Lyven</Text>
+              <Text style={[styles.welcomeText, { color: colors.text }]}>Bem-vindo, Admin</Text>
+              <Text style={[styles.subtitleText, { color: colors.textSecondary }]}>Painel de Controlo Lyven</Text>
             </View>
 
             {stats.pendingApprovals > 0 && (
               <TouchableOpacity 
-                style={styles.alertCard}
+                style={[styles.alertCard, { backgroundColor: colors.warning + '10', borderColor: colors.warning + '30' }]}
                 onPress={() => router.push('/(tabs)/tickets')}
               >
-                <AlertCircle size={24} color={COLORS.warning} />
+                <AlertCircle size={24} color={colors.warning} />
                 <View style={styles.alertContent}>
-                  <Text style={styles.alertTitle}>Aprovações Pendentes</Text>
-                  <Text style={styles.alertText}>
+                  <Text style={[styles.alertTitle, { color: colors.warning }]}>Aprovações Pendentes</Text>
+                  <Text style={[styles.alertText, { color: colors.textSecondary }]}>
                     {stats.pendingApprovals} publicidades aguardam aprovação
                   </Text>
                 </View>
@@ -200,7 +202,7 @@ function IndexContent() {
             )}
 
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Visão Geral</Text>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Visão Geral</Text>
               <View style={styles.statsGrid}>
                 <View style={styles.statsRow}>
                   <View style={styles.statsRowItem}>
@@ -216,7 +218,7 @@ function IndexContent() {
                       title="Promotores"
                       value={stats.totalPromoters}
                       icon={UserCheck}
-                      color={COLORS.success}
+                      color={colors.success}
                       onPress={() => router.push('/admin-promoters')}
                     />
                   </View>
@@ -227,7 +229,7 @@ function IndexContent() {
                       title="Total Eventos"
                       value={stats.totalEvents}
                       icon={Calendar}
-                      color={COLORS.warning}
+                      color={colors.warning}
                       onPress={() => router.push('/admin-events')}
                     />
                   </View>
@@ -236,7 +238,7 @@ function IndexContent() {
                       title="Receita Total"
                       value={`€${stats.totalRevenue.toLocaleString()}`}
                       icon={DollarSign}
-                      color={COLORS.success}
+                      color={colors.success}
                     />
                   </View>
                 </View>
@@ -244,19 +246,19 @@ function IndexContent() {
             </View>
 
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Hoje</Text>
-              <View style={styles.todayStats}>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Hoje</Text>
+              <View style={[styles.todayStats, { backgroundColor: colors.card }]}>
                 <View style={styles.todayStatItem}>
-                  <Text style={styles.todayStatValue}>{stats.newUsersToday}</Text>
-                  <Text style={styles.todayStatLabel}>Novos Utilizadores</Text>
+                  <Text style={[styles.todayStatValue, { color: colors.primary }]}>{stats.newUsersToday}</Text>
+                  <Text style={[styles.todayStatLabel, { color: colors.textSecondary }]}>Novos Utilizadores</Text>
                 </View>
                 <View style={styles.todayStatItem}>
-                  <Text style={styles.todayStatValue}>{stats.newEventsToday}</Text>
-                  <Text style={styles.todayStatLabel}>Novos Eventos</Text>
+                  <Text style={[styles.todayStatValue, { color: colors.primary }]}>{stats.newEventsToday}</Text>
+                  <Text style={[styles.todayStatLabel, { color: colors.textSecondary }]}>Novos Eventos</Text>
                 </View>
                 <View style={styles.todayStatItem}>
-                  <Text style={styles.todayStatValue}>{stats.activeEvents}</Text>
-                  <Text style={styles.todayStatLabel}>Eventos Ativos</Text>
+                  <Text style={[styles.todayStatValue, { color: colors.primary }]}>{stats.activeEvents}</Text>
+                  <Text style={[styles.todayStatLabel, { color: colors.textSecondary }]}>Eventos Ativos</Text>
                 </View>
               </View>
             </View>
@@ -270,7 +272,7 @@ function IndexContent() {
 
   if (user?.userType === 'promoter') {
     return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
+      <View style={[styles.container, { paddingTop: insets.top, backgroundColor: colors.background }]}>
         <PromoterDashboard promoterId={user.id} />
       </View>
     );
@@ -290,7 +292,6 @@ export default function IndexScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   scrollView: {
     flex: 1,
@@ -304,12 +305,10 @@ const styles = StyleSheet.create({
   welcomeText: {
     fontSize: 28,
     fontWeight: 'bold' as const,
-    color: COLORS.text,
     marginBottom: 5,
   },
   subtitleText: {
     fontSize: 16,
-    color: COLORS.textSecondary,
   },
   section: {
     marginBottom: 30,
@@ -317,7 +316,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold' as const,
-    color: COLORS.text,
     marginBottom: 15,
   },
   statsGrid: {
@@ -331,7 +329,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   statCard: {
-    backgroundColor: COLORS.white,
     borderRadius: 12,
     padding: 20,
     borderLeftWidth: 4,
@@ -352,12 +349,10 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 24,
     fontWeight: 'bold' as const,
-    color: COLORS.text,
     marginBottom: 5,
   },
   statTitle: {
     fontSize: 14,
-    color: COLORS.textSecondary,
   },
   statIconContainer: {
     width: 50,
@@ -368,7 +363,6 @@ const styles = StyleSheet.create({
   },
   todayStats: {
     flexDirection: 'row',
-    backgroundColor: COLORS.white,
     borderRadius: 12,
     padding: 20,
     shadowColor: '#000',
@@ -384,23 +378,19 @@ const styles = StyleSheet.create({
   todayStatValue: {
     fontSize: 20,
     fontWeight: 'bold' as const,
-    color: COLORS.primary,
     marginBottom: 5,
   },
   todayStatLabel: {
     fontSize: 12,
-    color: COLORS.textSecondary,
     textAlign: 'center',
   },
   alertCard: {
-    backgroundColor: COLORS.warning + '10',
     borderRadius: 12,
     padding: 15,
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: COLORS.warning + '30',
   },
   alertContent: {
     marginLeft: 15,
@@ -409,12 +399,10 @@ const styles = StyleSheet.create({
   alertTitle: {
     fontSize: 16,
     fontWeight: 'bold' as const,
-    color: COLORS.warning,
     marginBottom: 2,
   },
   alertText: {
     fontSize: 14,
-    color: COLORS.textSecondary,
   },
   exploreContent: {
     padding: 20,
@@ -425,12 +413,10 @@ const styles = StyleSheet.create({
   exploreTitle: {
     fontSize: 28,
     fontWeight: 'bold' as const,
-    color: COLORS.text,
     marginBottom: 4,
   },
   exploreSubtitle: {
     fontSize: 16,
-    color: COLORS.textSecondary,
   },
   exploreSection: {
     marginBottom: 30,
@@ -438,13 +424,11 @@ const styles = StyleSheet.create({
   exploreSectionTitle: {
     fontSize: 20,
     fontWeight: 'bold' as const,
-    color: COLORS.text,
     marginBottom: 15,
   },
   eventCard: {
     width: 240,
     marginRight: 15,
-    backgroundColor: COLORS.white,
     borderRadius: 12,
     overflow: 'hidden',
     shadowColor: '#000',
@@ -464,7 +448,6 @@ const styles = StyleSheet.create({
   eventCardTitle: {
     fontSize: 16,
     fontWeight: 'bold' as const,
-    color: COLORS.text,
     marginBottom: 8,
   },
   eventCardInfo: {
@@ -475,16 +458,13 @@ const styles = StyleSheet.create({
   },
   eventCardDate: {
     fontSize: 13,
-    color: COLORS.textSecondary,
   },
   eventCardLocation: {
     fontSize: 13,
-    color: COLORS.textSecondary,
     flex: 1,
   },
   eventListItem: {
     flexDirection: 'row',
-    backgroundColor: COLORS.white,
     borderRadius: 12,
     marginBottom: 12,
     overflow: 'hidden',
@@ -506,7 +486,6 @@ const styles = StyleSheet.create({
   eventListTitle: {
     fontSize: 15,
     fontWeight: 'bold' as const,
-    color: COLORS.text,
     marginBottom: 6,
   },
   eventListInfo: {
@@ -517,7 +496,6 @@ const styles = StyleSheet.create({
   },
   eventListText: {
     fontSize: 12,
-    color: COLORS.textSecondary,
     flex: 1,
   },
 });

@@ -9,9 +9,8 @@ import { FavoritesContext } from "@/hooks/favorites-context";
 import { CalendarProvider } from "@/hooks/calendar-context";
 import { SocialProvider } from "@/hooks/social-context";
 import { NotificationsContext } from "@/hooks/notifications-context";
-import { ThemeProvider } from "@/hooks/theme-context";
+import { ThemeProvider, useTheme } from "@/hooks/theme-context";
 import { OfflineProvider } from "@/hooks/offline-context";
-import { COLORS } from "@/constants/colors";
 import { trpc, trpcReactClient } from "@/lib/trpc";
 
 LogBox.ignoreLogs([
@@ -32,16 +31,18 @@ const queryClient = new QueryClient({
 });
 
 function RootLayoutNav() {
+  const { colors } = useTheme();
+  
   return (
     <Stack screenOptions={{ 
       headerBackTitle: "Voltar",
       headerStyle: {
-        backgroundColor: COLORS.header,
+        backgroundColor: colors.primary,
       },
-      headerTintColor: COLORS.headerText,
+      headerTintColor: colors.white,
       headerTitleStyle: {
         fontWeight: 'bold' as const,
-        color: COLORS.headerText,
+        color: colors.white,
       },
     }}>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
