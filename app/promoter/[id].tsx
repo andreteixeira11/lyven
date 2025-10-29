@@ -37,16 +37,24 @@ export default function PromoterScreen() {
   const utils = trpc.useUtils();
 
   const followMutation = trpc.social.follow.useMutation({
-    onSuccess: () => {
-      isFollowingQuery.refetch();
-      utils.social.getFollowing.invalidate();
+    onSuccess: async () => {
+      await isFollowingQuery.refetch();
+      await utils.social.getFollowing.invalidate();
+      console.log('Follow successful - promoter:', promoterId);
+    },
+    onError: (error) => {
+      console.error('Follow error:', error);
     }
   });
 
   const unfollowMutation = trpc.social.unfollow.useMutation({
-    onSuccess: () => {
-      isFollowingQuery.refetch();
-      utils.social.getFollowing.invalidate();
+    onSuccess: async () => {
+      await isFollowingQuery.refetch();
+      await utils.social.getFollowing.invalidate();
+      console.log('Unfollow successful - promoter:', promoterId);
+    },
+    onError: (error) => {
+      console.error('Unfollow error:', error);
     }
   });
 
@@ -69,7 +77,9 @@ export default function PromoterScreen() {
       return;
     }
 
+    console.log('Toggle follow for promoter:', promoterId, 'user:', user.id);
     const isFollowing = isFollowingQuery.data?.isFollowing || false;
+    console.log('Currently following:', isFollowing);
 
     if (isFollowing) {
       unfollowMutation.mutate({

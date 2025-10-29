@@ -28,6 +28,20 @@ export default function FollowingScreen() {
     }
   );
 
+  const promoters = React.useMemo(() => {
+    return followingQuery.data?.following.filter(
+      (item: any) => item.type === 'promoter'
+    ) || [];
+  }, [followingQuery.data]);
+
+  React.useEffect(() => {
+    if (followingQuery.data) {
+      console.log('Following data received:', JSON.stringify(followingQuery.data, null, 2));
+      console.log('Filtered promoters count:', promoters.length);
+      console.log('Promoters:', promoters);
+    }
+  }, [followingQuery.data, promoters]);
+
   if (!user) {
     return (
       <>
@@ -49,10 +63,6 @@ export default function FollowingScreen() {
       </>
     );
   }
-
-  const promoters = followingQuery.data?.following.filter(
-    (item: any) => item.type === 'promoter'
-  ) || [];
 
   return (
     <>
