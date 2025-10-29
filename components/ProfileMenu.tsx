@@ -16,7 +16,6 @@ import {
   Calendar,
   Heart,
   History,
-  Bell,
   Shield,
   HelpCircle,
   Star,
@@ -146,14 +145,6 @@ export default function ProfileMenu({ visible, onClose }: ProfileMenuProps) {
 
   const renderCommonMenuItems = () => (
     <>
-      <TouchableOpacity
-        style={styles.menuItem}
-        onPress={() => handleMenuItemPress('/notifications')}
-      >
-        <Bell size={20} color="#fff" />
-        <Text style={styles.menuText}>Notificações</Text>
-      </TouchableOpacity>
-      
       <TouchableOpacity
         style={styles.menuItem}
         onPress={() => handleMenuItemPress('/settings')}
