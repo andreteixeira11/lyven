@@ -9,6 +9,13 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     isRequired: true,
   },
   {
+    id: 'phone',
+    title: 'Número de Telemóvel',
+    description: 'Adicione o seu contacto para maior segurança',
+    component: 'phone',
+    isRequired: false,
+  },
+  {
     id: 'interests',
     title: 'Interesses',
     description: 'Selecione os tipos de eventos que mais lhe interessam',

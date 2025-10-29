@@ -18,6 +18,7 @@ import { User, Mail, Eye, EyeOff, Building2 } from 'lucide-react-native';
 import { useUser } from '@/hooks/user-context';
 import { router } from 'expo-router';
 import { COLORS } from '@/constants/colors';
+import { trpcClient } from '@/lib/trpc';
 
 export default function LoginScreen() {
   const [userType, setUserType] = useState<'normal' | 'promoter'>('normal');
@@ -164,9 +165,20 @@ export default function LoginScreen() {
           return;
         }
         
-        const user = await createUser(email, name);
-        if (user) {
-          router.replace('/onboarding');
+        try {
+          await trpcClient.auth.sendVerificationCode.mutate({
+            email,
+            name,
+            password,
+          });
+          
+          router.push({
+            pathname: '/verify-email',
+            params: { email, name, password },
+          });
+        } catch (error: any) {
+          console.error('Erro ao enviar código:', error);
+          setErrorMessage(error.message || 'Erro ao enviar código de verificação. Este email pode já estar registado.');
         }
       }
     } catch (error) {

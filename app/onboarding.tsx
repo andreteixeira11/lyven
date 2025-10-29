@@ -15,6 +15,7 @@ import { router } from 'expo-router';
 import { ONBOARDING_STEPS } from '@/constants/onboarding';
 import { COLORS } from '@/constants/colors';
 import UserTypeStep from '@/components/onboarding/UserTypeStep';
+import PhoneStep from '@/components/onboarding/PhoneStep';
 import InterestsStep from '@/components/onboarding/InterestsStep';
 import LocationStep from '@/components/onboarding/LocationStep';
 import PreferencesStep from '@/components/onboarding/PreferencesStep';
@@ -53,6 +54,13 @@ export default function OnboardingScreen() {
       case 'userType':
         return (
           <UserTypeStep
+            data={onboardingData}
+            onUpdate={updateOnboardingData}
+          />
+        );
+      case 'phone':
+        return (
+          <PhoneStep
             data={onboardingData}
             onUpdate={updateOnboardingData}
           />

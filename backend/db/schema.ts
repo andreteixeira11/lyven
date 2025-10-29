@@ -5,6 +5,7 @@ export const users = sqliteTable('users', {
   id: text('id').primaryKey(),
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
+  phone: text('phone'),
   userType: text('user_type', { enum: ['normal', 'promoter', 'admin'] }).notNull(),
   interests: text('interests').notNull(),
   locationLatitude: real('location_latitude'),
@@ -161,5 +162,16 @@ export const notifications = sqliteTable('notifications', {
   message: text('message').notNull(),
   data: text('data'),
   isRead: integer('is_read', { mode: 'boolean' }).notNull().default(false),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const verificationCodes = sqliteTable('verification_codes', {
+  id: text('id').primaryKey(),
+  email: text('email').notNull(),
+  code: text('code').notNull(),
+  name: text('name').notNull(),
+  password: text('password').notNull(),
+  expiresAt: text('expires_at').notNull(),
+  isUsed: integer('is_used', { mode: 'boolean' }).notNull().default(false),
   createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
 });

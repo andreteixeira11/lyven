@@ -11,6 +11,7 @@ export const createUserProcedure = publicProcedure
       id: z.string(),
       name: z.string(),
       email: z.string().email(),
+      phone: z.string().optional(),
       userType: z.enum(['normal', 'promoter']),
       interests: z.array(z.string()),
       location: z.object({
@@ -35,6 +36,7 @@ export const createUserProcedure = publicProcedure
       id: input.id,
       name: input.name,
       email: input.email,
+      phone: input.phone,
       userType: input.userType,
       interests: JSON.stringify(input.interests),
       locationLatitude: input.location?.latitude,

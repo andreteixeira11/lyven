@@ -4,6 +4,7 @@ export interface User {
   id: string;
   name: string;
   email: string;
+  phone?: string;
   userType: UserType;
   interests: string[];
   location?: {
@@ -36,7 +37,7 @@ export interface OnboardingStep {
   id: string;
   title: string;
   description: string;
-  component: 'interests' | 'location' | 'preferences' | 'userType';
+  component: 'interests' | 'location' | 'preferences' | 'userType' | 'phone';
   isRequired: boolean;
 }
 
