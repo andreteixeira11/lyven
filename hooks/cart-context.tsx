@@ -108,11 +108,20 @@ export const [CartProvider, useCart] = createContextHook<CartContextType>(() => 
 
   const completePurchase = async (userId: string): Promise<boolean> => {
     try {
-      const ticketsToCreate = cartItems.map((item) => {
-        const ticketId = `ticket_${Date.now()}_${Math.random().toString(36).substring(7)}`;
-        const qrCode = `QR_${item.eventId}_${item.ticketTypeId}_${Date.now()}`;
+      const timestamp = Date.now();
+      const ticketsToCreate = cartItems.map((item, index) => {
+        const uniqueSuffix = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        const ticketId = `ticket_${timestamp}_${index}_${uniqueSuffix}`;
+        const qrCode = `LYVEN_${ticketId}_${item.eventId}_${uniqueSuffix.toUpperCase()}`;
         const validUntil = new Date();
         validUntil.setMonth(validUntil.getMonth() + 6);
+
+        console.log('🎫 Criando bilhete com QR Code:', {
+          ticketId,
+          qrCode,
+          eventId: item.eventId,
+          quantity: item.quantity,
+        });
 
         return {
           id: ticketId,
@@ -127,21 +136,23 @@ export const [CartProvider, useCart] = createContextHook<CartContextType>(() => 
       });
 
       await trpcClient.tickets.batchCreate.mutate({ tickets: ticketsToCreate });
+      console.log('✅ Bilhetes criados no backend com sucesso');
 
-      const newTickets: PurchasedTicket[] = cartItems.map((item) => ({
-        id: `ticket_${Date.now()}_${Math.random()}`,
-        eventId: item.eventId,
-        ticketTypeId: item.ticketTypeId,
-        quantity: item.quantity,
+      const newTickets: PurchasedTicket[] = ticketsToCreate.map((ticket) => ({
+        id: ticket.id,
+        eventId: ticket.eventId,
+        ticketTypeId: ticket.ticketTypeId,
+        quantity: ticket.quantity,
         purchaseDate: new Date(),
-        qrCode: `QR_${item.eventId}_${item.ticketTypeId}_${Date.now()}`,
+        qrCode: ticket.qrCode,
       }));
 
       setPurchasedTickets((prev) => [...prev, ...newTickets]);
+      console.log('✅ Bilhetes adicionados à lista de comprados');
       clearCart();
       return true;
     } catch (error) {
-      console.error('Error completing purchase:', error);
+      console.error('❌ Erro ao completar compra:', error);
       return false;
     }
   };

@@ -19,6 +19,7 @@ import {
 import { useLocalSearchParams, router, Stack } from 'expo-router';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { mockEvents } from '@/mocks/events';
+import { trpcClient } from '@/lib/trpc';
 
 interface ScannedTicket {
   id: string;
@@ -38,57 +39,9 @@ export default function QRScannerScreen() {
   const [flashOn, setFlashOn] = useState(false);
   const [lastScannedTicket, setLastScannedTicket] = useState<ScannedTicket | null>(null);
   const [validatedTickets, setValidatedTickets] = useState<string[]>([]);
+  const [isValidating, setIsValidating] = useState(false);
   
   const event = mockEvents.find(e => e.id === id);
-  
-  // Mock ticket validation database
-  const mockTicketDatabase: Record<string, ScannedTicket> = {
-    'QR_1_VIP_1737123456': {
-      id: '1',
-      eventId: '1',
-      buyerName: 'João Silva',
-      ticketType: 'VIP',
-      quantity: 2,
-      isValid: true,
-      isAlreadyUsed: false
-    },
-    'QR_1_GERAL_1737456789': {
-      id: '2',
-      eventId: '1',
-      buyerName: 'Maria Santos',
-      ticketType: 'Geral',
-      quantity: 1,
-      isValid: true,
-      isAlreadyUsed: false
-    },
-    'QR_1_GERAL_1737789012': {
-      id: '3',
-      eventId: '1',
-      buyerName: 'Pedro Costa',
-      ticketType: 'Geral',
-      quantity: 4,
-      isValid: true,
-      isAlreadyUsed: false
-    },
-    'QR_1_VIP_1738012345': {
-      id: '4',
-      eventId: '1',
-      buyerName: 'Ana Ferreira',
-      ticketType: 'VIP',
-      quantity: 1,
-      isValid: true,
-      isAlreadyUsed: false
-    },
-    'QR_INVALID_123': {
-      id: 'invalid',
-      eventId: '999',
-      buyerName: 'Ticket Inválido',
-      ticketType: 'N/A',
-      quantity: 0,
-      isValid: false,
-      isAlreadyUsed: false
-    }
-  };
   
   useEffect(() => {
     if (!permission) {
@@ -96,40 +49,58 @@ export default function QRScannerScreen() {
     }
   }, [permission, requestPermission]);
   
-  const handleBarCodeScanned = ({ data }: { data: string }) => {
-    if (scanned) return;
+  const handleBarCodeScanned = async ({ data }: { data: string }) => {
+    if (scanned || isValidating) return;
     
     setScanned(true);
+    setIsValidating(true);
     
-    // Validate ticket
-    const ticket = mockTicketDatabase[data];
+    console.log('🔍 Validando QR Code:', data);
     
-    if (!ticket) {
-      // Invalid QR code
-      handleInvalidTicket('QR Code não reconhecido');
-      return;
+    try {
+      // Validar bilhete no backend
+      const result = await trpcClient.tickets.validate.mutate({ qrCode: data });
+      
+      console.log('✅ Resultado da validação:', result);
+      
+      // Verificar se o bilhete é para este evento
+      if (result.ticket.eventId !== id) {
+        handleInvalidTicket('Bilhete não é para este evento');
+        setIsValidating(false);
+        return;
+      }
+      
+      // Bilhete válido
+      const validatedTicket: ScannedTicket = {
+        id: result.ticket.id,
+        eventId: result.ticket.eventId,
+        buyerName: 'Comprador',
+        ticketType: result.ticket.ticketTypeId,
+        quantity: result.ticket.quantity,
+        isValid: true,
+        isAlreadyUsed: true,
+        validatedAt: new Date(),
+      };
+      
+      handleValidTicket(validatedTicket, data);
+      
+    } catch (error: any) {
+      console.error('❌ Erro ao validar bilhete:', error);
+      
+      let errorMessage = 'Erro ao validar bilhete';
+      
+      if (error.message?.includes('not found')) {
+        errorMessage = 'QR Code não reconhecido';
+      } else if (error.message?.includes('already used')) {
+        errorMessage = 'Bilhete já foi utilizado';
+      } else if (error.message?.includes('expired')) {
+        errorMessage = 'Bilhete expirado';
+      }
+      
+      handleInvalidTicket(errorMessage);
+    } finally {
+      setIsValidating(false);
     }
-    
-    if (!ticket.isValid) {
-      // Invalid ticket
-      handleInvalidTicket('Bilhete inválido');
-      return;
-    }
-    
-    if (ticket.eventId !== id) {
-      // Wrong event
-      handleInvalidTicket('Bilhete não é para este evento');
-      return;
-    }
-    
-    if (validatedTickets.includes(data)) {
-      // Already validated
-      handleInvalidTicket('Bilhete já foi validado');
-      return;
-    }
-    
-    // Valid ticket
-    handleValidTicket(ticket, data);
   };
   
   const handleValidTicket = (ticket: ScannedTicket, qrCode: string) => {
@@ -317,14 +288,14 @@ export default function QRScannerScreen() {
           <TouchableOpacity 
             style={styles.resetButton}
             onPress={() => setScanned(false)}
-            disabled={!scanned}
+            disabled={!scanned || isValidating}
           >
             <QrCode size={20} color={scanned ? "#666" : "#fff"} />
             <Text style={[
               styles.resetButtonText,
-              { color: scanned ? "#666" : "#fff" }
+              { color: (scanned || isValidating) ? "#666" : "#fff" }
             ]}>
-              {scanned ? 'Processando...' : 'Pronto para Scan'}
+              {isValidating ? 'Validando...' : scanned ? 'Processando...' : 'Pronto para Scan'}
             </Text>
           </TouchableOpacity>
         </View>
