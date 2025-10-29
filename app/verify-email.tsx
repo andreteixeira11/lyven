@@ -11,10 +11,9 @@ import {
   Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Mail, ArrowLeft } from 'lucide-react-native';
+import { Mail } from 'lucide-react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { COLORS } from '@/constants/colors';
-import { trpcClient } from '@/lib/trpc';
 
 export default function VerifyEmailScreen() {
   const params = useLocalSearchParams();
@@ -143,13 +142,6 @@ export default function VerifyEmailScreen() {
           style={styles.keyboardView}
         >
           <View style={styles.content}>
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => router.back()}
-            >
-              <ArrowLeft size={24} color={COLORS.text} />
-            </TouchableOpacity>
-
             <View style={styles.header}>
               <View style={styles.iconContainer}>
                 <Mail size={48} color={COLORS.primary} />
@@ -239,18 +231,7 @@ const styles = StyleSheet.create({
     padding: 20,
     justifyContent: 'center',
   },
-  backButton: {
-    position: 'absolute',
-    top: 20,
-    left: 20,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: COLORS.white,
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 10,
-  },
+
   header: {
     alignItems: 'center',
     marginBottom: 50,
