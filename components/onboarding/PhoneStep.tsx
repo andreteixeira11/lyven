@@ -4,9 +4,38 @@ import {
   Text,
   StyleSheet,
   TextInput,
+  TouchableOpacity,
+  Modal,
+  FlatList,
 } from 'react-native';
-import { Smartphone } from 'lucide-react-native';
+import { Smartphone, ChevronDown, Search, X } from 'lucide-react-native';
 import { COLORS } from '@/constants/colors';
+
+interface Country {
+  name: string;
+  code: string;
+  dial: string;
+  flag: string;
+}
+
+const COUNTRIES: Country[] = [
+  { name: 'Portugal', code: 'PT', dial: '+351', flag: '🇵🇹' },
+  { name: 'Brasil', code: 'BR', dial: '+55', flag: '🇧🇷' },
+  { name: 'Angola', code: 'AO', dial: '+244', flag: '🇦🇴' },
+  { name: 'Moçambique', code: 'MZ', dial: '+258', flag: '🇲🇿' },
+  { name: 'Cabo Verde', code: 'CV', dial: '+238', flag: '🇨🇻' },
+  { name: 'Espanha', code: 'ES', dial: '+34', flag: '🇪🇸' },
+  { name: 'França', code: 'FR', dial: '+33', flag: '🇫🇷' },
+  { name: 'Reino Unido', code: 'GB', dial: '+44', flag: '🇬🇧' },
+  { name: 'Alemanha', code: 'DE', dial: '+49', flag: '🇩🇪' },
+  { name: 'Itália', code: 'IT', dial: '+39', flag: '🇮🇹' },
+  { name: 'Estados Unidos', code: 'US', dial: '+1', flag: '🇺🇸' },
+  { name: 'Canadá', code: 'CA', dial: '+1', flag: '🇨🇦' },
+  { name: 'Suíça', code: 'CH', dial: '+41', flag: '🇨🇭' },
+  { name: 'Bélgica', code: 'BE', dial: '+32', flag: '🇧🇪' },
+  { name: 'Luxemburgo', code: 'LU', dial: '+352', flag: '🇱🇺' },
+  { name: 'Países Baixos', code: 'NL', dial: '+31', flag: '🇳🇱' },
+].sort((a, b) => a.name.localeCompare(b.name));
 
 interface PhoneStepProps {
   data: any;
@@ -15,11 +44,28 @@ interface PhoneStepProps {
 
 export default function PhoneStep({ data, onUpdate }: PhoneStepProps) {
   const [phone, setPhone] = useState(data.phone || '');
+  const [selectedCountry, setSelectedCountry] = useState<Country>(
+    COUNTRIES.find(c => c.code === 'PT') || COUNTRIES[0]
+  );
+  const [modalVisible, setModalVisible] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredCountries = COUNTRIES.filter(country =>
+    country.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    country.dial.includes(searchQuery)
+  );
 
   const handlePhoneChange = (text: string) => {
-    const cleaned = text.replace(/[^0-9+]/g, '');
+    const cleaned = text.replace(/[^0-9]/g, '');
     setPhone(cleaned);
-    onUpdate({ phone: cleaned });
+    onUpdate({ phone: selectedCountry.dial + cleaned });
+  };
+
+  const handleCountrySelect = (country: Country) => {
+    setSelectedCountry(country);
+    setModalVisible(false);
+    setSearchQuery('');
+    onUpdate({ phone: country.dial + phone });
   };
 
   return (
@@ -34,9 +80,15 @@ export default function PhoneStep({ data, onUpdate }: PhoneStepProps) {
       </View>
 
       <View style={styles.inputContainer}>
-        <View style={styles.prefixContainer}>
-          <Text style={styles.prefixText}>+351</Text>
-        </View>
+        <TouchableOpacity
+          style={styles.prefixContainer}
+          onPress={() => setModalVisible(true)}
+          activeOpacity={0.7}
+        >
+          <Text style={styles.flagText}>{selectedCountry.flag}</Text>
+          <Text style={styles.prefixText}>{selectedCountry.dial}</Text>
+          <ChevronDown size={16} color={COLORS.textSecondary} style={styles.chevron} />
+        </TouchableOpacity>
         <TextInput
           style={styles.input}
           placeholder="9XX XXX XXX"
@@ -44,9 +96,65 @@ export default function PhoneStep({ data, onUpdate }: PhoneStepProps) {
           value={phone}
           onChangeText={handlePhoneChange}
           keyboardType="phone-pad"
-          maxLength={13}
+          maxLength={15}
         />
       </View>
+
+      <Modal
+        visible={modalVisible}
+        animationType="slide"
+        transparent={true}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Selecione o país</Text>
+              <TouchableOpacity
+                onPress={() => {
+                  setModalVisible(false);
+                  setSearchQuery('');
+                }}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              >
+                <X size={24} color={COLORS.text} />
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.searchContainer}>
+              <Search size={20} color={COLORS.textSecondary} />
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Pesquisar país ou indicativo"
+                placeholderTextColor={COLORS.textSecondary}
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                autoCapitalize="none"
+              />
+            </View>
+
+            <FlatList
+              data={filteredCountries}
+              keyExtractor={(item) => item.code}
+              renderItem={({ item }) => (
+                <TouchableOpacity
+                  style={[
+                    styles.countryItem,
+                    selectedCountry.code === item.code && styles.countryItemSelected,
+                  ]}
+                  onPress={() => handleCountrySelect(item)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.countryFlag}>{item.flag}</Text>
+                  <Text style={styles.countryName}>{item.name}</Text>
+                  <Text style={styles.countryDial}>{item.dial}</Text>
+                </TouchableOpacity>
+              )}
+              showsVerticalScrollIndicator={false}
+            />
+          </View>
+        </View>
+      </Modal>
 
       <View style={styles.infoBox}>
         <Text style={styles.infoTitle}>🔒 Segurança</Text>
@@ -101,15 +209,24 @@ const styles = StyleSheet.create({
   },
   prefixContainer: {
     backgroundColor: COLORS.background,
-    paddingHorizontal: 16,
+    paddingHorizontal: 12,
     paddingVertical: 16,
     borderRightWidth: 2,
     borderRightColor: COLORS.border,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  flagText: {
+    fontSize: 24,
   },
   prefixText: {
     fontSize: 16,
     fontWeight: '600' as const,
     color: COLORS.text,
+  },
+  chevron: {
+    marginLeft: 2,
   },
   input: {
     flex: 1,
@@ -148,5 +265,69 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     marginTop: 12,
     fontStyle: 'italic' as const,
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    backgroundColor: COLORS.white,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    maxHeight: '80%',
+    paddingTop: 20,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold' as const,
+    color: COLORS.text,
+  },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.background,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    marginHorizontal: 20,
+    marginBottom: 16,
+    gap: 12,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: COLORS.text,
+  },
+  countryItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    gap: 12,
+  },
+  countryItemSelected: {
+    backgroundColor: `${COLORS.primary}15`,
+  },
+  countryFlag: {
+    fontSize: 28,
+    width: 40,
+  },
+  countryName: {
+    flex: 1,
+    fontSize: 16,
+    color: COLORS.text,
+  },
+  countryDial: {
+    fontSize: 16,
+    color: COLORS.textSecondary,
+    fontWeight: '600' as const,
   },
 });
