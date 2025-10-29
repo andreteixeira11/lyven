@@ -230,9 +230,12 @@ function NormalUserTicketsContent() {
       activeOpacity={0.8}
     >
       <View style={styles.upcomingCardHeader}>
-        <View style={styles.dateTimeContainer}>
-          <Text style={[styles.dateMonth, { color: colors.text }]}>{formatDate(ticket.eventDate)}</Text>
-          <Text style={[styles.dateTime, { color: colors.text }]}>{formatTime(ticket.eventDate)}</Text>
+        <View style={styles.titleContainer}>
+          <Text style={[styles.upcomingTitle, { color: colors.text }]}>{ticket.eventTitle}</Text>
+          <View style={styles.dateTimeContainer}>
+            <Text style={[styles.dateMonth, { color: colors.textSecondary }]}>{formatDate(ticket.eventDate)}</Text>
+            <Text style={[styles.dateTime, { color: colors.textSecondary }]}> · {formatTime(ticket.eventDate)}</Text>
+          </View>
         </View>
         <TouchableOpacity 
           style={styles.qrContainer}
@@ -243,7 +246,6 @@ function NormalUserTicketsContent() {
         </TouchableOpacity>
       </View>
 
-      <Text style={[styles.upcomingTitle, { color: colors.text }]}>{ticket.eventTitle}</Text>
       <Text style={[styles.upcomingVenue, { color: colors.textSecondary }]}>
         {ticket.venue} · {ticket.city}
       </Text>
@@ -287,9 +289,14 @@ function NormalUserTicketsContent() {
       onPress={() => router.push(`/ticket-details/${ticket.id}` as any)}
     >
       <View style={styles.comingCardHeader}>
-        <View style={styles.comingDateContainer}>
-          <Text style={[styles.comingMonth, { color: colors.text }]}>{formatDate(ticket.eventDate)}</Text>
-          <Text style={[styles.comingTime, { color: colors.text }]}>{formatTime(ticket.eventDate)}</Text>
+        <View style={styles.comingTitleContainer}>
+          <Text style={[styles.comingTitle, { color: colors.text }]} numberOfLines={1}>
+            {ticket.eventTitle}
+          </Text>
+          <View style={styles.comingDateContainer}>
+            <Text style={[styles.comingMonth, { color: colors.textSecondary }]}>{formatDate(ticket.eventDate)}</Text>
+            <Text style={[styles.comingTime, { color: colors.textSecondary }]}> · {formatTime(ticket.eventDate)}</Text>
+          </View>
         </View>
         <View style={styles.comingQrContainer}>
           <Text style={[styles.comingQrCount, { color: colors.text }]}>{ticket.quantity}</Text>
@@ -302,9 +309,6 @@ function NormalUserTicketsContent() {
           <Image source={{ uri: ticket.eventImage }} style={styles.comingThumbnailImage} />
         </View>
         <View style={styles.comingInfo}>
-          <Text style={[styles.comingTitle, { color: colors.text }]} numberOfLines={1}>
-            {ticket.eventTitle}
-          </Text>
           <Text style={[styles.comingVenue, { color: colors.textSecondary }]} numberOfLines={1}>
             {ticket.venue} · {ticket.city}
           </Text>
@@ -338,9 +342,14 @@ function NormalUserTicketsContent() {
       activeOpacity={0.7}
     >
       <View style={styles.pastHeader}>
-        <View style={styles.pastDateContainer}>
-          <Text style={[styles.pastMonth, { color: colors.text }]}>{formatDate(ticket.eventDate)}</Text>
-          <Text style={[styles.pastTime, { color: colors.text }]}>{formatTime(ticket.eventDate)}</Text>
+        <View style={styles.pastTitleContainer}>
+          <Text style={[styles.pastTitle, { color: colors.text }]} numberOfLines={2}>
+            {ticket.eventTitle}
+          </Text>
+          <View style={styles.pastDateContainer}>
+            <Text style={[styles.pastMonth, { color: colors.textSecondary }]}>{formatDate(ticket.eventDate)}</Text>
+            <Text style={[styles.pastTime, { color: colors.textSecondary }]}> · {formatTime(ticket.eventDate)}</Text>
+          </View>
         </View>
         <View style={styles.pastQrContainer}>
           <Text style={[styles.pastQrCount, { color: colors.text }]}>{ticket.quantity}</Text>
@@ -353,9 +362,6 @@ function NormalUserTicketsContent() {
           <Image source={{ uri: ticket.eventImage }} style={styles.pastThumbnailImage} />
         </View>
         <View style={styles.pastInfo}>
-          <Text style={[styles.pastTitle, { color: colors.text }]} numberOfLines={2}>
-            {ticket.eventTitle}
-          </Text>
           <Text style={[styles.pastVenue, { color: colors.textSecondary }]} numberOfLines={1}>
             {ticket.venue} · {ticket.city}
           </Text>
@@ -674,17 +680,22 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: 16,
   },
-  dateTimeContainer: {
+  titleContainer: {
     flex: 1,
   },
+  dateTimeContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
   dateMonth: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '400' as const,
   },
   dateTime: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '400' as const,
   },
   qrContainer: {
@@ -712,11 +723,10 @@ const styles = StyleSheet.create({
   upcomingTitle: {
     fontSize: 24,
     fontWeight: '700' as const,
-    marginBottom: 4,
   },
   upcomingVenue: {
     fontSize: 14,
-    marginBottom: 16,
+    marginBottom: 12,
   },
   upcomingImage: {
     width: '100%',
@@ -781,15 +791,20 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: 12,
   },
-  comingDateContainer: {
+  comingTitleContainer: {
     flex: 1,
   },
+  comingDateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
   comingMonth: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '400' as const,
   },
   comingTime: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '400' as const,
   },
   comingQrContainer: {
@@ -828,9 +843,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   comingTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '700' as const,
-    marginBottom: 4,
   },
   comingVenue: {
     fontSize: 14,
@@ -870,15 +884,20 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginBottom: 12,
   },
-  pastDateContainer: {
+  pastTitleContainer: {
     flex: 1,
   },
+  pastDateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+  },
   pastMonth: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '400' as const,
   },
   pastTime: {
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: '400' as const,
   },
   pastQrContainer: {
@@ -916,9 +935,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   pastTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '700' as const,
-    marginBottom: 4,
   },
   pastVenue: {
     fontSize: 14,
