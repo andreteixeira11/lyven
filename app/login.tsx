@@ -27,6 +27,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
   const [logoClickCount, setLogoClickCount] = useState(0);
   const logoClickTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   
@@ -83,18 +84,20 @@ export default function LoginScreen() {
   };
 
   const handleAuth = async () => {
+    setErrorMessage('');
+    
     if (!email.trim()) {
-      Alert.alert('Erro', 'Por favor, insira um email');
+      setErrorMessage('Por favor, insira um email');
       return;
     }
 
     if (!password.trim()) {
-      Alert.alert('Erro', 'Por favor, insira uma palavra-passe');
+      setErrorMessage('Por favor, insira uma palavra-passe');
       return;
     }
 
     if (!isLogin && !name.trim()) {
-      Alert.alert('Erro', 'Por favor, insira o seu nome');
+      setErrorMessage('Por favor, insira o seu nome');
       return;
     }
 
@@ -140,7 +143,7 @@ export default function LoginScreen() {
             router.replace('/(tabs)');
           } else {
             console.error('❌ Credenciais inválidas');
-            Alert.alert('Erro de Login', 'Email ou palavra-passe incorretos.');
+            setErrorMessage('Email ou palavra-passe incorretos.');
           }
         } else {
           Alert.alert('Sucesso', 'Login realizado com sucesso!');
@@ -157,7 +160,7 @@ export default function LoginScreen() {
         }
         
         if (email.toLowerCase() === 'admin') {
-          Alert.alert('Erro', 'Este email não pode ser usado para registo.');
+          setErrorMessage('Este email não pode ser usado para registo.');
           return;
         }
         
@@ -166,8 +169,9 @@ export default function LoginScreen() {
           router.replace('/onboarding');
         }
       }
-    } catch {
-      Alert.alert('Erro', 'Ocorreu um erro. Tente novamente.');
+    } catch (error) {
+      console.error('❌ Erro durante autenticação:', error);
+      setErrorMessage('Ocorreu um erro durante a autenticação. Por favor, verifique os seus dados e tente novamente.');
     } finally {
       setIsLoading(false);
     }
@@ -303,6 +307,12 @@ export default function LoginScreen() {
                   <Text style={styles.forgotPasswordText}>Esqueceu a palavra-passe?</Text>
                 </TouchableOpacity>
               )}
+
+              {errorMessage ? (
+                <View style={styles.errorContainer}>
+                  <Text style={styles.errorText}>{errorMessage}</Text>
+                </View>
+              ) : null}
 
               <TouchableOpacity
                 style={[styles.button, isLoading && styles.buttonDisabled]}
@@ -477,5 +487,19 @@ const styles = StyleSheet.create({
     color: COLORS.primary,
     fontSize: 14,
     fontWeight: '600' as const,
+  },
+  errorContainer: {
+    backgroundColor: '#FFEBEE',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#FFCDD2',
+  },
+  errorText: {
+    color: '#C62828',
+    fontSize: 14,
+    lineHeight: 20,
+    textAlign: 'center',
   },
 });
