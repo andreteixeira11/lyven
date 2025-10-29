@@ -406,6 +406,38 @@ export default function AdminAnalytics() {
             </View>
           </View>
 
+          {/* Most Popular Events */}
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Eventos Mais Populares</Text>
+            <View style={styles.popularEventsContainer}>
+              {topEvents.slice(0, 3).map((event, index) => (
+                <View key={event.id} style={styles.popularEventCard}>
+                  <View style={styles.popularEventRank}>
+                    <Award size={20} color={index === 0 ? '#FFD700' : index === 1 ? '#C0C0C0' : '#CD7F32'} />
+                    <Text style={styles.popularRankText}>#{index + 1}</Text>
+                  </View>
+                  <View style={styles.popularEventContent}>
+                    <Text style={styles.popularEventTitle}>{event.title}</Text>
+                    <View style={styles.popularEventStats}>
+                      <View style={styles.popularStatItem}>
+                        <Target size={14} color={COLORS.primary} />
+                        <Text style={styles.popularStatText}>{event.ticketsSold} bilhetes</Text>
+                      </View>
+                      <View style={styles.popularStatItem}>
+                        <Eye size={14} color={COLORS.info} />
+                        <Text style={styles.popularStatText}>{event.views} views</Text>
+                      </View>
+                      <View style={styles.popularStatItem}>
+                        <DollarSign size={14} color={COLORS.success} />
+                        <Text style={styles.popularStatText}>€{event.revenue.toLocaleString()}</Text>
+                      </View>
+                    </View>
+                  </View>
+                </View>
+              ))}
+            </View>
+          </View>
+
           {/* Top Performing Events */}
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Eventos com Melhor Performance</Text>
@@ -711,5 +743,53 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginRight: 15,
     gap: 6,
+  },
+  popularEventsContainer: {
+    gap: 12,
+  },
+  popularEventCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 12,
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 15,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  popularEventRank: {
+    alignItems: 'center',
+    gap: 4,
+  },
+  popularRankText: {
+    fontSize: 12,
+    fontWeight: 'bold' as const,
+    color: COLORS.textSecondary,
+  },
+  popularEventContent: {
+    flex: 1,
+  },
+  popularEventTitle: {
+    fontSize: 16,
+    fontWeight: 'bold' as const,
+    color: COLORS.text,
+    marginBottom: 8,
+  },
+  popularEventStats: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+  },
+  popularStatItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  popularStatText: {
+    fontSize: 12,
+    color: COLORS.textSecondary,
   },
 });
