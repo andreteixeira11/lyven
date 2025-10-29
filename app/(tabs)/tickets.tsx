@@ -296,20 +296,6 @@ function NormalUserTicketsContent() {
           <Text style={[styles.comingMonth, { color: colors.text }]}>{formatDate(ticket.eventDate)}</Text>
           <Text style={[styles.comingTime, { color: colors.text }]}>{formatTime(ticket.eventDate)}</Text>
         </View>
-        <TouchableOpacity 
-          style={styles.comingQrContainer}
-          onPress={(e) => {
-            e.stopPropagation();
-            setSelectedQRTicket(selectedQRTicket === ticket.id ? null : ticket.id);
-          }}
-        >
-          <View style={styles.comingQrIcon}>
-            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
-            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
-            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
-            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
-          </View>
-        </TouchableOpacity>
       </View>
 
       <View style={styles.comingContent}>
