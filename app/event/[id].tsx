@@ -352,13 +352,7 @@ export default function EventDetailScreen() {
               </View>
             </View>
             
-            <View style={styles.infoItem}>
-              <Users size={20} color={colors.primary} />
-              <View style={styles.infoContent}>
-                <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Capacidade</Text>
-                <Text style={[styles.infoText, { color: colors.text }]}>{event.venue.capacity} pessoas</Text>
-              </View>
-            </View>
+
           </View>
 
           {/* Quick Actions */}
