@@ -415,7 +415,11 @@ export default function EventDetailScreen() {
           {/* Promoter Info */}
           <View style={styles.promoterSection}>
             <Text style={[styles.sectionTitle, { color: colors.primary }]}>Organizado por</Text>
-            <View style={[styles.promoterCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+            <TouchableOpacity 
+              style={[styles.promoterCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+              onPress={() => router.push(`/promoter/${event.promoter.id}` as any)}
+              activeOpacity={0.7}
+            >
               <View style={styles.promoterInfo}>
                 <View style={styles.promoterHeader}>
                   <Text style={[styles.promoterName, { color: colors.primary }]}>{event.promoter.name}</Text>
@@ -427,7 +431,7 @@ export default function EventDetailScreen() {
                 </View>
                 <Text style={[styles.promoterDescription, { color: colors.textSecondary }]}>{event.promoter.description}</Text>
               </View>
-            </View>
+            </TouchableOpacity>
           </View>
           
           {/* Social Links */}
