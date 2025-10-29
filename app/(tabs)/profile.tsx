@@ -25,6 +25,7 @@ import {
   Moon,
   Sun,
   Bell,
+  UserPlus,
 } from 'lucide-react-native';
 import { useUser } from '@/hooks/user-context';
 import { useTheme } from '@/hooks/theme-context';
@@ -268,6 +269,12 @@ export default function ProfileScreen() {
         icon={Heart}
         title="Favoritos"
         onPress={() => handleMenuItemPress('/(tabs)/favorites')}
+      />
+
+      <MenuItem
+        icon={UserPlus}
+        title="A Seguir"
+        onPress={() => handleMenuItemPress('/following')}
       />
 
       <View style={styles.themeMenuItem}>
