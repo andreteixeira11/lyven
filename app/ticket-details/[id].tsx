@@ -347,7 +347,8 @@ export default function TicketDetailsScreen() {
                     value={ticket.qrCode} 
                     size={QR_SIZE} 
                     backgroundColor={isDark ? '#1E1E1E' : '#FFFFFF'}
-                    foregroundColor={isDark ? '#FFFFFF' : '#000000'}
+                    ticketType={ticket.ticketType}
+                    enableGradient={true}
                   />
                 </View>
                 <Text style={[styles.ticketOwner, { color: colors.text }]}>

@@ -1,83 +1,77 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
-import Svg, { Rect } from 'react-native-svg';
+import QRCodeSVG from 'react-native-qrcode-svg';
 
 interface QRCodeProps {
   value: string;
   size?: number;
   backgroundColor?: string;
   foregroundColor?: string;
+  ticketType?: string;
+  logo?: string;
+  enableGradient?: boolean;
 }
+
+const ticketColors: Record<string, { primary: string; secondary: string }> = {
+  'VIP': { primary: '#FFD700', secondary: '#FFA500' },
+  'Premium': { primary: '#C084FC', secondary: '#9333EA' },
+  'General Admission': { primary: '#3B82F6', secondary: '#1D4ED8' },
+  'Early Bird': { primary: '#10B981', secondary: '#059669' },
+  'Student': { primary: '#F59E0B', secondary: '#D97706' },
+  'default': { primary: '#000000', secondary: '#1F2937' }
+};
 
 export default function QRCode({ 
   value, 
   size = 120, 
   backgroundColor = '#FFFFFF',
-  foregroundColor = '#000000'
+  foregroundColor,
+  ticketType = 'default',
+  logo,
+  enableGradient = true
 }: QRCodeProps) {
-  const generateSimpleQR = (data: string): boolean[][] => {
-    const hash = data.split('').reduce((acc, char) => {
-      return char.charCodeAt(0) + ((acc << 5) - acc);
-    }, 0);
-    
-    const gridSize = 25;
-    const grid: boolean[][] = [];
-    
-    for (let i = 0; i < gridSize; i++) {
-      grid[i] = [];
-      for (let j = 0; j < gridSize; j++) {
-        const seed = (hash + i * gridSize + j) % 997;
-        grid[i][j] = seed % 2 === 0;
-      }
-    }
-    
-    for (let i = 0; i < 7; i++) {
-      for (let j = 0; j < 7; j++) {
-        if ((i === 0 || i === 6 || j === 0 || j === 6) && !(i >= 2 && i <= 4 && j >= 2 && j <= 4)) {
-          grid[i][j] = true;
-          grid[i][gridSize - 1 - j] = true;
-          grid[gridSize - 1 - i][j] = true;
-        }
-        if (i >= 2 && i <= 4 && j >= 2 && j <= 4) {
-          grid[i][j] = true;
-          grid[i][gridSize - 1 - j] = true;
-          grid[gridSize - 1 - i][j] = true;
-        }
-      }
-    }
-    
-    return grid;
-  };
-
-  const grid = generateSimpleQR(value);
-  const gridSize = grid.length;
-  const cellSize = size / gridSize;
+  const colors = ticketColors[ticketType] || ticketColors.default;
+  const qrColor = foregroundColor || colors.primary;
 
   return (
-    <View style={[styles.container, { width: size, height: size, backgroundColor }]}>
-      <Svg width={size} height={size}>
-        {grid.map((row, i) =>
-          row.map((cell, j) =>
-            cell ? (
-              <Rect
-                key={`${i}-${j}`}
-                x={j * cellSize}
-                y={i * cellSize}
-                width={cellSize}
-                height={cellSize}
-                fill={foregroundColor}
-              />
-            ) : null
-          )
-        )}
-      </Svg>
+    <View style={[styles.container, { backgroundColor }]}>
+      <View style={styles.qrWrapper}>
+        <QRCodeSVG
+          value={value}
+          size={size}
+          color={qrColor}
+          backgroundColor={backgroundColor}
+          quietZone={8}
+          ecl="M"
+          enableLinearGradient={enableGradient}
+          linearGradient={enableGradient ? [colors.primary, colors.secondary] : undefined}
+          gradientDirection={['0%', '0%', '100%', '100%']}
+          logo={logo}
+          logoSize={size * 0.2}
+          logoBackgroundColor={backgroundColor}
+          logoMargin={4}
+          logoBorderRadius={size * 0.05}
+        />
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: 8,
-    borderRadius: 8,
+    padding: 16,
+    borderRadius: 24,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  qrWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });
