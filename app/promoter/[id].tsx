@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -18,20 +18,35 @@ export default function PromoterScreen() {
   const { id } = useLocalSearchParams();
   const { colors } = useTheme();
   const { user } = useUser();
-  const [isFollowing, setIsFollowing] = useState(false);
 
   const promoterId = Array.isArray(id) ? id[0] : id;
 
   const eventsQuery = trpc.events.list.useQuery();
+  
+  const isFollowingQuery = trpc.social.isFollowing.useQuery(
+    {
+      userId: user?.id || '',
+      targetId: promoterId,
+      targetType: 'promoter',
+    },
+    {
+      enabled: !!user?.id,
+    }
+  );
+
+  const utils = trpc.useUtils();
+
   const followMutation = trpc.social.follow.useMutation({
     onSuccess: () => {
-      setIsFollowing(true);
+      isFollowingQuery.refetch();
+      utils.social.getFollowing.invalidate();
     }
   });
 
   const unfollowMutation = trpc.social.unfollow.useMutation({
     onSuccess: () => {
-      setIsFollowing(false);
+      isFollowingQuery.refetch();
+      utils.social.getFollowing.invalidate();
     }
   });
 
@@ -53,6 +68,8 @@ export default function PromoterScreen() {
       router.push('/login');
       return;
     }
+
+    const isFollowing = isFollowingQuery.data?.isFollowing || false;
 
     if (isFollowing) {
       unfollowMutation.mutate({
@@ -128,24 +145,24 @@ export default function PromoterScreen() {
           <TouchableOpacity
             style={[
               styles.followButton,
-              isFollowing && styles.followingButton,
-              { backgroundColor: isFollowing ? colors.card : '#fff' }
+              isFollowingQuery.data?.isFollowing && styles.followingButton,
+              { backgroundColor: isFollowingQuery.data?.isFollowing ? colors.card : '#fff' }
             ]}
             onPress={handleFollowToggle}
-            disabled={followMutation.isPending || unfollowMutation.isPending}
+            disabled={followMutation.isPending || unfollowMutation.isPending || isFollowingQuery.isLoading}
           >
-            {followMutation.isPending || unfollowMutation.isPending ? (
+            {followMutation.isPending || unfollowMutation.isPending || isFollowingQuery.isLoading ? (
               <ActivityIndicator size="small" color={colors.primary} />
             ) : (
               <>
-                {isFollowing && <Check size={18} color={colors.primary} />}
+                {isFollowingQuery.data?.isFollowing && <Check size={18} color={colors.primary} />}
                 <Text
                   style={[
                     styles.followButtonText,
-                    { color: isFollowing ? colors.primary : colors.primary }
+                    { color: isFollowingQuery.data?.isFollowing ? colors.primary : colors.primary }
                   ]}
                 >
-                  {isFollowing ? 'A seguir' : 'Seguir'}
+                  {isFollowingQuery.data?.isFollowing ? 'A seguir' : 'Seguir'}
                 </Text>
               </>
             )}
