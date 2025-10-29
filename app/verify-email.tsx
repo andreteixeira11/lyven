@@ -14,12 +14,14 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Mail } from 'lucide-react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { COLORS } from '@/constants/colors';
+import { useUser } from '@/hooks/user-context';
 
 export default function VerifyEmailScreen() {
   const params = useLocalSearchParams();
   const email = params.email as string;
   const name = params.name as string;
   const password = params.password as string;
+  const { createUser } = useUser();
 
   const [code, setCode] = useState(['', '', '', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
@@ -93,11 +95,14 @@ export default function VerifyEmailScreen() {
     try {
       if (codeToVerify === '000000') {
         console.log('✅ Código verificado com sucesso (modo temporário)');
+        console.log('🔄 Criando utilizador:', { email, name });
+        
+        await createUser(email, name);
+        
+        console.log('✅ Utilizador criado com sucesso');
         Alert.alert('Sucesso', 'Email verificado com sucesso!');
-        router.replace({
-          pathname: '/onboarding',
-          params: { email, name, password },
-        });
+        
+        router.replace('/onboarding');
       } else {
         setErrorMessage('Código inválido. Use 000000');
         setCode(['', '', '', '', '', '']);
