@@ -21,6 +21,7 @@ import {
 } from 'lucide-react-native';
 import { COLORS } from '@/constants/colors';
 import { useUser } from '@/hooks/user-context';
+import { useTheme } from '@/hooks/theme-context';
 import AuthGuard from '@/components/AuthGuard';
 import CreateEvent from '@/app/create-event';
 import { router } from 'expo-router';
@@ -74,6 +75,7 @@ interface UserTicket {
 
 function NormalUserTicketsContent() {
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
   const [selectedTab, setSelectedTab] = useState<'upcoming' | 'past'>('upcoming');
   
   const [userTickets] = useState<UserTicket[]>([
@@ -115,17 +117,17 @@ function NormalUserTicketsContent() {
 
   const TicketCard = ({ ticket }: { ticket: UserTicket }) => (
     <TouchableOpacity
-      style={styles.ticketCard}
+      style={[styles.ticketCard, { backgroundColor: colors.card }]}
       onPress={() => router.push(`/event/${ticket.eventId}` as any)}
     >
       <Image source={{ uri: ticket.eventImage }} style={styles.ticketImage} />
       <View style={styles.ticketContent}>
         <View style={styles.ticketHeader}>
-          <Text style={styles.ticketTitle} numberOfLines={2}>
+          <Text style={[styles.ticketTitle, { color: colors.text }]} numberOfLines={2}>
             {ticket.eventTitle}
           </Text>
           {ticket.isUsed && (
-            <View style={styles.usedBadge}>
+            <View style={[styles.usedBadge, { backgroundColor: colors.textSecondary }]}>
               <Text style={styles.usedBadgeText}>Usado</Text>
             </View>
           )}
@@ -133,8 +135,8 @@ function NormalUserTicketsContent() {
         
         <View style={styles.ticketDetails}>
           <View style={styles.ticketDetailRow}>
-            <Calendar size={14} color={COLORS.textSecondary} />
-            <Text style={styles.ticketDetailText}>
+            <Calendar size={14} color={colors.textSecondary} />
+            <Text style={[styles.ticketDetailText, { color: colors.textSecondary }]}>
               {new Date(ticket.eventDate).toLocaleDateString('pt-PT', {
                 weekday: 'long',
                 day: 'numeric',
@@ -145,8 +147,8 @@ function NormalUserTicketsContent() {
           </View>
           
           <View style={styles.ticketDetailRow}>
-            <Clock size={14} color={COLORS.textSecondary} />
-            <Text style={styles.ticketDetailText}>
+            <Clock size={14} color={colors.textSecondary} />
+            <Text style={[styles.ticketDetailText, { color: colors.textSecondary }]}>
               {new Date(ticket.eventDate).toLocaleTimeString('pt-PT', {
                 hour: '2-digit',
                 minute: '2-digit',
@@ -155,28 +157,28 @@ function NormalUserTicketsContent() {
           </View>
           
           <View style={styles.ticketDetailRow}>
-            <MapPin size={14} color={COLORS.textSecondary} />
-            <Text style={styles.ticketDetailText}>
+            <MapPin size={14} color={colors.textSecondary} />
+            <Text style={[styles.ticketDetailText, { color: colors.textSecondary }]}>
               {ticket.venue}, {ticket.city}
             </Text>
           </View>
         </View>
 
-        <View style={styles.ticketFooter}>
+        <View style={[styles.ticketFooter, { borderTopColor: colors.border }]}>
           <View>
-            <Text style={styles.ticketType}>{ticket.ticketType}</Text>
-            <Text style={styles.ticketQuantity}>{ticket.quantity}x bilhete(s)</Text>
+            <Text style={[styles.ticketType, { color: colors.text }]}>{ticket.ticketType}</Text>
+            <Text style={[styles.ticketQuantity, { color: colors.textSecondary }]}>{ticket.quantity}x bilhete(s)</Text>
           </View>
-          <Text style={styles.ticketPrice}>€{ticket.totalPrice}</Text>
+          <Text style={[styles.ticketPrice, { color: colors.primary }]}>€{ticket.totalPrice}</Text>
         </View>
 
         {!ticket.isUsed && new Date(ticket.eventDate) >= now && (
           <TouchableOpacity
-            style={styles.viewQRButton}
+            style={[styles.viewQRButton, { backgroundColor: colors.primary }]}
             onPress={() => Alert.alert('QR Code', `Código: ${ticket.qrCode}`)}
           >
-            <Eye size={16} color={COLORS.white} />
-            <Text style={styles.viewQRButtonText}>Ver QR Code</Text>
+            <Eye size={16} color={colors.white} />
+            <Text style={[styles.viewQRButtonText, { color: colors.white }]}>Ver QR Code</Text>
           </TouchableOpacity>
         )}
       </View>
@@ -185,10 +187,16 @@ function NormalUserTicketsContent() {
 
   const TabButton = ({ tab, title, count }: { tab: 'upcoming' | 'past'; title: string; count: number }) => (
     <TouchableOpacity
-      style={[styles.ticketTabButton, selectedTab === tab && styles.ticketTabButtonActive]}
+      style={[
+        styles.ticketTabButton,
+        { backgroundColor: selectedTab === tab ? colors.primary : colors.border }
+      ]}
       onPress={() => setSelectedTab(tab)}
     >
-      <Text style={[styles.ticketTabText, selectedTab === tab && styles.ticketTabTextActive]}>
+      <Text style={[
+        styles.ticketTabText,
+        { color: selectedTab === tab ? colors.white : colors.textSecondary }
+      ]}>
         {title} ({count})
       </Text>
     </TouchableOpacity>
@@ -197,10 +205,10 @@ function NormalUserTicketsContent() {
   const currentTickets = selectedTab === 'upcoming' ? upcomingTickets : pastTickets;
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container, { paddingTop: insets.top, backgroundColor: colors.background }]}>
       <View style={styles.ticketHeader}>
-        <Text style={styles.ticketHeaderTitle}>Os Meus Bilhetes</Text>
-        <Text style={styles.ticketHeaderSubtitle}>
+        <Text style={[styles.ticketHeaderTitle, { color: colors.text }]}>Os Meus Bilhetes</Text>
+        <Text style={[styles.ticketHeaderSubtitle, { color: colors.textSecondary }]}>
           {userTickets.length} {userTickets.length === 1 ? 'bilhete' : 'bilhetes'}
         </Text>
       </View>
@@ -218,21 +226,21 @@ function NormalUserTicketsContent() {
             ))
           ) : (
             <View style={styles.emptyState}>
-              <Calendar size={64} color={COLORS.textSecondary} />
-              <Text style={styles.emptyTicketsTitle}>
+              <Calendar size={64} color={colors.textSecondary} />
+              <Text style={[styles.emptyTicketsTitle, { color: colors.text }]}>
                 {selectedTab === 'upcoming' ? 'Nenhum bilhete próximo' : 'Nenhum bilhete passado'}
               </Text>
-              <Text style={styles.emptyTicketsSubtitle}>
+              <Text style={[styles.emptyTicketsSubtitle, { color: colors.textSecondary }]}>
                 {selectedTab === 'upcoming'
                   ? 'Explora eventos e compra os teus bilhetes'
                   : 'Os teus bilhetes usados aparecerão aqui'}
               </Text>
               {selectedTab === 'upcoming' && (
                 <TouchableOpacity
-                  style={styles.exploreButton}
+                  style={[styles.exploreButton, { backgroundColor: colors.primary }]}
                   onPress={() => router.push('/(tabs)')}
                 >
-                  <Text style={styles.exploreButtonText}>Explorar Eventos</Text>
+                  <Text style={[styles.exploreButtonText, { color: colors.white }]}>Explorar Eventos</Text>
                 </TouchableOpacity>
               )}
             </View>
@@ -245,6 +253,7 @@ function NormalUserTicketsContent() {
 
 function AdminApprovalsContent() {
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
   const [pendingAds, setPendingAds] = useState<PendingAd[]>([
     {
       id: '1',
@@ -363,44 +372,44 @@ function AdminApprovalsContent() {
   };
 
   const AdCard = ({ ad }: { ad: PendingAd }) => (
-    <View style={styles.adCard}>
+    <View style={[styles.adCard, { backgroundColor: colors.card }]}>
       <View style={styles.adHeader}>
         <View style={styles.adHeaderLeft}>
-          <Text style={styles.eventTitle}>{ad.eventTitle}</Text>
+          <Text style={[styles.eventTitle, { color: colors.text }]}>{ad.eventTitle}</Text>
           <View style={[styles.adTypeBadge, { backgroundColor: getAdTypeColor(ad.adType) + '20' }]}>
             <Text style={[styles.adTypeText, { color: getAdTypeColor(ad.adType) }]}>
               {getAdTypeLabel(ad.adType)}
             </Text>
           </View>
         </View>
-        <Text style={styles.priceText}>€{ad.price}</Text>
+        <Text style={[styles.priceText, { color: colors.success }]}>€{ad.price}</Text>
       </View>
 
       <Image source={{ uri: ad.imageUrl }} style={styles.adImage} />
 
       <View style={styles.adDetails}>
         <View style={styles.detailRow}>
-          <User size={16} color={COLORS.textSecondary} />
-          <Text style={styles.detailText}>{ad.promoterName}</Text>
+          <User size={16} color={colors.textSecondary} />
+          <Text style={[styles.detailText, { color: colors.textSecondary }]}>{ad.promoterName}</Text>
         </View>
         <View style={styles.detailRow}>
-          <Calendar size={16} color={COLORS.textSecondary} />
-          <Text style={styles.detailText}>{formatDate(ad.eventDate)}</Text>
+          <Calendar size={16} color={colors.textSecondary} />
+          <Text style={[styles.detailText, { color: colors.textSecondary }]}>{formatDate(ad.eventDate)}</Text>
         </View>
         <View style={styles.detailRow}>
-          <MapPin size={16} color={COLORS.textSecondary} />
-          <Text style={styles.detailText}>{ad.eventLocation}</Text>
+          <MapPin size={16} color={colors.textSecondary} />
+          <Text style={[styles.detailText, { color: colors.textSecondary }]}>{ad.eventLocation}</Text>
         </View>
         <View style={styles.detailRow}>
-          <DollarSign size={16} color={COLORS.textSecondary} />
-          <Text style={styles.detailText}>{ad.duration} dias de duração</Text>
+          <DollarSign size={16} color={colors.textSecondary} />
+          <Text style={[styles.detailText, { color: colors.textSecondary }]}>{ad.duration} dias de duração</Text>
         </View>
       </View>
 
-      <Text style={styles.description}>{ad.description}</Text>
+      <Text style={[styles.description, { color: colors.text }]}>{ad.description}</Text>
 
-      <View style={styles.submissionInfo}>
-        <Text style={styles.submissionText}>
+      <View style={[styles.submissionInfo, { borderTopColor: colors.border }]}>
+        <Text style={[styles.submissionText, { color: colors.textSecondary }]}>
           Submetido em {formatDate(ad.submittedAt)}
         </Text>
       </View>
@@ -408,19 +417,19 @@ function AdminApprovalsContent() {
       {ad.status === 'pending' && (
         <View style={styles.actionButtons}>
           <TouchableOpacity
-            style={[styles.actionButton, styles.rejectButton]}
+            style={[styles.actionButton, { backgroundColor: colors.error }]}
             onPress={() => handleReject(ad.id)}
           >
-            <X size={20} color={COLORS.white} />
-            <Text style={styles.actionButtonText}>Rejeitar</Text>
+            <X size={20} color={colors.white} />
+            <Text style={[styles.actionButtonText, { color: colors.white }]}>Rejeitar</Text>
           </TouchableOpacity>
           
           <TouchableOpacity
-            style={[styles.actionButton, styles.approveButton]}
+            style={[styles.actionButton, { backgroundColor: colors.success }]}
             onPress={() => handleApprove(ad.id)}
           >
-            <Check size={20} color={COLORS.white} />
-            <Text style={styles.actionButtonText}>Aprovar</Text>
+            <Check size={20} color={colors.white} />
+            <Text style={[styles.actionButtonText, { color: colors.white }]}>Aprovar</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -428,11 +437,11 @@ function AdminApprovalsContent() {
       {ad.status !== 'pending' && (
         <View style={[
           styles.statusBadge,
-          { backgroundColor: ad.status === 'approved' ? COLORS.success + '20' : COLORS.error + '20' }
+          { backgroundColor: ad.status === 'approved' ? colors.success + '20' : colors.error + '20' }
         ]}>
           <Text style={[
             styles.statusText,
-            { color: ad.status === 'approved' ? COLORS.success : COLORS.error }
+            { color: ad.status === 'approved' ? colors.success : colors.error }
           ]}>
             {ad.status === 'approved' ? 'Aprovada' : 'Rejeitada'}
           </Text>
@@ -446,40 +455,40 @@ function AdminApprovalsContent() {
   const rejectedCount = pendingAds.filter(ad => ad.status === 'rejected').length;
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container, { paddingTop: insets.top, backgroundColor: colors.background }]}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
-          <View style={styles.statsContainer}>
+          <View style={[styles.statsContainer, { backgroundColor: colors.card }]}>
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>{pendingCount}</Text>
-              <Text style={styles.statLabel}>Pendentes</Text>
+              <Text style={[styles.statValue, { color: colors.primary }]}>{pendingCount}</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Pendentes</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={[styles.statValue, { color: COLORS.success }]}>{approvedCount}</Text>
-              <Text style={styles.statLabel}>Aprovadas</Text>
+              <Text style={[styles.statValue, { color: colors.success }]}>{approvedCount}</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Aprovadas</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={[styles.statValue, { color: COLORS.error }]}>{rejectedCount}</Text>
-              <Text style={styles.statLabel}>Rejeitadas</Text>
+              <Text style={[styles.statValue, { color: colors.error }]}>{rejectedCount}</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Rejeitadas</Text>
             </View>
           </View>
 
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Publicidades Pendentes</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Publicidades Pendentes</Text>
             {pendingAds.filter(ad => ad.status === 'pending').map(ad => (
               <AdCard key={ad.id} ad={ad} />
             ))}
             {pendingCount === 0 && (
               <View style={styles.emptyState}>
-                <Eye size={48} color={COLORS.textSecondary} />
-                <Text style={styles.emptyStateText}>Nenhuma publicidade pendente</Text>
+                <Eye size={48} color={colors.textSecondary} />
+                <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>Nenhuma publicidade pendente</Text>
               </View>
             )}
           </View>
 
           {(approvedCount > 0 || rejectedCount > 0) && (
             <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Decisões Recentes</Text>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>Decisões Recentes</Text>
               {pendingAds.filter(ad => ad.status !== 'pending').map(ad => (
                 <AdCard key={ad.id} ad={ad} />
               ))}
