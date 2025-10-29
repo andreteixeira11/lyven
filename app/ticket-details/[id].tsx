@@ -483,7 +483,11 @@ export default function TicketDetailsScreen() {
             <Text style={[styles.organizerTitle, { color: colors.text }]}>
               Organizado por
             </Text>
-            <View style={[styles.organizerCard, { backgroundColor: colors.background }]}>
+            <TouchableOpacity 
+              style={[styles.organizerCard, { backgroundColor: colors.background }]}
+              onPress={() => router.push(`/promoter/${event.promoter.id}` as any)}
+              activeOpacity={0.8}
+            >
               <Image 
                 source={{ uri: event.promoter.image }} 
                 style={styles.organizerImage}
@@ -515,7 +519,8 @@ export default function TicketDetailsScreen() {
                   </View>
                 </View>
               </View>
-            </View>
+              <ChevronRight size={20} color={colors.textSecondary} style={styles.organizerChevron} />
+            </TouchableOpacity>
           </View>
 
           <View style={{ height: 100 }} />
@@ -853,6 +858,10 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     gap: 16,
+    alignItems: 'center',
+  },
+  organizerChevron: {
+    marginLeft: 'auto',
   },
   organizerImage: {
     width: 80,
