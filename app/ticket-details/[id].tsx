@@ -511,12 +511,6 @@ export default function TicketDetailsScreen() {
                     </Text>
                     <Text style={[styles.statValue, { color: colors.text }]}>321</Text>
                   </View>
-                  <View style={styles.statItem}>
-                    <Text style={[styles.statLabel, { color: colors.textSecondary }]}>
-                      Hospedagem
-                    </Text>
-                    <Text style={[styles.statValue, { color: colors.text }]}>8 anos</Text>
-                  </View>
                 </View>
               </View>
               <ChevronRight size={20} color={colors.textSecondary} style={styles.organizerChevron} />
