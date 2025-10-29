@@ -296,6 +296,15 @@ function NormalUserTicketsContent() {
           <Text style={[styles.comingMonth, { color: colors.text }]}>{formatDate(ticket.eventDate)}</Text>
           <Text style={[styles.comingTime, { color: colors.text }]}>{formatTime(ticket.eventDate)}</Text>
         </View>
+        <View style={styles.comingQrContainer}>
+          <Text style={[styles.comingQrCount, { color: colors.text }]}>{ticket.quantity}</Text>
+          <View style={styles.comingQrIcon}>
+            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
+            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
+            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
+            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
+          </View>
+        </View>
       </View>
 
       <View style={styles.comingContent}>
