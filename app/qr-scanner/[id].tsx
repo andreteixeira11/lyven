@@ -19,6 +19,7 @@ import {
 import { useLocalSearchParams, router, Stack } from 'expo-router';
 import { CameraView, CameraType, useCameraPermissions } from 'expo-camera';
 import { mockEvents } from '@/mocks/events';
+import { useUser } from '@/hooks/user-context';
 import { trpcClient } from '@/lib/trpc';
 
 interface ScannedTicket {
@@ -34,6 +35,7 @@ interface ScannedTicket {
 
 export default function QRScannerScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { user } = useUser();
   const [permission, requestPermission] = useCameraPermissions();
   const [scanned, setScanned] = useState(false);
   const [flashOn, setFlashOn] = useState(false);
@@ -59,7 +61,10 @@ export default function QRScannerScreen() {
     
     try {
       // Validar bilhete no backend
-      const result = await trpcClient.tickets.validate.mutate({ qrCode: data });
+      const result = await trpcClient.tickets.validate.mutate({ 
+        qrCode: data,
+        validatedBy: user?.id,
+      });
       
       console.log('✅ Resultado da validação:', result);
       
@@ -74,12 +79,12 @@ export default function QRScannerScreen() {
       const validatedTicket: ScannedTicket = {
         id: result.ticket.id,
         eventId: result.ticket.eventId,
-        buyerName: 'Comprador',
+        buyerName: result.buyer?.name || 'Comprador',
         ticketType: result.ticket.ticketTypeId,
         quantity: result.ticket.quantity,
         isValid: true,
         isAlreadyUsed: true,
-        validatedAt: new Date(),
+        validatedAt: result.ticket.validatedAt ? new Date(result.ticket.validatedAt) : new Date(),
       };
       
       handleValidTicket(validatedTicket, data);

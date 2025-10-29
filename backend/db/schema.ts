@@ -94,6 +94,8 @@ export const tickets = sqliteTable('tickets', {
   price: real('price').notNull(),
   qrCode: text('qr_code').notNull(),
   isUsed: integer('is_used', { mode: 'boolean' }).notNull().default(false),
+  validatedAt: text('validated_at'),
+  validatedBy: text('validated_by'),
   purchaseDate: text('purchase_date').notNull().default(sql`CURRENT_TIMESTAMP`),
   validUntil: text('valid_until').notNull(),
   addedToCalendar: integer('added_to_calendar', { mode: 'boolean' }).default(false),
