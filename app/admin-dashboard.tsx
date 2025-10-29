@@ -527,7 +527,7 @@ export default function AdminDashboard() {
     <SafeAreaView style={styles.container}>
       <Stack.Screen 
         options={{ 
-          title: 'Administração - Lyven',
+          title: 'Painel de Controlo - Administração',
           headerStyle: { backgroundColor: COLORS.primary },
           headerTintColor: COLORS.white,
           headerTitleStyle: { fontWeight: 'bold' as const },
@@ -538,10 +538,6 @@ export default function AdminDashboard() {
       <View style={styles.content}>
         <View style={styles.header}>
           <View style={styles.headerTop}>
-            <View style={styles.headerTexts}>
-              <Text style={styles.welcomeText}>Painel de Controlo</Text>
-              <Text style={styles.subtitleText}>Gerir plataforma Lyven</Text>
-            </View>
             <TouchableOpacity
               style={styles.compactDropdownButton}
               onPress={() => setMenuOpen(!menuOpen)}
@@ -694,21 +690,8 @@ const styles = StyleSheet.create({
   headerTop: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'flex-end',
     marginBottom: 12,
-  },
-  headerTexts: {
-    flex: 1,
-  },
-  welcomeText: {
-    fontSize: 24,
-    fontWeight: 'bold' as const,
-    color: COLORS.text,
-    marginBottom: 4,
-  },
-  subtitleText: {
-    fontSize: 14,
-    color: COLORS.textSecondary,
   },
   alertBanner: {
     flexDirection: 'row',
