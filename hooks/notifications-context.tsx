@@ -72,6 +72,10 @@ export const [NotificationsContext, useNotifications] = createContextHook(() => 
 
   useEffect(() => {
     if (!user?.id) return;
+    if (Platform.OS === 'web') {
+      console.log('Notificações push não disponíveis na web');
+      return;
+    }
 
     registerForPushNotificationsAsync()
       .then(token => {
