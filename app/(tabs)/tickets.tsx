@@ -303,7 +303,6 @@ function NormalUserTicketsContent() {
             setSelectedQRTicket(selectedQRTicket === ticket.id ? null : ticket.id);
           }}
         >
-          <Text style={[styles.comingQrCount, { color: colors.text }]}>{ticket.quantity}</Text>
           <View style={styles.comingQrIcon}>
             <View style={[styles.qrSquare, { borderColor: colors.text }]} />
             <View style={[styles.qrSquare, { borderColor: colors.text }]} />
@@ -359,7 +358,6 @@ function NormalUserTicketsContent() {
           <Text style={[styles.pastTime, { color: colors.text }]}>{formatTime(ticket.eventDate)}</Text>
         </View>
         <View style={styles.pastQrContainer}>
-          <Text style={[styles.pastQrCount, { color: colors.text }]}>{ticket.quantity}</Text>
           <View style={styles.pastQrIcon}>
             <View style={[styles.qrSquare, { borderColor: colors.text }]} />
             <View style={[styles.qrSquare, { borderColor: colors.text }]} />
