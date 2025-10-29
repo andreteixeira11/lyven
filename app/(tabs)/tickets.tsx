@@ -149,7 +149,11 @@ function NormalUserTicketsContent() {
   };
 
   const UpcomingTicketCard = ({ ticket }: { ticket: UserTicket }) => (
-    <View style={[styles.upcomingCard, { backgroundColor: colors.background }]}>
+    <TouchableOpacity
+      style={[styles.upcomingCard, { backgroundColor: colors.background }]}
+      onPress={() => router.push(`/ticket-details/${ticket.id}` as any)}
+      activeOpacity={0.8}
+    >
       <View style={styles.upcomingCardHeader}>
         <View style={styles.dateTimeContainer}>
           <Text style={[styles.dateMonth, { color: colors.text }]}>{formatDate(ticket.eventDate)}</Text>
@@ -204,13 +208,13 @@ function NormalUserTicketsContent() {
           <Text style={[styles.qrCodeText, { color: colors.textSecondary }]}>{ticket.qrCode}</Text>
         </View>
       )}
-    </View>
+    </TouchableOpacity>
   );
 
   const ComingTicketCard = ({ ticket }: { ticket: UserTicket }) => (
     <TouchableOpacity
       style={[styles.comingCard, { backgroundColor: colors.background }]}
-      onPress={() => router.push(`/event/${ticket.eventId}` as any)}
+      onPress={() => router.push(`/ticket-details/${ticket.id}` as any)}
     >
       <View style={styles.comingCardHeader}>
         <View style={styles.comingDateContainer}>
@@ -271,7 +275,7 @@ function NormalUserTicketsContent() {
   const PastTicketCard = ({ ticket }: { ticket: UserTicket }) => (
     <TouchableOpacity
       style={[styles.pastCard, { backgroundColor: colors.card, borderColor: colors.border }]}
-      onPress={() => router.push(`/event/${ticket.eventId}` as any)}
+      onPress={() => router.push(`/ticket-details/${ticket.id}` as any)}
     >
       <View style={styles.pastContent}>
         <Image source={{ uri: ticket.eventImage }} style={styles.pastImage} />
