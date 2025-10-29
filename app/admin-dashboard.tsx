@@ -30,11 +30,12 @@ import {
   ChevronRight,
   Menu,
   ChevronDown,
+  Database,
 } from 'lucide-react-native';
 import { COLORS } from '@/constants/colors';
 import { useUser } from '@/hooks/user-context';
 
-type TabType = 'users' | 'events' | 'approvals' | 'analytics';
+type TabType = 'users' | 'events' | 'approvals' | 'analytics' | 'registered-users';
 
 interface AdminUser {
   id: string;
@@ -547,12 +548,14 @@ export default function AdminDashboard() {
                 {activeTab === 'events' && <Calendar size={16} color={COLORS.white} />}
                 {activeTab === 'approvals' && <CheckCircle size={16} color={COLORS.white} />}
                 {activeTab === 'analytics' && <BarChart3 size={16} color={COLORS.white} />}
+                {activeTab === 'registered-users' && <Database size={16} color={COLORS.white} />}
               </View>
               <Text style={styles.compactDropdownText}>
                 {activeTab === 'users' && 'Utilizadores'}
                 {activeTab === 'events' && 'Eventos'}
                 {activeTab === 'approvals' && 'Aprovações'}
                 {activeTab === 'analytics' && 'Analytics'}
+                {activeTab === 'registered-users' && 'Utilizadores Registados'}
               </Text>
               <ChevronDown 
                 size={16} 
@@ -581,6 +584,7 @@ export default function AdminDashboard() {
                 {activeTab === 'events' && <Calendar size={20} color={COLORS.white} />}
                 {activeTab === 'approvals' && <CheckCircle size={20} color={COLORS.white} />}
                 {activeTab === 'analytics' && <BarChart3 size={20} color={COLORS.white} />}
+                {activeTab === 'registered-users' && <Database size={20} color={COLORS.white} />}
               </View>
               <View>
                 <Text style={styles.dropdownLabel}>Secção Ativa</Text>
@@ -589,6 +593,7 @@ export default function AdminDashboard() {
                   {activeTab === 'events' && 'Eventos'}
                   {activeTab === 'approvals' && 'Aprovações'}
                   {activeTab === 'analytics' && 'Analytics'}
+                  {activeTab === 'registered-users' && 'Utilizadores Registados'}
                 </Text>
               </View>
             </View>
@@ -660,6 +665,19 @@ export default function AdminDashboard() {
                 <BarChart3 size={20} color={activeTab === 'analytics' ? COLORS.primary : COLORS.textSecondary} />
                 <Text style={[styles.dropdownMenuText, activeTab === 'analytics' && styles.dropdownMenuTextActive]}>
                   Analytics
+                </Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.dropdownMenuItem, activeTab === 'registered-users' && styles.dropdownMenuItemActive]}
+                onPress={() => {
+                  setMenuOpen(false);
+                  router.push('/users-list');
+                }}
+              >
+                <Database size={20} color={activeTab === 'registered-users' ? COLORS.primary : COLORS.textSecondary} />
+                <Text style={[styles.dropdownMenuText, activeTab === 'registered-users' && styles.dropdownMenuTextActive]}>
+                  Utilizadores Registados
                 </Text>
               </TouchableOpacity>
             </View>
