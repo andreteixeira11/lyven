@@ -11,7 +11,7 @@ import {
   Platform,
   ScrollView,
 } from 'react-native';
-import { Mail, ArrowLeft, Check } from 'lucide-react-native';
+import { Mail, Check } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { COLORS } from '@/constants/colors';
 
@@ -65,13 +65,6 @@ export default function ForgotPasswordScreen() {
           style={styles.keyboardView}
         >
           <ScrollView contentContainerStyle={styles.scrollContent}>
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={() => router.back()}
-            >
-              <ArrowLeft size={24} color={COLORS.text} />
-            </TouchableOpacity>
-
             <View style={styles.header}>
               <View style={styles.iconContainer}>
                 <Mail size={40} color={COLORS.primary} />
@@ -151,24 +144,12 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     padding: 20,
-    paddingTop: 60,
-  },
-  backButton: {
-    position: 'absolute' as const,
-    top: 20,
-    left: 20,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: COLORS.white,
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 10,
+    paddingTop: 20,
   },
   header: {
     alignItems: 'center',
     marginBottom: 50,
-    marginTop: 40,
+    marginTop: 20,
   },
   iconContainer: {
     width: 80,
