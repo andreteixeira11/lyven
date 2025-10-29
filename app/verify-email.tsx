@@ -9,6 +9,8 @@ import {
   Platform,
   Alert,
   Animated,
+  TouchableWithoutFeedback,
+  Keyboard,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Mail } from 'lucide-react-native';
@@ -146,7 +148,8 @@ export default function VerifyEmailScreen() {
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.keyboardView}
         >
-          <View style={styles.content}>
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.content}>
             <View style={styles.header}>
               <View style={styles.iconContainer}>
                 <Mail size={48} color={COLORS.primary} />
@@ -213,7 +216,8 @@ export default function VerifyEmailScreen() {
                 {isLoading ? 'Verificando...' : 'Verificar'}
               </Text>
             </TouchableOpacity>
-          </View>
+            </View>
+          </TouchableWithoutFeedback>
         </KeyboardAvoidingView>
       </View>
     </SafeAreaView>
