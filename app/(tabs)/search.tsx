@@ -31,6 +31,7 @@ import {
   Plus
 } from 'lucide-react-native';
 import { COLORS } from '@/constants/colors';
+import { useTheme } from '@/hooks/theme-context';
 import { useUser } from '@/hooks/user-context';
 import AuthGuard from '@/components/AuthGuard';
 import { Event } from '@/types/event';
@@ -68,6 +69,7 @@ function SearchContent() {
 
 function NormalUserSearchContent() {
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
@@ -164,7 +166,7 @@ function NormalUserSearchContent() {
   );
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container, { paddingTop: insets.top, backgroundColor: colors.background }]}>
       <View style={styles.searchHeader}>
         <View style={styles.searchInputWrapper}>
           <SearchIcon size={20} color={COLORS.textSecondary} />
@@ -253,6 +255,7 @@ function NormalUserSearchContent() {
 
 function AdminUsersContent() {
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [filterType, setFilterType] = useState<'all' | 'normal' | 'promoter' | 'admin'>('all');
   const [showFilters, setShowFilters] = useState(false);
@@ -336,9 +339,9 @@ function AdminUsersContent() {
 
   const getUserTypeColor = (type: string) => {
     switch (type) {
-      case 'normal': return COLORS.info;
-      case 'promoter': return COLORS.warning;
-      case 'admin': return COLORS.error;
+      case 'normal': return colors.primary;
+      case 'promoter': return colors.warning;
+      case 'admin': return colors.error;
       default: return '#999';
     }
   };
@@ -525,7 +528,7 @@ function AdminUsersContent() {
   const normalUsers = users.filter(u => u.userType === 'normal').length;
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container, { paddingTop: insets.top, backgroundColor: colors.background }]}>
       <View style={styles.content}>
         <View style={styles.searchContainer}>
           <View style={styles.searchInputContainer}>
@@ -606,6 +609,7 @@ function AdminUsersContent() {
 function PromoterEventsContent() {
   const insets = useSafeAreaInsets();
   const { user, promoterProfile } = useUser();
+  const { colors } = useTheme();
   const [selectedTab, setSelectedTab] = useState<'upcoming' | 'past'>('upcoming');
 
   const demoPromoterEvents: Event[] = [
@@ -848,7 +852,7 @@ function PromoterEventsContent() {
   const currentEvents = selectedTab === 'upcoming' ? upcomingEvents : pastEvents;
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container, { paddingTop: insets.top, backgroundColor: colors.background }]}>
       <View style={styles.tabContainer}>
         <TabButton 
           tab="upcoming" 
@@ -904,7 +908,6 @@ export default function SearchScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   content: {
     flex: 1,
