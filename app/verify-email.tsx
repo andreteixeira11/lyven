@@ -146,7 +146,7 @@ export default function VerifyEmailScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Stack.Screen options={{ headerShown: false }} />
+      <Stack.Screen options={{ title: '' }} />
       <Modal
         visible={showSuccessModal}
         transparent
