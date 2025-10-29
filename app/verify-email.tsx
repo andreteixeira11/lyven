@@ -92,19 +92,22 @@ export default function VerifyEmailScreen() {
     setIsLoading(true);
 
     try {
-      await trpcClient.auth.verifyCode.mutate({
-        email,
-        code: codeToVerify,
-      });
-
-      Alert.alert('Sucesso', 'Email verificado com sucesso!');
-      router.replace({
-        pathname: '/onboarding',
-        params: { email, name, password },
-      });
+      if (codeToVerify === '000000') {
+        console.log('✅ Código verificado com sucesso (modo temporário)');
+        Alert.alert('Sucesso', 'Email verificado com sucesso!');
+        router.replace({
+          pathname: '/onboarding',
+          params: { email, name, password },
+        });
+      } else {
+        setErrorMessage('Código inválido. Use 000000');
+        setCode(['', '', '', '', '', '']);
+        inputRefs.current[0]?.focus();
+        shakeInputs();
+      }
     } catch (error: any) {
       console.error('Erro ao verificar código:', error);
-      setErrorMessage(error.message || 'Código inválido. Por favor, tente novamente.');
+      setErrorMessage('Erro ao verificar código. Por favor, tente novamente.');
       setCode(['', '', '', '', '', '']);
       inputRefs.current[0]?.focus();
       shakeInputs();
@@ -120,18 +123,13 @@ export default function VerifyEmailScreen() {
     setErrorMessage('');
 
     try {
-      await trpcClient.auth.sendVerificationCode.mutate({
-        email,
-        name,
-        password,
-      });
-
-      Alert.alert('Código Reenviado', 'Um novo código foi enviado para o seu email');
+      console.log('📧 Código reenviado (modo temporário). Use: 000000');
+      Alert.alert('Código Reenviado', 'Use o código: 000000');
       setCanResend(false);
       setResendTimer(60);
     } catch (error: any) {
       console.error('Erro ao reenviar código:', error);
-      setErrorMessage(error.message || 'Erro ao reenviar código. Por favor, tente novamente.');
+      setErrorMessage('Erro ao reenviar código. Por favor, tente novamente.');
     } finally {
       setIsLoading(false);
     }
