@@ -46,11 +46,11 @@ export default function QRCode({
           enableLinearGradient={enableGradient}
           linearGradient={enableGradient ? [colors.primary, colors.secondary] : undefined}
           gradientDirection={['0%', '0%', '100%', '100%']}
-          logo={logo}
-          logoSize={size * 0.2}
-          logoBackgroundColor={backgroundColor}
-          logoMargin={4}
-          logoBorderRadius={size * 0.05}
+          logo={logo || 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/rcudplkc4ofu5bj6ow23e'}
+          logoSize={size * 0.22}
+          logoBackgroundColor="#FFFFFF"
+          logoMargin={6}
+          logoBorderRadius={size * 0.08}
         />
       </View>
     </View>
