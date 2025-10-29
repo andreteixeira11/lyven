@@ -229,7 +229,10 @@ export default function LoginScreen() {
                     styles.userTypeButton,
                     userType === 'normal' && styles.userTypeButtonActive,
                   ]}
-                  onPress={() => setUserType('normal')}
+                  onPress={() => {
+                    setUserType('normal');
+                    setIsLogin(true);
+                  }}
                 >
                   <User size={20} color={userType === 'normal' ? COLORS.white : COLORS.primary} />
                   <Text
@@ -247,7 +250,10 @@ export default function LoginScreen() {
                     styles.userTypeButton,
                     userType === 'promoter' && styles.userTypeButtonActive,
                   ]}
-                  onPress={() => setUserType('promoter')}
+                  onPress={() => {
+                    setUserType('promoter');
+                    setIsLogin(true);
+                  }}
                 >
                   <Building2 size={20} color={userType === 'promoter' ? COLORS.white : COLORS.primary} />
                   <Text
