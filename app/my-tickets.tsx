@@ -1,15 +1,18 @@
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from "react-native";
-import { ShoppingCart, Ticket, Calendar, MapPin, ChevronRight, Info, ChevronLeft } from "lucide-react-native";
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image, Platform, Alert, Linking } from "react-native";
+import { ShoppingCart, Ticket, Calendar, MapPin, ChevronRight, Info, ChevronLeft, Wallet } from "lucide-react-native";
 import { useCart } from "@/hooks/cart-context";
 import { mockEvents } from "@/mocks/events";
 import { router } from "expo-router";
 import { useState } from "react";
 import { COLORS } from "@/constants/colors";
 import QRCode from '@/components/QRCode';
+import { trpc } from '@/lib/trpc';
 
 export default function MyTicketsScreen() {
   const { cartItems, purchasedTickets, getTotalPrice, removeFromCart } = useCart();
   const [activeTab, setActiveTab] = useState<'cart' | 'purchased'>('purchased');
+  
+  const generateWalletPassMutation = trpc.tickets.generateWalletPass.useMutation();
 
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('pt-PT', {
@@ -25,6 +28,39 @@ export default function MyTicketsScreen() {
   const getTicketType = (eventId: string, ticketTypeId: string) => {
     const event = getEventById(eventId);
     return event?.ticketTypes.find(t => t.id === ticketTypeId);
+  };
+  
+  const handleAddToWallet = async (ticketId: string) => {
+    const platform = Platform.OS === 'ios' ? 'ios' : 'android';
+    const platformName = platform === 'ios' ? 'Apple Wallet' : 'Google Wallet';
+    
+    try {
+      const result = await generateWalletPassMutation.mutateAsync({
+        ticketId,
+        platform,
+      });
+      
+      if (result.success && result.url) {
+        const supported = await Linking.canOpenURL(result.url);
+        
+        if (supported) {
+          await Linking.openURL(result.url);
+        } else {
+          Alert.alert(
+            'Erro',
+            `Não foi possível abrir ${platformName}. Por favor, instale o aplicativo.`,
+            [{ text: 'OK' }]
+          );
+        }
+      }
+    } catch (error) {
+      console.error('Erro ao adicionar à wallet:', error);
+      Alert.alert(
+        'Erro',
+        `Não foi possível adicionar o bilhete à ${platformName}. Tente novamente.`,
+        [{ text: 'OK' }]
+      );
+    }
   };
 
   return (
@@ -173,6 +209,22 @@ export default function MyTicketsScreen() {
                         />
                         <Text style={styles.qrCode}>{ticket.id}</Text>
                       </View>
+                      
+                      <TouchableOpacity 
+                        style={styles.walletButton}
+                        onPress={() => handleAddToWallet(ticket.id)}
+                        disabled={generateWalletPassMutation.isPending}
+                      >
+                        <Wallet size={20} color={COLORS.white} />
+                        <Text style={styles.walletButtonText}>
+                          {generateWalletPassMutation.isPending 
+                            ? 'Adicionando...' 
+                            : Platform.OS === 'ios' 
+                              ? 'Adicionar à Apple Wallet' 
+                              : 'Adicionar à Google Wallet'
+                          }
+                        </Text>
+                      </TouchableOpacity>
                     </View>
                   </TouchableOpacity>
                 );
@@ -417,5 +469,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: COLORS.gray,
     fontFamily: 'monospace' as const,
+  },
+  walletButton: {
+    marginTop: 16,
+    backgroundColor: COLORS.primary,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    gap: 10,
+  },
+  walletButtonText: {
+    color: COLORS.white,
+    fontSize: 15,
+    fontWeight: '600' as const,
   },
 });

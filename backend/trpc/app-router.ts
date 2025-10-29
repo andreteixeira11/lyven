@@ -39,6 +39,7 @@ import { cancelTicketProcedure } from "./routes/tickets/cancel";
 import { transferTicketProcedure } from "./routes/tickets/transfer";
 import { addToCalendarProcedure } from "./routes/tickets/add-to-calendar";
 import { setReminderProcedure } from "./routes/tickets/set-reminder";
+import { generateWalletPassProcedure } from "./routes/tickets/generate-wallet-pass";
 
 import { createAdProcedure } from "./routes/advertisements/create";
 import { getAdProcedure } from "./routes/advertisements/get";
@@ -122,6 +123,7 @@ export const appRouter = createTRPCRouter({
     transfer: transferTicketProcedure,
     addToCalendar: addToCalendarProcedure,
     setReminder: setReminderProcedure,
+    generateWalletPass: generateWalletPassProcedure,
   }),
   
   advertisements: createTRPCRouter({
