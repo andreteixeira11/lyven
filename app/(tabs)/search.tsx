@@ -101,7 +101,7 @@ function NormalUserSearchContent() {
       <Image source={{ uri: event.image }} style={styles.featuredCardImage} />
       <View style={styles.featuredCardOverlay}>
         <View style={styles.featuredCardContent}>
-          <View style={styles.featuredBadge}>
+          <View style={[styles.featuredBadge, { backgroundColor: colors.primary }]}>
             <Text style={styles.featuredBadgeText}>Em Destaque</Text>
           </View>
           <Text style={styles.featuredCardTitle} numberOfLines={2}>
@@ -131,17 +131,17 @@ function NormalUserSearchContent() {
 
   const EventCard = ({ event }: { event: Event }) => (
     <TouchableOpacity
-      style={styles.eventCard2}
+      style={[styles.eventCard2, { backgroundColor: colors.card }]}
       onPress={() => router.push(`/event/${event.id}` as any)}
     >
       <Image source={{ uri: event.image }} style={styles.eventCardImage} />
       <View style={styles.eventCardContent}>
-        <Text style={styles.eventCardTitle} numberOfLines={2}>
+        <Text style={[styles.eventCardTitle, { color: colors.text }]} numberOfLines={2}>
           {event.title}
         </Text>
         <View style={styles.eventCardInfo}>
-          <Calendar size={14} color={COLORS.textSecondary} />
-          <Text style={styles.eventCardText}>
+          <Calendar size={14} color={colors.textSecondary} />
+          <Text style={[styles.eventCardText, { color: colors.textSecondary }]}>
             {new Date(event.date).toLocaleDateString('pt-PT', {
               day: 'numeric',
               month: 'short',
@@ -149,8 +149,8 @@ function NormalUserSearchContent() {
           </Text>
         </View>
         <View style={styles.eventCardInfo}>
-          <MapPin size={14} color={COLORS.textSecondary} />
-          <Text style={styles.eventCardText} numberOfLines={1}>
+          <MapPin size={14} color={colors.textSecondary} />
+          <Text style={[styles.eventCardText, { color: colors.textSecondary }]} numberOfLines={1}>
             {event.venue.city}
           </Text>
         </View>
@@ -167,15 +167,15 @@ function NormalUserSearchContent() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top, backgroundColor: colors.background }]}>
-      <View style={styles.searchHeader}>
-        <View style={styles.searchInputWrapper}>
-          <SearchIcon size={20} color={COLORS.textSecondary} />
+      <View style={[styles.searchHeader, { backgroundColor: colors.background }]}>
+        <View style={[styles.searchInputWrapper, { backgroundColor: colors.card }]}>
+          <SearchIcon size={20} color={colors.textSecondary} />
           <TextInput
-            style={styles.searchInput}
+            style={[styles.searchInput, { color: colors.text }]}
             placeholder="Procurar eventos..."
             value={searchQuery}
             onChangeText={setSearchQuery}
-            placeholderTextColor={COLORS.textSecondary}
+            placeholderTextColor={colors.textSecondary}
           />
         </View>
       </View>
@@ -191,7 +191,8 @@ function NormalUserSearchContent() {
             key={cat.id}
             style={[
               styles.categoryCard,
-              selectedCategory === cat.id && styles.categoryCardActive,
+              { backgroundColor: colors.card },
+              selectedCategory === cat.id && { backgroundColor: colors.primary, borderColor: colors.primary },
             ]}
             onPress={() => setSelectedCategory(cat.id)}
           >
@@ -199,6 +200,7 @@ function NormalUserSearchContent() {
             <Text
               style={[
                 styles.categoryLabel,
+                { color: colors.text },
                 selectedCategory === cat.id && styles.categoryLabelActive,
               ]}
             >
@@ -213,7 +215,7 @@ function NormalUserSearchContent() {
           <View style={styles.eventsContent}>
             {featuredEvents.length > 0 && (
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Em Destaque</Text>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>Em Destaque</Text>
                 <ScrollView
                   horizontal
                   showsHorizontalScrollIndicator={false}
@@ -228,7 +230,7 @@ function NormalUserSearchContent() {
 
             {regularEvents.length > 0 && (
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>
+                <Text style={[styles.sectionTitle, { color: colors.text }]}>
                   {featuredEvents.length > 0 ? 'Outros Eventos' : 'Todos os Eventos'}
                 </Text>
                 <View style={styles.eventsGrid}>
@@ -241,9 +243,9 @@ function NormalUserSearchContent() {
           </View>
         ) : (
           <View style={styles.emptySearch}>
-            <SearchIcon size={64} color={COLORS.textSecondary} />
-            <Text style={styles.emptySearchText}>Nenhum evento encontrado</Text>
-            <Text style={styles.emptySearchSubtext}>
+            <SearchIcon size={64} color={colors.textSecondary} />
+            <Text style={[styles.emptySearchText, { color: colors.text }]}>Nenhum evento encontrado</Text>
+            <Text style={[styles.emptySearchSubtext, { color: colors.textSecondary }]}>
               Tenta ajustar os filtros ou a pesquisa
             </Text>
           </View>
@@ -406,11 +408,11 @@ function AdminUsersContent() {
   });
 
   const UserCard = ({ user: u }: { user: AdminUser }) => (
-    <View style={styles.userCard}>
+    <View style={[styles.userCard, { backgroundColor: colors.card }]}>
       <View style={styles.userHeader}>
         <View style={styles.userInfo}>
           <View style={styles.userNameRow}>
-            <Text style={styles.userName}>{u.name}</Text>
+            <Text style={[styles.userName, { color: colors.text }]}>{u.name}</Text>
             {u.isVerified && (
               <UserCheck size={16} color={COLORS.success} />
             )}
@@ -427,56 +429,56 @@ function AdminUsersContent() {
             { backgroundColor: u.isActive ? COLORS.success : COLORS.error }
           ]} />
           <TouchableOpacity style={styles.moreButton}>
-            <MoreVertical size={20} color={COLORS.textSecondary} />
+            <MoreVertical size={20} color={colors.textSecondary} />
           </TouchableOpacity>
         </View>
       </View>
 
       <View style={styles.userDetails}>
         <View style={styles.detailRow}>
-          <Mail size={14} color={COLORS.textSecondary} />
-          <Text style={styles.detailText}>{u.email}</Text>
+          <Mail size={14} color={colors.textSecondary} />
+          <Text style={[styles.detailText, { color: colors.textSecondary }]}>{u.email}</Text>
         </View>
         {u.phone && (
           <View style={styles.detailRow}>
-            <Phone size={14} color={COLORS.textSecondary} />
-            <Text style={styles.detailText}>{u.phone}</Text>
+            <Phone size={14} color={colors.textSecondary} />
+            <Text style={[styles.detailText, { color: colors.textSecondary }]}>{u.phone}</Text>
           </View>
         )}
         {u.location && (
           <View style={styles.detailRow}>
-            <MapPin size={14} color={COLORS.textSecondary} />
-            <Text style={styles.detailText}>{u.location}</Text>
+            <MapPin size={14} color={colors.textSecondary} />
+            <Text style={[styles.detailText, { color: colors.textSecondary }]}>{u.location}</Text>
           </View>
         )}
         <View style={styles.detailRow}>
-          <Calendar size={14} color={COLORS.textSecondary} />
-          <Text style={styles.detailText}>Membro desde {formatDate(u.joinDate)}</Text>
+          <Calendar size={14} color={colors.textSecondary} />
+          <Text style={[styles.detailText, { color: colors.textSecondary }]}>Membro desde {formatDate(u.joinDate)}</Text>
         </View>
       </View>
 
       <View style={styles.userStats}>
         {u.userType === 'promoter' && (
           <View style={styles.statItem}>
-            <Text style={styles.statValue}>{u.eventsCreated || 0}</Text>
-            <Text style={styles.statLabel}>Eventos Criados</Text>
+            <Text style={[styles.statValue, { color: colors.primary }]}>{u.eventsCreated || 0}</Text>
+            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Eventos Criados</Text>
           </View>
         )}
         {u.userType === 'normal' && (
           <>
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>{u.eventsAttended || 0}</Text>
-              <Text style={styles.statLabel}>Eventos</Text>
+              <Text style={[styles.statValue, { color: colors.primary }]}>{u.eventsAttended || 0}</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Eventos</Text>
             </View>
             <View style={styles.statItem}>
-              <Text style={styles.statValue}>€{u.totalSpent || 0}</Text>
-              <Text style={styles.statLabel}>Gasto Total</Text>
+              <Text style={[styles.statValue, { color: colors.primary }]}>€{u.totalSpent || 0}</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Gasto Total</Text>
             </View>
           </>
         )}
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>{formatLastActive(u.lastActive)}</Text>
-          <Text style={styles.statLabel}>Última Atividade</Text>
+          <Text style={[styles.statValue, { color: colors.primary }]}>{formatLastActive(u.lastActive)}</Text>
+          <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Última Atividade</Text>
         </View>
       </View>
 
@@ -531,21 +533,21 @@ function AdminUsersContent() {
     <View style={[styles.container, { paddingTop: insets.top, backgroundColor: colors.background }]}>
       <View style={styles.content}>
         <View style={styles.searchContainer}>
-          <View style={styles.searchInputContainer}>
-            <SearchIcon size={20} color={COLORS.textSecondary} />
+          <View style={[styles.searchInputContainer, { backgroundColor: colors.card }]}>
+            <SearchIcon size={20} color={colors.textSecondary} />
             <TextInput
-              style={styles.searchInput}
+              style={[styles.searchInput, { color: colors.text }]}
               placeholder="Procurar utilizadores..."
               value={searchQuery}
               onChangeText={setSearchQuery}
-              placeholderTextColor={COLORS.textSecondary}
+              placeholderTextColor={colors.textSecondary}
             />
           </View>
           <TouchableOpacity
-            style={styles.filterButton}
+            style={[styles.filterButton, { backgroundColor: colors.card }]}
             onPress={() => setShowFilters(!showFilters)}
           >
-            <Filter size={20} color={COLORS.primary} />
+            <Filter size={20} color={colors.primary} />
           </TouchableOpacity>
         </View>
 
@@ -556,12 +558,14 @@ function AdminUsersContent() {
                 key={type}
                 style={[
                   styles.filterOption,
-                  filterType === type && styles.filterOptionActive
+                  { backgroundColor: colors.border },
+                  filterType === type && { backgroundColor: colors.primary }
                 ]}
                 onPress={() => setFilterType(type as any)}
               >
                 <Text style={[
                   styles.filterOptionText,
+                  { color: colors.textSecondary },
                   filterType === type && styles.filterOptionTextActive
                 ]}>
                   {type === 'all' ? 'Todos' : getUserTypeLabel(type)}
@@ -572,21 +576,21 @@ function AdminUsersContent() {
         )}
 
         <View style={styles.statsContainer}>
-          <View style={styles.statCard}>
-            <Text style={styles.statNumber}>{totalUsers}</Text>
-            <Text style={styles.statCardLabel}>Total</Text>
+          <View style={[styles.statCard, { backgroundColor: colors.card }]}>
+            <Text style={[styles.statNumber, { color: colors.primary }]}>{totalUsers}</Text>
+            <Text style={[styles.statCardLabel, { color: colors.textSecondary }]}>Total</Text>
           </View>
-          <View style={styles.statCard}>
+          <View style={[styles.statCard, { backgroundColor: colors.card }]}>
             <Text style={[styles.statNumber, { color: COLORS.success }]}>{activeUsers}</Text>
-            <Text style={styles.statCardLabel}>Ativos</Text>
+            <Text style={[styles.statCardLabel, { color: colors.textSecondary }]}>Ativos</Text>
           </View>
-          <View style={styles.statCard}>
+          <View style={[styles.statCard, { backgroundColor: colors.card }]}>
             <Text style={[styles.statNumber, { color: COLORS.warning }]}>{promoters}</Text>
-            <Text style={styles.statCardLabel}>Promotores</Text>
+            <Text style={[styles.statCardLabel, { color: colors.textSecondary }]}>Promotores</Text>
           </View>
-          <View style={styles.statCard}>
+          <View style={[styles.statCard, { backgroundColor: colors.card }]}>
             <Text style={[styles.statNumber, { color: COLORS.info }]}>{normalUsers}</Text>
-            <Text style={styles.statCardLabel}>Utilizadores</Text>
+            <Text style={[styles.statCardLabel, { color: colors.textSecondary }]}>Utilizadores</Text>
           </View>
         </View>
 
@@ -596,8 +600,8 @@ function AdminUsersContent() {
           ))}
           {filteredUsers.length === 0 && (
             <View style={styles.emptyState}>
-              <Users size={48} color={COLORS.textSecondary} />
-              <Text style={styles.emptyStateText}>Nenhum utilizador encontrado</Text>
+              <Users size={48} color={colors.textSecondary} />
+              <Text style={[styles.emptyStateText, { color: colors.textSecondary }]}>Nenhum utilizador encontrado</Text>
             </View>
           )}
         </ScrollView>
@@ -609,7 +613,7 @@ function AdminUsersContent() {
 function PromoterEventsContent() {
   const insets = useSafeAreaInsets();
   const { user, promoterProfile } = useUser();
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const [selectedTab, setSelectedTab] = useState<'upcoming' | 'past'>('upcoming');
 
   const demoPromoterEvents: Event[] = [
@@ -743,27 +747,27 @@ function PromoterEventsContent() {
     const totalTickets = isDemoEvent ? 1500 : event.venue.capacity;
 
     return (
-      <View style={styles.eventCard}>
+      <View style={[styles.eventCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
         <Image source={{ uri: event.image }} style={styles.eventImage} />
         
         <View style={styles.eventContent}>
           <View style={styles.eventHeader}>
-            <Text style={styles.eventTitle}>{event.title}</Text>
+            <Text style={[styles.eventTitle, { color: colors.text }]}>{event.title}</Text>
             <View style={styles.eventActions}>
               <TouchableOpacity
-                style={styles.actionButtonIcon}
+                style={[styles.actionButtonIcon, { backgroundColor: isDark ? colors.border : '#f8f9fa' }]}
                 onPress={() => router.push(`/event-buyers/${event.id}` as any)}
               >
-                <Eye size={18} color="#007AFF" />
+                <Eye size={18} color={colors.primary} />
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.actionButtonIcon}
+                style={[styles.actionButtonIcon, { backgroundColor: isDark ? colors.border : '#f8f9fa' }]}
                 onPress={() => console.log('Editar evento:', event.id)}
               >
                 <Edit3 size={18} color="#FFD700" />
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.actionButtonIcon}
+                style={[styles.actionButtonIcon, { backgroundColor: isDark ? colors.border : '#f8f9fa' }]}
                 onPress={() => handleDeleteEvent(event.id)}
               >
                 <Trash2 size={18} color="#FF385C" />
@@ -773,8 +777,8 @@ function PromoterEventsContent() {
 
           <View style={styles.eventInfo}>
             <View style={styles.infoRow}>
-              <Calendar size={16} color="#999" />
-              <Text style={styles.infoText}>
+              <Calendar size={16} color={colors.textSecondary} />
+              <Text style={[styles.infoText, { color: colors.textSecondary }]}>
                 {new Date(event.date).toLocaleDateString('pt-PT', {
                   weekday: 'long',
                   year: 'numeric',
@@ -785,8 +789,8 @@ function PromoterEventsContent() {
             </View>
             
             <View style={styles.infoRow}>
-              <Clock size={16} color="#999" />
-              <Text style={styles.infoText}>
+              <Clock size={16} color={colors.textSecondary} />
+              <Text style={[styles.infoText, { color: colors.textSecondary }]}>
                 {new Date(event.date).toLocaleTimeString('pt-PT', {
                   hour: '2-digit',
                   minute: '2-digit',
@@ -795,41 +799,41 @@ function PromoterEventsContent() {
             </View>
 
             <View style={styles.infoRow}>
-              <MapPin size={16} color="#999" />
-              <Text style={styles.infoText}>{event.venue.name}</Text>
+              <MapPin size={16} color={colors.textSecondary} />
+              <Text style={[styles.infoText, { color: colors.textSecondary }]}>{event.venue.name}</Text>
             </View>
           </View>
 
-          <View style={styles.eventStats}>
+          <View style={[styles.eventStats, { backgroundColor: colors.background }]}>
             <View style={styles.statItem}>
               <Users size={16} color="#4CAF50" />
-              <Text style={styles.statValue}>{soldTickets}/{totalTickets}</Text>
-              <Text style={styles.statLabel}>Bilhetes</Text>
+              <Text style={[styles.statValue, { color: colors.text }]}>{soldTickets}/{totalTickets}</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Bilhetes</Text>
             </View>
             
             <View style={styles.statItem}>
               <DollarSign size={16} color="#FFD700" />
-              <Text style={styles.statValue}>€{revenue.toLocaleString('pt-PT')}</Text>
-              <Text style={styles.statLabel}>Receita</Text>
+              <Text style={[styles.statValue, { color: colors.text }]}>€{revenue.toLocaleString('pt-PT')}</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Receita</Text>
             </View>
             
             <View style={styles.statItem}>
               <Eye size={16} color="#2196F3" />
-              <Text style={styles.statValue}>{views.toLocaleString('pt-PT')}</Text>
-              <Text style={styles.statLabel}>Visualizações</Text>
+              <Text style={[styles.statValue, { color: colors.text }]}>{views.toLocaleString('pt-PT')}</Text>
+              <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Visualizações</Text>
             </View>
           </View>
 
           <View style={styles.progressContainer}>
-            <View style={styles.progressBar}>
+            <View style={[styles.progressBar, { backgroundColor: colors.border }]}>
               <View 
                 style={[
                   styles.progressFill, 
-                  { width: `${Math.min((soldTickets / totalTickets) * 100, 100)}%` }
+                  { width: `${Math.min((soldTickets / totalTickets) * 100, 100)}%`, backgroundColor: colors.primary }
                 ]} 
               />
             </View>
-            <Text style={styles.progressText}>
+            <Text style={[styles.progressText, { color: colors.textSecondary }]}>
               {Math.round((soldTickets / totalTickets) * 100)}% vendidos
             </Text>
           </View>
@@ -840,7 +844,11 @@ function PromoterEventsContent() {
 
   const TabButton = ({ tab, title, isActive }: { tab: 'upcoming' | 'past'; title: string; isActive: boolean }) => (
     <TouchableOpacity
-      style={[styles.tabButton, isActive && styles.activeTabButton]}
+      style={[
+        styles.tabButton,
+        { backgroundColor: colors.card },
+        isActive && { backgroundColor: colors.primary }
+      ]}
       onPress={() => setSelectedTab(tab)}
     >
       <Text style={[styles.tabButtonText, isActive && styles.activeTabButtonText]}>
@@ -853,7 +861,7 @@ function PromoterEventsContent() {
 
   return (
     <View style={[styles.container, { paddingTop: insets.top, backgroundColor: colors.background }]}>
-      <View style={styles.tabContainer}>
+      <View style={[styles.tabContainer, { borderBottomColor: colors.border }]}>
         <TabButton 
           tab="upcoming" 
           title={`Próximos (${upcomingEvents.length})`} 
@@ -873,11 +881,11 @@ function PromoterEventsContent() {
           ))
         ) : (
           <View style={styles.emptyState}>
-            <Calendar size={64} color="#666" />
-            <Text style={styles.emptyTitle}>
+            <Calendar size={64} color={colors.textSecondary} />
+            <Text style={[styles.emptyTitle, { color: colors.text }]}>
               {selectedTab === 'upcoming' ? 'Nenhum evento próximo' : 'Nenhum evento passado'}
             </Text>
-            <Text style={styles.emptySubtitle}>
+            <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
               {selectedTab === 'upcoming' 
                 ? 'Crie seu primeiro evento para começar a vender ingressos'
                 : 'Seus eventos passados aparecerão aqui'
@@ -888,7 +896,7 @@ function PromoterEventsContent() {
       </ScrollView>
       
       <TouchableOpacity 
-        style={styles.floatingButton}
+        style={[styles.floatingButton, { backgroundColor: colors.primary }]}
         onPress={() => router.push('/create-event' as any)}
       >
         <Plus size={28} color="#fff" />
@@ -922,7 +930,6 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
     borderRadius: 12,
     paddingHorizontal: 15,
     paddingVertical: 12,
@@ -936,10 +943,8 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 16,
-    color: COLORS.text,
   },
   filterButton: {
-    backgroundColor: COLORS.white,
     borderRadius: 12,
     padding: 12,
     justifyContent: 'center',
@@ -959,14 +964,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: COLORS.border,
   },
-  filterOptionActive: {
-    backgroundColor: COLORS.primary,
-  },
+  filterOptionActive: {},
   filterOptionText: {
     fontSize: 14,
-    color: COLORS.textSecondary,
   },
   filterOptionTextActive: {
     color: COLORS.white,
@@ -979,7 +980,6 @@ const styles = StyleSheet.create({
   },
   statCard: {
     flex: 1,
-    backgroundColor: COLORS.white,
     borderRadius: 12,
     padding: 15,
     alignItems: 'center',
@@ -992,18 +992,15 @@ const styles = StyleSheet.create({
   statNumber: {
     fontSize: 20,
     fontWeight: 'bold' as const,
-    color: COLORS.primary,
     marginBottom: 5,
   },
   statCardLabel: {
     fontSize: 12,
-    color: COLORS.textSecondary,
   },
   usersList: {
     flex: 1,
   },
   userCard: {
-    backgroundColor: COLORS.white,
     borderRadius: 12,
     padding: 15,
     marginBottom: 15,
@@ -1031,7 +1028,6 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 18,
     fontWeight: 'bold' as const,
-    color: COLORS.text,
   },
   userTypeBadge: {
     paddingHorizontal: 8,
@@ -1067,7 +1063,6 @@ const styles = StyleSheet.create({
   },
   detailText: {
     fontSize: 14,
-    color: COLORS.textSecondary,
   },
   userStats: {
     flexDirection: 'row',
@@ -1080,12 +1075,10 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 16,
     fontWeight: 'bold' as const,
-    color: COLORS.primary,
     marginBottom: 2,
   },
   statLabel: {
     fontSize: 12,
-    color: COLORS.textSecondary,
   },
   userActionButtons: {
     flexDirection: 'row',
@@ -1124,7 +1117,6 @@ const styles = StyleSheet.create({
   },
   emptyStateText: {
     fontSize: 16,
-    color: COLORS.textSecondary,
     marginTop: 10,
   },
   errorText: {
@@ -1138,7 +1130,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
   },
   tabButton: {
     flex: 1,
@@ -1147,11 +1138,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginHorizontal: 4,
     alignItems: 'center',
-    backgroundColor: '#f0f0f0',
   },
-  activeTabButton: {
-    backgroundColor: COLORS.primary,
-  },
+  activeTabButton: {},
   tabButtonText: {
     color: '#999',
     fontSize: 16,
@@ -1167,12 +1155,10 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   eventCard: {
-    backgroundColor: '#fff',
     borderRadius: 16,
     marginBottom: 20,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#e9ecef',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -1194,7 +1180,6 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   eventTitle: {
-    color: '#333',
     fontSize: 18,
     fontWeight: 'bold' as const,
     flex: 1,
@@ -1207,7 +1192,6 @@ const styles = StyleSheet.create({
   actionButtonIcon: {
     padding: 8,
     borderRadius: 8,
-    backgroundColor: '#f8f9fa',
   },
   eventInfo: {
     marginBottom: 16,
@@ -1218,7 +1202,6 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   infoText: {
-    color: '#666',
     fontSize: 14,
     marginLeft: 8,
     flex: 1,
@@ -1228,7 +1211,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     marginBottom: 16,
     paddingVertical: 12,
-    backgroundColor: '#f8f9fa',
     borderRadius: 8,
   },
   progressContainer: {
@@ -1236,22 +1218,18 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 6,
-    backgroundColor: '#e9ecef',
     borderRadius: 3,
     marginBottom: 8,
   },
   progressFill: {
     height: '100%',
-    backgroundColor: COLORS.primary,
     borderRadius: 3,
   },
   progressText: {
-    color: '#999',
     fontSize: 12,
     textAlign: 'center',
   },
   emptyTitle: {
-    color: '#333',
     fontSize: 20,
     fontWeight: 'bold' as const,
     marginTop: 20,
@@ -1259,7 +1237,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   emptySubtitle: {
-    color: '#999',
     fontSize: 16,
     textAlign: 'center',
     lineHeight: 22,
@@ -1272,7 +1249,6 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: COLORS.primary,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -1285,12 +1261,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 15,
-    backgroundColor: COLORS.background,
   },
   searchInputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 14,
@@ -1313,7 +1287,6 @@ const styles = StyleSheet.create({
   categoryCard: {
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.white,
     borderRadius: 12,
     paddingVertical: 8,
     paddingHorizontal: 14,
@@ -1326,17 +1299,13 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 2,
   },
-  categoryCardActive: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
-  },
+  categoryCardActive: {},
   categoryIcon: {
     fontSize: 22,
     marginBottom: 4,
   },
   categoryLabel: {
     fontSize: 12,
-    color: COLORS.text,
     fontWeight: '600' as const,
   },
   categoryLabelActive: {
@@ -1354,7 +1323,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold' as const,
-    color: COLORS.text,
     marginBottom: 15,
     paddingHorizontal: 20,
   },
@@ -1392,7 +1360,6 @@ const styles = StyleSheet.create({
   },
   featuredBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: COLORS.primary,
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 12,
@@ -1431,7 +1398,6 @@ const styles = StyleSheet.create({
   },
   eventCard2: {
     width: '48%',
-    backgroundColor: COLORS.white,
     borderRadius: 16,
     overflow: 'hidden',
     shadowColor: '#000',
@@ -1452,7 +1418,6 @@ const styles = StyleSheet.create({
   eventCardTitle: {
     fontSize: 14,
     fontWeight: 'bold' as const,
-    color: COLORS.text,
     marginBottom: 8,
     minHeight: 36,
   },
@@ -1464,7 +1429,6 @@ const styles = StyleSheet.create({
   },
   eventCardText: {
     fontSize: 12,
-    color: COLORS.textSecondary,
     flex: 1,
   },
   eventCardPrice: {
@@ -1489,13 +1453,11 @@ const styles = StyleSheet.create({
   emptySearchText: {
     fontSize: 20,
     fontWeight: 'bold' as const,
-    color: COLORS.text,
     marginTop: 20,
     textAlign: 'center',
   },
   emptySearchSubtext: {
     fontSize: 15,
-    color: COLORS.textSecondary,
     marginTop: 8,
     textAlign: 'center',
   },
