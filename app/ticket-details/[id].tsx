@@ -687,6 +687,11 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
     marginBottom: 16,
     borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   dateText: {
     fontSize: 18,
@@ -705,6 +710,11 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     borderRadius: 12,
     gap: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
   eventImage: {
     width: 60,
