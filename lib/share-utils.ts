@@ -6,14 +6,58 @@ import * as Clipboard from 'expo-clipboard';
 export interface ShareEventParams {
   eventId: string;
   eventTitle: string;
+  eventDescription?: string;
+  eventImage?: string;
+  eventDate?: Date;
+  eventVenue?: string;
+  eventPrice?: number;
   platform?: 'whatsapp' | 'facebook' | 'instagram' | 'twitter' | 'copy' | 'system';
 }
 
 export async function shareEvent(params: ShareEventParams): Promise<boolean> {
-  const { eventId, eventTitle, platform = 'system' } = params;
+  const { 
+    eventId, 
+    eventTitle, 
+    eventDescription,
+    eventDate,
+    eventVenue,
+    eventPrice,
+    platform = 'system' 
+  } = params;
   
   const deepLink = Linking.createURL(`/event/${eventId}`);
-  const shareMessage = `Olá! Vem comigo ao evento "${eventTitle}" 🎉\n\nCompra os teus bilhetes aqui: ${deepLink}`;
+  
+  let shareMessage = `🎉 ${eventTitle}\n`;
+  
+  if (eventDate) {
+    const formattedDate = new Intl.DateTimeFormat('pt-PT', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(eventDate);
+    shareMessage += `\n📅 ${formattedDate}`;
+  }
+  
+  if (eventVenue) {
+    shareMessage += `\n📍 ${eventVenue}`;
+  }
+  
+  if (eventPrice !== undefined && eventPrice > 0) {
+    shareMessage += `\n💰 A partir de €${eventPrice}`;
+  }
+  
+  if (eventDescription) {
+    const shortDescription = eventDescription.length > 100 
+      ? eventDescription.substring(0, 100) + '...' 
+      : eventDescription;
+    shareMessage += `\n\n${shortDescription}`;
+  }
+  
+  shareMessage += `\n\n🎫 Compra os teus bilhetes aqui:\n${deepLink}`;
+  
+  const webShareUrl = `https://rork.app/event/${eventId}`;
   
   try {
     if (platform === 'copy') {
@@ -30,13 +74,24 @@ export async function shareEvent(params: ShareEventParams): Promise<boolean> {
         await Linking.openURL(whatsappUrl);
         return true;
       } else {
-        Alert.alert('WhatsApp não encontrado', 'Por favor, instala o WhatsApp para partilhar.');
-        return false;
+        if (Platform.OS === 'web') {
+          window.open(`https://wa.me/?text=${encodeURIComponent(shareMessage)}`, '_blank');
+          return true;
+        } else {
+          Alert.alert('WhatsApp não encontrado', 'Por favor, instala o WhatsApp para partilhar.');
+          return false;
+        }
       }
     }
 
     if (platform === 'facebook') {
-      const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(deepLink)}`;
+      const facebookUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(webShareUrl)}`;
+      
+      if (Platform.OS === 'web') {
+        window.open(facebookUrl, '_blank');
+        return true;
+      }
+      
       const canOpen = await Linking.canOpenURL(facebookUrl);
       
       if (canOpen) {
@@ -75,7 +130,14 @@ export async function shareEvent(params: ShareEventParams): Promise<boolean> {
     }
 
     if (platform === 'twitter') {
-      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareMessage)}`;
+      const tweetText = `${eventTitle}\n${webShareUrl}`;
+      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+      
+      if (Platform.OS === 'web') {
+        window.open(twitterUrl, '_blank');
+        return true;
+      }
+      
       const canOpen = await Linking.canOpenURL(twitterUrl);
       
       if (canOpen) {
@@ -91,14 +153,14 @@ export async function shareEvent(params: ShareEventParams): Promise<boolean> {
       const shareData = {
         title: eventTitle,
         text: shareMessage,
-        url: deepLink,
+        url: webShareUrl,
       };
 
       if (navigator.share && navigator.canShare(shareData)) {
         await navigator.share(shareData);
         return true;
       } else {
-        await Clipboard.setStringAsync(deepLink);
+        await Clipboard.setStringAsync(webShareUrl);
         Alert.alert('Link Copiado', 'O link do evento foi copiado!');
         return true;
       }

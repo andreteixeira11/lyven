@@ -118,6 +118,17 @@ export default function EventDetailScreen() {
   const handleShare = async () => {
     if (!event) return;
     
+    const minPrice = Math.min(...event.ticketTypes.map(t => t.price));
+    const shareParams = {
+      eventId: event.id,
+      eventTitle: event.title,
+      eventDescription: event.description,
+      eventImage: event.image,
+      eventDate: event.date,
+      eventVenue: `${event.venue.name}, ${event.venue.city}`,
+      eventPrice: minPrice,
+    };
+    
     const shareOptions = [
       'WhatsApp',
       'Facebook', 
@@ -142,8 +153,7 @@ export default function EventDetailScreen() {
           ];
           
           await shareEventUtil({
-            eventId: event.id,
-            eventTitle: event.title,
+            ...shareParams,
             platform: platforms[buttonIndex]
           });
         }
@@ -155,23 +165,23 @@ export default function EventDetailScreen() {
         [
           {
             text: 'WhatsApp',
-            onPress: () => shareEventUtil({ eventId: event.id, eventTitle: event.title, platform: 'whatsapp' })
+            onPress: () => shareEventUtil({ ...shareParams, platform: 'whatsapp' })
           },
           {
             text: 'Facebook',
-            onPress: () => shareEventUtil({ eventId: event.id, eventTitle: event.title, platform: 'facebook' })
+            onPress: () => shareEventUtil({ ...shareParams, platform: 'facebook' })
           },
           {
             text: 'Instagram',
-            onPress: () => shareEventUtil({ eventId: event.id, eventTitle: event.title, platform: 'instagram' })
+            onPress: () => shareEventUtil({ ...shareParams, platform: 'instagram' })
           },
           {
             text: 'Twitter/X',
-            onPress: () => shareEventUtil({ eventId: event.id, eventTitle: event.title, platform: 'twitter' })
+            onPress: () => shareEventUtil({ ...shareParams, platform: 'twitter' })
           },
           {
             text: 'Copiar Link',
-            onPress: () => shareEventUtil({ eventId: event.id, eventTitle: event.title, platform: 'copy' })
+            onPress: () => shareEventUtil({ ...shareParams, platform: 'copy' })
           },
           {
             text: 'Cancelar',
@@ -180,7 +190,7 @@ export default function EventDetailScreen() {
         ]
       );
     } else {
-      await shareEventUtil({ eventId: event.id, eventTitle: event.title });
+      await shareEventUtil(shareParams);
     }
   };
   
