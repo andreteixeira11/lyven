@@ -131,6 +131,81 @@ function NormalUserTicketsContent() {
       isUsed: false,
       friendsGoing: 1,
     },
+    {
+      id: 't4',
+      eventId: '4',
+      eventTitle: 'Purple Fridays',
+      eventImage: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=800',
+      eventDate: '2025-01-31T19:00:00',
+      venue: 'Estalagem Da Ponta Do Sol',
+      city: 'Ponta do Sol',
+      ticketType: 'Geral',
+      quantity: 2,
+      totalPrice: 40,
+      purchaseDate: '2025-01-20T14:30:00',
+      qrCode: 'PF2025013100001',
+      isUsed: true,
+    },
+    {
+      id: 't5',
+      eventId: '5',
+      eventTitle: 'Purple Fridays',
+      eventImage: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800',
+      eventDate: '2025-01-24T19:00:00',
+      venue: 'Estalagem Da Ponta Do Sol',
+      city: 'Ponta do Sol',
+      ticketType: 'Geral',
+      quantity: 2,
+      totalPrice: 40,
+      purchaseDate: '2025-01-15T12:00:00',
+      qrCode: 'PF2025012400001',
+      isUsed: true,
+    },
+    {
+      id: 't6',
+      eventId: '6',
+      eventTitle: 'Purple Fridays',
+      eventImage: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=800',
+      eventDate: '2025-01-17T19:00:00',
+      venue: 'Estalagem Da Ponta Do Sol',
+      city: 'Ponta do Sol',
+      ticketType: 'Geral',
+      quantity: 2,
+      totalPrice: 40,
+      purchaseDate: '2025-01-10T11:30:00',
+      qrCode: 'PF2025011700001',
+      isUsed: true,
+    },
+    {
+      id: 't7',
+      eventId: '7',
+      eventTitle: 'Purple Fridays - XINOBI inThe Last Purple of the year',
+      eventImage: 'https://images.unsplash.com/photo-1598387993281-cecf8b71a8f8?w=800',
+      eventDate: '2024-12-20T19:00:00',
+      venue: 'Estalagem Da Ponta Do Sol',
+      city: 'Ponta do Sol',
+      ticketType: 'Geral',
+      quantity: 2,
+      totalPrice: 50,
+      purchaseDate: '2024-12-10T09:00:00',
+      qrCode: 'PF2024122000001',
+      isUsed: true,
+    },
+    {
+      id: 't8',
+      eventId: '8',
+      eventTitle: 'Purple Fridays - End of Year Special',
+      eventImage: 'https://images.unsplash.com/photo-1514320291840-2e0a9bf2a9ae?w=800',
+      eventDate: '2024-12-14T19:00:00',
+      venue: 'Estalagem Da Ponta Do Sol',
+      city: 'Ponta do Sol',
+      ticketType: 'VIP',
+      quantity: 1,
+      totalPrice: 60,
+      purchaseDate: '2024-12-01T15:00:00',
+      qrCode: 'PF2024121400001',
+      isUsed: true,
+    },
   ]);
 
   const now = new Date();
@@ -274,27 +349,37 @@ function NormalUserTicketsContent() {
 
   const PastTicketCard = ({ ticket }: { ticket: UserTicket }) => (
     <TouchableOpacity
-      style={[styles.pastCard, { backgroundColor: colors.card, borderColor: colors.border }]}
+      style={[styles.pastCard, { backgroundColor: colors.background }]}
       onPress={() => router.push(`/ticket-details/${ticket.id}` as any)}
+      activeOpacity={0.7}
     >
+      <View style={styles.pastHeader}>
+        <View style={styles.pastDateContainer}>
+          <Text style={[styles.pastMonth, { color: colors.text }]}>{formatDate(ticket.eventDate)}</Text>
+          <Text style={[styles.pastTime, { color: colors.text }]}>{formatTime(ticket.eventDate)}</Text>
+        </View>
+        <View style={styles.pastQrContainer}>
+          <Text style={[styles.pastQrCount, { color: colors.text }]}>{ticket.quantity}</Text>
+          <View style={styles.pastQrIcon}>
+            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
+            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
+            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
+            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
+          </View>
+        </View>
+      </View>
+
       <View style={styles.pastContent}>
-        <Image source={{ uri: ticket.eventImage }} style={styles.pastImage} />
+        <View style={[styles.pastThumbnail, { backgroundColor: colors.primary }]}>
+          <Image source={{ uri: ticket.eventImage }} style={styles.pastThumbnailImage} />
+        </View>
         <View style={styles.pastInfo}>
-          <Text style={[styles.pastTitle, { color: colors.textSecondary }]} numberOfLines={2}>
+          <Text style={[styles.pastTitle, { color: colors.text }]} numberOfLines={2}>
             {ticket.eventTitle}
           </Text>
-          <View style={styles.pastDetailRow}>
-            <Calendar size={12} color={colors.textSecondary} />
-            <Text style={[styles.pastDetailText, { color: colors.textSecondary }]}>
-              {formatDate(ticket.eventDate)}
-            </Text>
-          </View>
-          <View style={styles.pastDetailRow}>
-            <MapPin size={12} color={colors.textSecondary} />
-            <Text style={[styles.pastDetailText, { color: colors.textSecondary }]} numberOfLines={1}>
-              {ticket.venue}
-            </Text>
-          </View>
+          <Text style={[styles.pastVenue, { color: colors.textSecondary }]} numberOfLines={1}>
+            {ticket.venue} · {ticket.city}
+          </Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -780,37 +865,69 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   pastCard: {
-    borderRadius: 12,
-    borderWidth: 1,
-    padding: 12,
+    marginBottom: 20,
+    paddingBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0, 0, 0, 0.06)',
+  },
+  pastHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     marginBottom: 12,
+  },
+  pastDateContainer: {
+    flex: 1,
+  },
+  pastMonth: {
+    fontSize: 14,
+    fontWeight: '400' as const,
+  },
+  pastTime: {
+    fontSize: 14,
+    fontWeight: '400' as const,
+  },
+  pastQrContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  pastQrCount: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+  },
+  pastQrIcon: {
+    width: 24,
+    height: 24,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 2,
   },
   pastContent: {
     flexDirection: 'row',
     gap: 12,
   },
-  pastImage: {
-    width: 60,
-    height: 60,
+  pastThumbnail: {
+    width: 80,
+    height: 80,
     borderRadius: 8,
+    overflow: 'hidden',
+  },
+  pastThumbnailImage: {
+    width: '100%',
+    height: '100%',
   },
   pastInfo: {
     flex: 1,
     justifyContent: 'center',
   },
   pastTitle: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    marginBottom: 6,
+    fontSize: 18,
+    fontWeight: '700' as const,
+    marginBottom: 4,
   },
-  pastDetailRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    marginTop: 2,
-  },
-  pastDetailText: {
-    fontSize: 12,
+  pastVenue: {
+    fontSize: 14,
   },
   emptyState: {
     alignItems: 'center',
