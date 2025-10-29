@@ -21,10 +21,9 @@ import {
   Flag,
   ChevronRight
 } from 'lucide-react-native';
-import { useLocalSearchParams, router, Stack } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import { useTheme } from '@/hooks/theme-context';
 import QRCode from '@/components/QRCode';
-import { mockEvents } from '@/mocks/events';
 
 const { width } = Dimensions.get('window');
 const QR_SIZE = width * 0.7;
@@ -58,20 +57,38 @@ const mockTickets: Ticket[] = [
 ];
 
 export default function TicketDetailsScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
   const { colors, isDark } = useTheme();
   const scrollRef = useRef<ScrollView>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
-  const event = mockEvents.find(e => e.id === id);
+  const demoEvent = {
+    id: 't1',
+    title: 'The Purple Fridays',
+    image: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800',
+    date: new Date('2025-10-31T19:00:00'),
+    endDate: new Date('2025-10-31T23:00:00'),
+    venue: {
+      id: 'v1',
+      name: 'Estalagem Da Ponta Do Sol',
+      address: 'Rua da Ponta do Sol',
+      city: 'Ponta do Sol',
+      capacity: 500
+    },
+    promoter: {
+      id: 'p1',
+      name: 'Live Nation Portugal',
+      image: 'https://images.unsplash.com/photo-1556075798-4825dfaaf498?w=400',
+      description: 'Promotora líder mundial em entretenimento ao vivo',
+      verified: true,
+      followersCount: 125000
+    },
+    coordinates: {
+      latitude: 32.6871,
+      longitude: -17.1024
+    }
+  };
   
-  if (!event) {
-    return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <Text style={[styles.errorText, { color: colors.text }]}>Evento não encontrado</Text>
-      </View>
-    );
-  }
+  const event = demoEvent;
 
   const formatDate = (date: Date) => {
     return date.toLocaleDateString('pt-PT', {

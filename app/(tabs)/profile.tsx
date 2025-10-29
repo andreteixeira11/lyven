@@ -15,7 +15,6 @@ import {
   Settings,
   LogOut,
   Heart,
-  Ticket,
   Shield,
   HelpCircle,
   Calendar,
@@ -264,12 +263,6 @@ export default function ProfileScreen() {
 
   const renderUserMenuItems = () => (
     <>
-      <MenuItem
-        icon={Ticket}
-        title="Os Meus Bilhetes"
-        onPress={() => handleMenuItemPress('/my-tickets')}
-      />
-
       <MenuItem
         icon={Heart}
         title="Favoritos"
