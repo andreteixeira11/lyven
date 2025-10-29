@@ -1,0 +1,163 @@
+import { sql } from 'drizzle-orm';
+import { sqliteTable, text, integer, real } from 'drizzle-orm/sqlite-core';
+
+export const users = sqliteTable('users', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  email: text('email').notNull().unique(),
+  userType: text('user_type', { enum: ['normal', 'promoter', 'admin'] }).notNull(),
+  interests: text('interests').notNull(),
+  locationLatitude: real('location_latitude'),
+  locationLongitude: real('location_longitude'),
+  locationCity: text('location_city'),
+  locationRegion: text('location_region'),
+  preferencesNotifications: integer('preferences_notifications', { mode: 'boolean' }).notNull().default(true),
+  preferencesLanguage: text('preferences_language', { enum: ['pt', 'en'] }).notNull().default('pt'),
+  preferencesPriceMin: real('preferences_price_min').notNull().default(0),
+  preferencesPriceMax: real('preferences_price_max').notNull().default(1000),
+  preferencesEventTypes: text('preferences_event_types').notNull(),
+  favoriteEvents: text('favorite_events').notNull().default('[]'),
+  eventHistory: text('event_history').notNull().default('[]'),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+  isOnboardingComplete: integer('is_onboarding_complete', { mode: 'boolean' }).notNull().default(false),
+});
+
+export const promoters = sqliteTable('promoters', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  image: text('image').notNull(),
+  description: text('description').notNull(),
+  verified: integer('verified', { mode: 'boolean' }).notNull().default(false),
+  followersCount: integer('followers_count').notNull().default(0),
+});
+
+export const promoterProfiles = sqliteTable('promoter_profiles', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id),
+  companyName: text('company_name').notNull(),
+  description: text('description').notNull(),
+  website: text('website'),
+  instagramHandle: text('instagram_handle'),
+  facebookHandle: text('facebook_handle'),
+  twitterHandle: text('twitter_handle'),
+  isApproved: integer('is_approved', { mode: 'boolean' }).notNull().default(false),
+  approvalDate: text('approval_date'),
+  eventsCreated: text('events_created').notNull().default('[]'),
+  followers: text('followers').notNull().default('[]'),
+  rating: real('rating').notNull().default(0),
+  totalEvents: integer('total_events').notNull().default(0),
+});
+
+export const promoterAuth = sqliteTable('promoter_auth', {
+  id: text('id').primaryKey(),
+  email: text('email').notNull().unique(),
+  password: text('password').notNull(),
+  userId: text('user_id').notNull().references(() => users.id),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const events = sqliteTable('events', {
+  id: text('id').primaryKey(),
+  title: text('title').notNull(),
+  artists: text('artists').notNull(),
+  venueName: text('venue_name').notNull(),
+  venueAddress: text('venue_address').notNull(),
+  venueCity: text('venue_city').notNull(),
+  venueCapacity: integer('venue_capacity').notNull(),
+  date: text('date').notNull(),
+  endDate: text('end_date'),
+  image: text('image').notNull(),
+  description: text('description').notNull(),
+  category: text('category', { enum: ['music', 'theater', 'comedy', 'dance', 'festival', 'other'] }).notNull(),
+  ticketTypes: text('ticket_types').notNull(),
+  isSoldOut: integer('is_sold_out', { mode: 'boolean' }).notNull().default(false),
+  isFeatured: integer('is_featured', { mode: 'boolean' }).notNull().default(false),
+  duration: integer('duration'),
+  promoterId: text('promoter_id').notNull().references(() => promoters.id),
+  tags: text('tags').notNull(),
+  instagramLink: text('instagram_link'),
+  facebookLink: text('facebook_link'),
+  twitterLink: text('twitter_link'),
+  websiteLink: text('website_link'),
+  latitude: real('latitude'),
+  longitude: real('longitude'),
+  status: text('status', { enum: ['draft', 'pending', 'published', 'cancelled', 'completed'] }).notNull().default('pending'),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const tickets = sqliteTable('tickets', {
+  id: text('id').primaryKey(),
+  eventId: text('event_id').notNull().references(() => events.id),
+  userId: text('user_id').notNull().references(() => users.id),
+  ticketTypeId: text('ticket_type_id').notNull(),
+  quantity: integer('quantity').notNull(),
+  price: real('price').notNull(),
+  qrCode: text('qr_code').notNull(),
+  isUsed: integer('is_used', { mode: 'boolean' }).notNull().default(false),
+  purchaseDate: text('purchase_date').notNull().default(sql`CURRENT_TIMESTAMP`),
+  validUntil: text('valid_until').notNull(),
+  addedToCalendar: integer('added_to_calendar', { mode: 'boolean' }).default(false),
+  reminderSet: integer('reminder_set', { mode: 'boolean' }).default(false),
+});
+
+export const advertisements = sqliteTable('advertisements', {
+  id: text('id').primaryKey(),
+  title: text('title').notNull(),
+  description: text('description').notNull(),
+  image: text('image').notNull(),
+  targetUrl: text('target_url'),
+  type: text('type', { enum: ['banner', 'card', 'sponsored_event'] }).notNull(),
+  position: text('position', { enum: ['home_top', 'home_middle', 'search_results', 'event_detail'] }).notNull(),
+  isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+  startDate: text('start_date').notNull(),
+  endDate: text('end_date').notNull(),
+  impressions: integer('impressions').notNull().default(0),
+  clicks: integer('clicks').notNull().default(0),
+  budget: real('budget').notNull(),
+  targetAudienceInterests: text('target_audience_interests'),
+  targetAudienceAgeMin: integer('target_audience_age_min'),
+  targetAudienceAgeMax: integer('target_audience_age_max'),
+  targetAudienceLocation: text('target_audience_location'),
+  promoterId: text('promoter_id').references(() => promoters.id),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const following = sqliteTable('following', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id),
+  promoterId: text('promoter_id').references(() => promoters.id),
+  artistId: text('artist_id'),
+  friendId: text('friend_id').references(() => users.id),
+  followedAt: text('followed_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const eventStatistics = sqliteTable('event_statistics', {
+  id: text('id').primaryKey(),
+  eventId: text('event_id').notNull().references(() => events.id),
+  totalTicketsSold: integer('total_tickets_sold').notNull().default(0),
+  totalRevenue: real('total_revenue').notNull().default(0),
+  ticketTypeStats: text('ticket_type_stats').notNull().default('[]'),
+  dailySales: text('daily_sales').notNull().default('[]'),
+  lastUpdated: text('last_updated').notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const pushTokens = sqliteTable('push_tokens', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id),
+  token: text('token').notNull(),
+  platform: text('platform', { enum: ['ios', 'android', 'web'] }).notNull(),
+  isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+  lastUsed: text('last_used').notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const notifications = sqliteTable('notifications', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id),
+  type: text('type', { enum: ['event_approved', 'ad_approved', 'ticket_sold', 'event_reminder', 'follower', 'system'] }).notNull(),
+  title: text('title').notNull(),
+  message: text('message').notNull(),
+  data: text('data'),
+  isRead: integer('is_read', { mode: 'boolean' }).notNull().default(false),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+});
