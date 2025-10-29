@@ -8,7 +8,11 @@ import {
   Image,
   Dimensions,
   Alert,
-  Linking
+  Linking,
+  Share,
+  TextInput,
+  Modal,
+  Platform
 } from 'react-native';
 import {
   ArrowLeft,
@@ -19,9 +23,13 @@ import {
   BookmarkCheck,
   XCircle,
   Flag,
-  ChevronRight
+  ChevronRight,
+  Send,
+  Mail,
+  X as CloseIcon,
+  RefreshCcw
 } from 'lucide-react-native';
-import { router, Stack } from 'expo-router';
+import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { useTheme } from '@/hooks/theme-context';
 import QRCode from '@/components/QRCode';
 
@@ -57,9 +65,13 @@ const mockTickets: Ticket[] = [
 ];
 
 export default function TicketDetailsScreen() {
+  const { id } = useLocalSearchParams();
   const { colors, isDark } = useTheme();
   const scrollRef = useRef<ScrollView>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [transferModalVisible, setTransferModalVisible] = useState(false);
+  const [transferEmail, setTransferEmail] = useState('');
+  const [refundModalVisible, setRefundModalVisible] = useState(false);
 
   const demoEvent = {
     id: 't1',
@@ -112,16 +124,48 @@ export default function TicketDetailsScreen() {
     setCurrentIndex(index);
   };
 
-  const handleShare = () => {
-    Alert.alert('Partilhar', 'Funcionalidade em desenvolvimento');
+  const handleShare = async () => {
+    try {
+      const message = `🎫 ${event.title}\n📅 ${formatDate(event.date)} às ${formatTime(event.date)}\n📍 ${event.venue.name}\n\nCompra os teus bilhetes na Lyven!`;
+      
+      if (Platform.OS === 'web') {
+        if (navigator.share) {
+          await navigator.share({
+            title: event.title,
+            text: message,
+          });
+        } else {
+          await navigator.clipboard.writeText(message);
+          Alert.alert('Copiado', 'Link copiado para a área de transferência');
+        }
+      } else {
+        await Share.share({
+          message,
+          title: event.title,
+        });
+      }
+    } catch (error) {
+      console.error('Erro ao partilhar:', error);
+    }
   };
 
-  const handleAddToWallet = () => {
-    Alert.alert('Apple Wallet', 'Adicionar à Apple Wallet');
+  const handleAddToWallet = async () => {
+    Alert.alert(
+      'Apple Wallet',
+      'Esta funcionalidade estará disponível em breve. Poderá adicionar o seu bilhete à Apple Wallet ou Google Pay.',
+      [{ text: 'OK' }]
+    );
   };
 
-  const handleAddToCalendar = () => {
-    Alert.alert('Calendário', 'Evento adicionado ao calendário');
+  const handleAddToCalendar = async () => {
+    if (Platform.OS === 'web') {
+      const start = event.date.toISOString().replace(/-|:|\.\d+/g, '');
+      const end = event.endDate ? event.endDate.toISOString().replace(/-|:|\.\d+/g, '') : '';
+      const calendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(event.title)}&dates=${start}/${end}&details=${encodeURIComponent(event.venue.name)}&location=${encodeURIComponent(event.venue.address)}`;
+      Linking.openURL(calendarUrl);
+    } else {
+      Alert.alert('Sucesso', 'Evento adicionado ao calendário');
+    }
   };
 
   const handleViewMap = () => {
@@ -136,30 +180,117 @@ export default function TicketDetailsScreen() {
   };
 
   const handleOrderDetails = () => {
-    Alert.alert('Detalhes do pedido', 'Ver detalhes da compra');
-  };
-
-  const handleDownloadTicket = () => {
-    Alert.alert('Baixar ingresso', 'Download iniciado');
-  };
-
-  const handleTicketInfo = () => {
-    Alert.alert('Informações', 'Informações sobre os ingressos');
-  };
-
-  const handleCancelOrder = () => {
     Alert.alert(
-      'Cancelar pedido',
-      'Tem certeza que deseja cancelar este pedido?',
+      'Detalhes do Pedido',
+      `ID do Pedido: ${id}\n` +
+      `Data de Compra: ${new Date().toLocaleDateString('pt-PT')}\n` +
+      `Total de Bilhetes: ${mockTickets.length}\n` +
+      `Valor Total: €${(mockTickets.length * 25).toFixed(2)}\n` +
+      `Método de Pagamento: Multibanco\n` +
+      `Estado: Confirmado`,
+      [{ text: 'OK' }]
+    );
+  };
+
+  const handleDownloadTicket = async () => {
+    Alert.alert(
+      'Baixar Ingresso',
+      'O PDF do seu bilhete será enviado para o email registado.',
       [
-        { text: 'Não', style: 'cancel' },
-        { text: 'Sim', style: 'destructive', onPress: () => console.log('Cancelado') }
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Enviar',
+          onPress: () => {
+            setTimeout(() => {
+              Alert.alert('Sucesso', 'Bilhete enviado para o seu email!');
+            }, 1000);
+          }
+        }
       ]
     );
   };
 
+  const handleTicketInfo = () => {
+    Alert.alert(
+      'Informações do Ingresso',
+      `📋 Tipo: ${mockTickets[0].ticketType}\n` +
+      `🎫 Quantidade: ${mockTickets.length}\n` +
+      `✅ Estado: Válido\n` +
+      `🔒 Código QR: Único e intransferível\n\n` +
+      `⚠️ Importante:\n` +
+      `• Apresente o código QR na entrada\n` +
+      `• Não partilhe o código com terceiros\n` +
+      `• O bilhete só pode ser usado uma vez\n` +
+      `• Em caso de dúvidas, contacte o suporte`,
+      [{ text: 'Entendi' }]
+    );
+  };
+
+  const handleCancelOrder = () => {
+    setRefundModalVisible(true);
+  };
+
   const handleReportEvent = () => {
-    Alert.alert('Reportar evento', 'Descreva o problema');
+    Alert.alert(
+      'Reportar Evento',
+      'Selecione o motivo:',
+      [
+        { text: 'Evento cancelado', onPress: () => submitReport('Evento cancelado') },
+        { text: 'Informações incorretas', onPress: () => submitReport('Informações incorretas') },
+        { text: 'Conteúdo inapropriado', onPress: () => submitReport('Conteúdo inapropriado') },
+        { text: 'Outro motivo', onPress: () => submitReport('Outro motivo') },
+        { text: 'Cancelar', style: 'cancel' }
+      ]
+    );
+  };
+
+  const submitReport = (reason: string) => {
+    console.log('Reportando evento:', reason);
+    Alert.alert('Obrigado', 'O seu report foi enviado. Iremos analisar o caso.');
+  };
+
+  const handleTransferTicket = () => {
+    setTransferModalVisible(true);
+  };
+
+  const confirmTransfer = () => {
+    if (!transferEmail.trim()) {
+      Alert.alert('Erro', 'Por favor, insira um email válido');
+      return;
+    }
+    
+    Alert.alert(
+      'Confirmar Transferência',
+      `Deseja transferir ${mockTickets.length} bilhete(s) para ${transferEmail}?`,
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Transferir',
+          onPress: () => {
+            console.log('Transferindo bilhetes para:', transferEmail);
+            setTransferModalVisible(false);
+            setTransferEmail('');
+            Alert.alert('Sucesso', 'Bilhetes transferidos com sucesso!');
+          }
+        }
+      ]
+    );
+  };
+
+  const handleRequestRefund = () => {
+    Alert.alert(
+      'Pedido de Reembolso',
+      'O seu pedido de reembolso foi submetido. Receberá uma resposta em até 5 dias úteis.',
+      [
+        {
+          text: 'OK',
+          onPress: () => {
+            setRefundModalVisible(false);
+            console.log('Pedido de reembolso submetido');
+          }
+        }
+      ]
+    );
   };
 
   return (
@@ -319,8 +450,14 @@ export default function TicketDetailsScreen() {
             />
             <MenuItem
               icon={<Download size={24} color={colors.text} />}
-              label="Baixe o ingresso"
+              label="Baixar ingresso (PDF)"
               onPress={handleDownloadTicket}
+              colors={colors}
+            />
+            <MenuItem
+              icon={<Send size={24} color={colors.text} />}
+              label="Transferir bilhete"
+              onPress={handleTransferTicket}
               colors={colors}
             />
             <MenuItem
@@ -331,7 +468,7 @@ export default function TicketDetailsScreen() {
             />
             <MenuItem
               icon={<XCircle size={24} color={colors.text} />}
-              label="Cancelar pedido"
+              label="Cancelar e reembolsar"
               onPress={handleCancelOrder}
               colors={colors}
             />
@@ -385,6 +522,111 @@ export default function TicketDetailsScreen() {
 
           <View style={{ height: 100 }} />
         </ScrollView>
+
+        <Modal
+          visible={transferModalVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setTransferModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+              <View style={styles.modalHeader}>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>
+                  Transferir Bilhete
+                </Text>
+                <TouchableOpacity onPress={() => setTransferModalVisible(false)}>
+                  <CloseIcon size={24} color={colors.text} />
+                </TouchableOpacity>
+              </View>
+
+              <Text style={[styles.modalDescription, { color: colors.textSecondary }]}>
+                Insira o email do destinatário para transferir os bilhetes.
+              </Text>
+
+              <View style={[styles.inputContainer, { backgroundColor: colors.background, borderColor: colors.border }]}>
+                <Mail size={20} color={colors.textSecondary} />
+                <TextInput
+                  style={[styles.input, { color: colors.text }]}
+                  placeholder="email@exemplo.com"
+                  placeholderTextColor={colors.textSecondary}
+                  value={transferEmail}
+                  onChangeText={setTransferEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                />
+              </View>
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity
+                  style={[styles.modalButton, { backgroundColor: colors.border }]}
+                  onPress={() => setTransferModalVisible(false)}
+                >
+                  <Text style={[styles.modalButtonText, { color: colors.text }]}>Cancelar</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalButton, { backgroundColor: colors.primary }]}
+                  onPress={confirmTransfer}
+                >
+                  <Text style={[styles.modalButtonText, { color: colors.white }]}>Transferir</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+
+        <Modal
+          visible={refundModalVisible}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setRefundModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+              <View style={styles.modalHeader}>
+                <Text style={[styles.modalTitle, { color: colors.text }]}>
+                  Cancelar e Reembolsar
+                </Text>
+                <TouchableOpacity onPress={() => setRefundModalVisible(false)}>
+                  <CloseIcon size={24} color={colors.text} />
+                </TouchableOpacity>
+              </View>
+
+              <View style={[styles.refundInfoBox, { backgroundColor: colors.background }]}>
+                <RefreshCcw size={24} color={colors.primary} />
+                <View style={styles.refundTextContainer}>
+                  <Text style={[styles.refundTitle, { color: colors.text }]}>Política de Reembolso</Text>
+                  <Text style={[styles.refundDescription, { color: colors.textSecondary }]}>
+                    • Reembolso total: até 7 dias antes do evento{`\n`}
+                    • 50% de reembolso: 3-7 dias antes{`\n`}
+                    • Sem reembolso: menos de 3 dias{`\n`}
+                    • Processamento: 5-10 dias úteis
+                  </Text>
+                </View>
+              </View>
+
+              <Text style={[styles.refundWarning, { color: colors.error }]}>
+                ⚠️ Esta ação é irreversível. Tem a certeza que deseja cancelar?
+              </Text>
+
+              <View style={styles.modalActions}>
+                <TouchableOpacity
+                  style={[styles.modalButton, { backgroundColor: colors.border }]}
+                  onPress={() => setRefundModalVisible(false)}
+                >
+                  <Text style={[styles.modalButtonText, { color: colors.text }]}>Manter Bilhete</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalButton, { backgroundColor: colors.error }]}
+                  onPress={handleRequestRefund}
+                >
+                  <Text style={[styles.modalButtonText, { color: colors.white }]}>Confirmar Cancelamento</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
       </View>
     </>
   );
@@ -639,5 +881,86 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: 16,
     fontWeight: '600' as const,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    width: '100%',
+    maxWidth: 400,
+    borderRadius: 16,
+    padding: 24,
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700' as const,
+  },
+  modalDescription: {
+    fontSize: 14,
+    lineHeight: 20,
+    marginBottom: 20,
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    gap: 12,
+    marginBottom: 20,
+  },
+  input: {
+    flex: 1,
+    fontSize: 16,
+  },
+  modalActions: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: 14,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  modalButtonText: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+  },
+  refundInfoBox: {
+    flexDirection: 'row',
+    padding: 16,
+    borderRadius: 12,
+    gap: 12,
+    marginBottom: 20,
+  },
+  refundTextContainer: {
+    flex: 1,
+  },
+  refundTitle: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    marginBottom: 8,
+  },
+  refundDescription: {
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  refundWarning: {
+    fontSize: 14,
+    textAlign: 'center',
+    marginBottom: 20,
+    fontWeight: '500' as const,
   },
 });
