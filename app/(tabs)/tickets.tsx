@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -7,9 +7,6 @@ import {
   TouchableOpacity,
   Image,
   Alert,
-  Animated,
-  Dimensions,
-  PanResponder,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
@@ -84,39 +81,6 @@ function NormalUserTicketsContent() {
   const { colors } = useTheme();
   const [selectedTab, setSelectedTab] = useState<'upcoming' | 'past'>('upcoming');
   const [selectedQRTicket, setSelectedQRTicket] = useState<string | null>(null);
-  
-  const screenWidth = Dimensions.get('window').width;
-  const scrollX = useRef(new Animated.Value(0)).current;
-  
-  const panResponder = useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: (evt, gestureState) => {
-        return Math.abs(gestureState.dx) > 10;
-      },
-      onPanResponderRelease: (evt, gestureState) => {
-        if (gestureState.dx > 50) {
-          if (selectedTab === 'past') {
-            handleTabChange('upcoming');
-          }
-        } else if (gestureState.dx < -50) {
-          if (selectedTab === 'upcoming') {
-            handleTabChange('past');
-          }
-        }
-      },
-    })
-  ).current;
-  
-  const handleTabChange = (tab: 'upcoming' | 'past') => {
-    setSelectedTab(tab);
-    const toValue = tab === 'upcoming' ? 0 : -screenWidth;
-    Animated.spring(scrollX, {
-      toValue,
-      useNativeDriver: true,
-      tension: 65,
-      friction: 10,
-    }).start();
-  };
   
   const [userTickets] = useState<UserTicket[]>([
     {
@@ -418,7 +382,7 @@ function NormalUserTicketsContent() {
             styles.tab,
             selectedTab === 'upcoming' && [styles.tabActive, { borderBottomColor: colors.primary }]
           ]}
-          onPress={() => handleTabChange('upcoming')}
+          onPress={() => setSelectedTab('upcoming')}
         >
           <Text style={[
             styles.tabText,
@@ -432,7 +396,7 @@ function NormalUserTicketsContent() {
             styles.tab,
             selectedTab === 'past' && [styles.tabActive, { borderBottomColor: colors.primary }]
           ]}
-          onPress={() => handleTabChange('past')}
+          onPress={() => setSelectedTab('past')}
         >
           <Text style={[
             styles.tabText,
@@ -443,69 +407,56 @@ function NormalUserTicketsContent() {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.slideContainer} {...panResponder.panHandlers}>
-        <Animated.View
-          style={[
-            styles.slidingContent,
-            {
-              transform: [{ translateX: scrollX }],
-            },
-          ]}
-        >
-          <View style={[styles.slidePanel, { width: screenWidth }]}>
-            <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-              <View style={styles.content}>
-                {upcomingTickets.length > 0 && <UpcomingTicketCard ticket={upcomingTickets[0]} />}
-                
-                {comingTickets.length > 0 && (
-                  <>
-                    <Text style={[styles.sectionTitle, { color: colors.text }]}>Chegando</Text>
-                    {comingTickets.map(ticket => (
-                      <ComingTicketCard key={ticket.id} ticket={ticket} />
-                    ))}
-                  </>
-                )}
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        <View style={styles.content}>
+          {selectedTab === 'upcoming' ? (
+            <>
+              {upcomingTickets.length > 0 && <UpcomingTicketCard ticket={upcomingTickets[0]} />}
+              
+              {comingTickets.length > 0 && (
+                <>
+                  <Text style={[styles.sectionTitle, { color: colors.text }]}>Chegando</Text>
+                  {comingTickets.map(ticket => (
+                    <ComingTicketCard key={ticket.id} ticket={ticket} />
+                  ))}
+                </>
+              )}
 
-                {upcomingTickets.length === 0 && (
-                  <View style={styles.emptyState}>
-                    <Calendar size={64} color={colors.textSecondary} />
-                    <Text style={[styles.emptyTitle, { color: colors.text }]}>Nenhum ingresso próximo</Text>
-                    <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
-                      Explore eventos e compre seus ingressos
-                    </Text>
-                    <TouchableOpacity
-                      style={[styles.exploreButton, { backgroundColor: colors.primary }]}
-                      onPress={() => router.push('/(tabs)')}
-                    >
-                      <Text style={styles.exploreButtonText}>Explorar Eventos</Text>
-                    </TouchableOpacity>
-                  </View>
-                )}
-              </View>
-            </ScrollView>
-          </View>
-
-          <View style={[styles.slidePanel, { width: screenWidth }]}>
-            <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-              <View style={styles.content}>
-                {pastTickets.length > 0 ? (
-                  pastTickets.map(ticket => (
-                    <PastTicketCard key={ticket.id} ticket={ticket} />
-                  ))
-                ) : (
-                  <View style={styles.emptyState}>
-                    <Calendar size={64} color={colors.textSecondary} />
-                    <Text style={[styles.emptyTitle, { color: colors.text }]}>Nenhum ingresso passado</Text>
-                    <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
-                      Seus ingressos usados aparecerão aqui
-                    </Text>
-                  </View>
-                )}
-              </View>
-            </ScrollView>
-          </View>
-        </Animated.View>
-      </View>
+              {upcomingTickets.length === 0 && (
+                <View style={styles.emptyState}>
+                  <Calendar size={64} color={colors.textSecondary} />
+                  <Text style={[styles.emptyTitle, { color: colors.text }]}>Nenhum ingresso próximo</Text>
+                  <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
+                    Explore eventos e compre seus ingressos
+                  </Text>
+                  <TouchableOpacity
+                    style={[styles.exploreButton, { backgroundColor: colors.primary }]}
+                    onPress={() => router.push('/(tabs)')}
+                  >
+                    <Text style={styles.exploreButtonText}>Explorar Eventos</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
+            </>
+          ) : (
+            <>
+              {pastTickets.length > 0 ? (
+                pastTickets.map(ticket => (
+                  <PastTicketCard key={ticket.id} ticket={ticket} />
+                ))
+              ) : (
+                <View style={styles.emptyState}>
+                  <Calendar size={64} color={colors.textSecondary} />
+                  <Text style={[styles.emptyTitle, { color: colors.text }]}>Nenhum ingresso passado</Text>
+                  <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
+                    Seus ingressos usados aparecerão aqui
+                  </Text>
+                </View>
+              )}
+            </>
+          )}
+        </View>
+      </ScrollView>
     </View>
   );
 }
@@ -713,16 +664,6 @@ const styles = StyleSheet.create({
   tabText: {
     fontSize: 16,
     fontWeight: '600' as const,
-  },
-  slideContainer: {
-    flex: 1,
-    overflow: 'hidden',
-  },
-  slidingContent: {
-    flexDirection: 'row',
-  },
-  slidePanel: {
-    flex: 1,
   },
   scrollView: {
     flex: 1,
