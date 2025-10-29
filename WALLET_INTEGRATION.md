@@ -236,6 +236,114 @@ Os passes gerados incluem o mesmo QR Code usado na app, garantindo que:
    - Templates têm restrições de design
    - Campos limitados comparado ao iOS
 
+## ⚠️ Requisitos para Implementação Completa em Produção
+
+### Certificados e Configurações Obrigatórias
+
+Para que a funcionalidade de Wallet funcione completamente em produção, é **obrigatório** configurar:
+
+#### 1. Apple Wallet - Certificados da Apple
+
+**Requisitos:**
+- Conta Apple Developer (99 USD/ano)
+- Pass Type ID registrado no portal Apple Developer
+- Certificado Pass Type ID (.p12) para assinar os passes
+- Team ID da organização
+
+**Passos para Configuração:**
+
+1. **Criar Pass Type ID:**
+   - Aceder a [Apple Developer Portal](https://developer.apple.com/account)
+   - Navegar para "Certificates, Identifiers & Profiles"
+   - Criar novo "Pass Type ID" (ex: `pass.com.lyven.ticket`)
+
+2. **Gerar Certificado:**
+   - Criar "Pass Type ID Certificate"
+   - Download do certificado (.cer)
+   - Converter para formato .p12 (incluindo chave privada)
+
+3. **Configurar no Servidor:**
+   ```bash
+   # Variáveis de ambiente necessárias
+   APPLE_PASS_TYPE_ID=pass.com.lyven.ticket
+   APPLE_TEAM_ID=YOUR_TEAM_ID
+   APPLE_PASS_CERTIFICATE_PATH=/path/to/certificate.p12
+   APPLE_PASS_CERTIFICATE_PASSWORD=certificate_password
+   ```
+
+**Sem estes certificados:** Os passes não serão aceites pela Apple Wallet e mostrarão erro ao tentar adicionar.
+
+#### 2. Google Wallet - Configuração Google Cloud Console
+
+**Requisitos:**
+- Conta Google Cloud (com faturação ativada)
+- Projeto Google Cloud configurado
+- Google Wallet API ativada
+- Service Account criada
+- Issuer ID registado
+
+**Passos para Configuração:**
+
+1. **Criar Projeto Google Cloud:**
+   - Aceder a [Google Cloud Console](https://console.cloud.google.com)
+   - Criar novo projeto ou usar existente
+   - Ativar faturação (necessário para Google Wallet API)
+
+2. **Ativar Google Wallet API:**
+   - No projeto, navegar para "APIs & Services"
+   - Procurar "Google Wallet API"
+   - Clicar em "Enable"
+
+3. **Criar Service Account:**
+   - Navegar para "IAM & Admin" > "Service Accounts"
+   - Criar nova Service Account
+   - Gerar chave JSON
+   - Dar permissões necessárias
+
+4. **Registar Issuer:**
+   - Aceder a [Google Pay & Wallet Console](https://pay.google.com/business/console)
+   - Criar Issuer Account
+   - Obter Issuer ID (formato: `3388000000XXXXXXXXX`)
+
+5. **Configurar no Servidor:**
+   ```bash
+   # Variáveis de ambiente necessárias
+   GOOGLE_WALLET_ISSUER_ID=3388000000XXXXXXXXX
+   GOOGLE_WALLET_SERVICE_ACCOUNT_EMAIL=service-account@project.iam.gserviceaccount.com
+   GOOGLE_WALLET_PRIVATE_KEY_PATH=/path/to/service-account-key.json
+   ```
+
+**Sem esta configuração:** Os passes não serão gerados corretamente e os utilizadores receberão erro ao tentar adicionar ao Google Wallet.
+
+### Resumo de Custos
+
+| Serviço | Custo | Frequência |
+|---------|-------|------------|
+| **Apple Developer Program** | 99 USD | Anual |
+| **Google Cloud** | Variável* | Mensal |
+
+*Google Cloud: Custos baseados em uso da API. Google Wallet API tem tier gratuito inicial, mas pode haver custos de infraestrutura do GCP.
+
+### Checklist de Implementação
+
+Antes de lançar em produção, confirmar:
+
+- [ ] Conta Apple Developer ativa
+- [ ] Pass Type ID criado e certificado gerado
+- [ ] Certificado .p12 instalado no servidor
+- [ ] Projeto Google Cloud criado
+- [ ] Faturação ativada no Google Cloud
+- [ ] Google Wallet API ativada
+- [ ] Service Account criada com chave JSON
+- [ ] Issuer ID obtido e configurado
+- [ ] Todas as variáveis de ambiente configuradas
+- [ ] Testes realizados em dispositivos reais (iOS e Android)
+- [ ] Validação de QR codes a funcionar com passes da wallet
+
+### ⚠️ Aviso Importante
+
+**A implementação atual é uma simulação para desenvolvimento.** Para funcionar em produção com utilizadores reais, é **obrigatório** completar todas as configurações acima. Sem os certificados da Apple e a configuração do Google Wallet, a funcionalidade **não funcionará** para utilizadores finais.
+
 ## Próximos Passos Recomendados
 
 ### Para Produção Completa
