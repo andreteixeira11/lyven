@@ -71,11 +71,11 @@ export const [NotificationsContext, useNotifications] = createContextHook(() => 
   );
 
   useEffect(() => {
-    if (!user?.id) return;
     if (Platform.OS === 'web') {
-      console.log('Notificações push não disponíveis na web');
       return;
     }
+
+    if (!user?.id) return;
 
     registerForPushNotificationsAsync()
       .then(token => {
@@ -95,7 +95,7 @@ export const [NotificationsContext, useNotifications] = createContextHook(() => 
         }
       })
       .catch(error => {
-        console.error('Failed to register for push notifications:', error);
+        console.log('Notification registration skipped:', error.message);
       });
 
     notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
