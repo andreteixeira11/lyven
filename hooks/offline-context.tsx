@@ -43,8 +43,11 @@ export const [OfflineProvider, useOffline] = createContextHook(() => {
 
   useEffect(() => {
     if (!initialized) {
-      loadCache();
-      setInitialized(true);
+      loadCache().catch(error => {
+        console.error('Failed to initialize offline cache:', error);
+      }).finally(() => {
+        setInitialized(true);
+      });
     }
   }, [initialized]);
 

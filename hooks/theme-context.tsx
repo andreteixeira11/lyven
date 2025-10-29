@@ -59,8 +59,11 @@ export const [ThemeProvider, useTheme] = createContextHook(() => {
 
   useEffect(() => {
     if (!initialized) {
-      loadTheme();
-      setInitialized(true);
+      loadTheme().catch(error => {
+        console.error('Failed to initialize theme:', error);
+      }).finally(() => {
+        setInitialized(true);
+      });
     }
   }, [initialized]);
 

@@ -73,22 +73,26 @@ export const [NotificationsContext, useNotifications] = createContextHook(() => 
   useEffect(() => {
     if (!user?.id) return;
 
-    registerForPushNotificationsAsync().then(token => {
-      setExpoPushToken(token);
-      if (token && user.id) {
-        const platform = Platform.OS === 'ios' 
-          ? 'ios' 
-          : Platform.OS === 'android' 
-          ? 'android' 
-          : 'web';
-        
-        registerTokenMutation.mutate({
-          userId: user.id,
-          token,
-          platform,
-        });
-      }
-    });
+    registerForPushNotificationsAsync()
+      .then(token => {
+        setExpoPushToken(token);
+        if (token && user.id) {
+          const platform = Platform.OS === 'ios' 
+            ? 'ios' 
+            : Platform.OS === 'android' 
+            ? 'android' 
+            : 'web';
+          
+          registerTokenMutation.mutate({
+            userId: user.id,
+            token,
+            platform,
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Failed to register for push notifications:', error);
+      });
 
     notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
       console.log('Notificação recebida:', notification);
