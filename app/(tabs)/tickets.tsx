@@ -343,12 +343,8 @@ function NormalUserTicketsContent() {
           <Text style={[styles.pastTime, { color: colors.text }]}>{formatTime(ticket.eventDate)}</Text>
         </View>
         <View style={styles.pastQrContainer}>
-          <View style={styles.pastQrIcon}>
-            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
-            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
-            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
-            <View style={[styles.qrSquare, { borderColor: colors.text }]} />
-          </View>
+          <Text style={[styles.pastQrCount, { color: colors.text }]}>{ticket.quantity}</Text>
+          <Ticket size={20} color={colors.text} />
         </View>
       </View>
 
