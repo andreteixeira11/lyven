@@ -230,13 +230,7 @@ function NormalUserTicketsContent() {
       activeOpacity={0.8}
     >
       <View style={styles.upcomingCardHeader}>
-        <View style={styles.titleContainer}>
-          <Text style={[styles.upcomingTitle, { color: colors.text }]}>{ticket.eventTitle}</Text>
-          <View style={styles.dateTimeContainer}>
-            <Text style={[styles.dateMonth, { color: colors.textSecondary }]}>{formatDate(ticket.eventDate)}</Text>
-            <Text style={[styles.dateTime, { color: colors.textSecondary }]}> · {formatTime(ticket.eventDate)}</Text>
-          </View>
-        </View>
+        <Text style={[styles.upcomingTitle, { color: colors.text }]}>{ticket.eventTitle}</Text>
         <TouchableOpacity 
           style={styles.qrContainer}
           onPress={() => setSelectedQRTicket(selectedQRTicket === ticket.id ? null : ticket.id)}
@@ -244,6 +238,11 @@ function NormalUserTicketsContent() {
           <Text style={[styles.qrCount, { color: colors.text }]}>{ticket.quantity}</Text>
           <Ticket size={24} color={colors.text} />
         </TouchableOpacity>
+      </View>
+
+      <View style={styles.dateTimeContainer}>
+        <Text style={[styles.dateMonth, { color: colors.textSecondary }]}>{formatDate(ticket.eventDate)}</Text>
+        <Text style={[styles.dateTime, { color: colors.textSecondary }]}> · {formatTime(ticket.eventDate)}</Text>
       </View>
 
       <Text style={[styles.upcomingVenue, { color: colors.textSecondary }]}>
@@ -289,19 +288,18 @@ function NormalUserTicketsContent() {
       onPress={() => router.push(`/ticket-details/${ticket.id}` as any)}
     >
       <View style={styles.comingCardHeader}>
-        <View style={styles.comingTitleContainer}>
-          <Text style={[styles.comingTitle, { color: colors.text }]} numberOfLines={1}>
-            {ticket.eventTitle}
-          </Text>
-          <View style={styles.comingDateContainer}>
-            <Text style={[styles.comingMonth, { color: colors.textSecondary }]}>{formatDate(ticket.eventDate)}</Text>
-            <Text style={[styles.comingTime, { color: colors.textSecondary }]}> · {formatTime(ticket.eventDate)}</Text>
-          </View>
-        </View>
+        <Text style={[styles.comingTitle, { color: colors.text }]} numberOfLines={1}>
+          {ticket.eventTitle}
+        </Text>
         <View style={styles.comingQrContainer}>
           <Text style={[styles.comingQrCount, { color: colors.text }]}>{ticket.quantity}</Text>
           <Ticket size={20} color={colors.text} />
         </View>
+      </View>
+
+      <View style={styles.comingDateContainer}>
+        <Text style={[styles.comingMonth, { color: colors.textSecondary }]}>{formatDate(ticket.eventDate)}</Text>
+        <Text style={[styles.comingTime, { color: colors.textSecondary }]}> · {formatTime(ticket.eventDate)}</Text>
       </View>
 
       <View style={styles.comingContent}>
@@ -342,19 +340,18 @@ function NormalUserTicketsContent() {
       activeOpacity={0.7}
     >
       <View style={styles.pastHeader}>
-        <View style={styles.pastTitleContainer}>
-          <Text style={[styles.pastTitle, { color: colors.text }]} numberOfLines={2}>
-            {ticket.eventTitle}
-          </Text>
-          <View style={styles.pastDateContainer}>
-            <Text style={[styles.pastMonth, { color: colors.textSecondary }]}>{formatDate(ticket.eventDate)}</Text>
-            <Text style={[styles.pastTime, { color: colors.textSecondary }]}> · {formatTime(ticket.eventDate)}</Text>
-          </View>
-        </View>
+        <Text style={[styles.pastTitle, { color: colors.text }]} numberOfLines={2}>
+          {ticket.eventTitle}
+        </Text>
         <View style={styles.pastQrContainer}>
           <Text style={[styles.pastQrCount, { color: colors.text }]}>{ticket.quantity}</Text>
           <Ticket size={20} color={colors.text} />
         </View>
+      </View>
+
+      <View style={styles.pastDateContainer}>
+        <Text style={[styles.pastMonth, { color: colors.textSecondary }]}>{formatDate(ticket.eventDate)}</Text>
+        <Text style={[styles.pastTime, { color: colors.textSecondary }]}> · {formatTime(ticket.eventDate)}</Text>
       </View>
 
       <View style={styles.pastContent}>
@@ -680,7 +677,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 16,
+    marginBottom: 8,
   },
   titleContainer: {
     flex: 1,
@@ -688,7 +685,7 @@ const styles = StyleSheet.create({
   dateTimeContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
+    marginBottom: 8,
   },
   dateMonth: {
     fontSize: 13,
@@ -789,7 +786,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   comingTitleContainer: {
     flex: 1,
@@ -797,7 +794,7 @@ const styles = StyleSheet.create({
   comingDateContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
+    marginBottom: 12,
   },
   comingMonth: {
     fontSize: 12,
@@ -882,7 +879,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 12,
+    marginBottom: 8,
   },
   pastTitleContainer: {
     flex: 1,
@@ -890,7 +887,7 @@ const styles = StyleSheet.create({
   pastDateContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
+    marginBottom: 12,
   },
   pastMonth: {
     fontSize: 12,
