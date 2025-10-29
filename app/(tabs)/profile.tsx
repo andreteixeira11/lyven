@@ -29,11 +29,10 @@ import {
 import { useUser } from '@/hooks/user-context';
 import { useTheme } from '@/hooks/theme-context';
 import { router } from 'expo-router';
-import { COLORS } from '@/constants/colors';
 
 export default function ProfileScreen() {
   const { user, logout } = useUser();
-  const { theme, isDark, changeTheme } = useTheme();
+  const { theme, isDark, changeTheme, colors } = useTheme();
   const insets = useSafeAreaInsets();
   const [tapCount, setTapCount] = useState(0);
   const tapTimeoutRef = useRef<number | null>(null);
@@ -86,15 +85,15 @@ export default function ProfileScreen() {
 
   if (isAdmin) {
     return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
+      <View style={[styles.container, { paddingTop: insets.top, backgroundColor: colors.background }]}>
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false} bounces={false}>
-          <View style={styles.userInfo}>
-            <View style={styles.avatar}>
-              <User size={32} color={COLORS.primary} />
+          <View style={[styles.userInfo, { backgroundColor: colors.primary }]}>
+            <View style={[styles.avatar, { backgroundColor: colors.white }]}>
+              <User size={32} color={colors.primary} />
             </View>
             <View style={styles.userDetails}>
-              <Text style={styles.userName}>Administrador</Text>
-              <Text style={styles.userEmail}>{user?.email}</Text>
+              <Text style={[styles.userName, { color: colors.white }]}>Administrador</Text>
+              <Text style={[styles.userEmail, { color: colors.white }]}>{user?.email}</Text>
               <View style={styles.promoterBadge}>
                 <Shield size={12} color="#FFD700" />
                 <Text style={styles.promoterText}>Admin</Text>
@@ -102,17 +101,17 @@ export default function ProfileScreen() {
             </View>
           </View>
           
-          <View style={styles.menuItems}>
+          <View style={[styles.menuItems, { backgroundColor: colors.card }]}>
             <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/admin-settings')}>
-              <Settings size={20} color={COLORS.text} />
-              <Text style={styles.menuText}>Configurações do Sistema</Text>
+              <Settings size={20} color={colors.text} />
+              <Text style={[styles.menuText, { color: colors.text }]}>Configurações do Sistema</Text>
             </TouchableOpacity>
             
-            <View style={styles.separator} />
+            <View style={[styles.separator, { backgroundColor: colors.border }]} />
             
             <TouchableOpacity style={styles.logoutItem} onPress={handleLogout}>
-              <LogOut size={20} color={COLORS.error} />
-              <Text style={styles.logoutText}>Terminar Sessão</Text>
+              <LogOut size={20} color={colors.error} />
+              <Text style={[styles.logoutText, { color: colors.error }]}>Terminar Sessão</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -136,15 +135,15 @@ export default function ProfileScreen() {
     const progress = (nextEvent.ticketsSold / nextEvent.totalTickets) * 100;
 
     return (
-      <View style={[styles.container, { paddingTop: insets.top }]}>
+      <View style={[styles.container, { paddingTop: insets.top, backgroundColor: colors.background }]}>
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false} bounces={false}>
-          <View style={styles.userInfo}>
-            <View style={styles.avatar}>
-              <User size={32} color={COLORS.primary} />
+          <View style={[styles.userInfo, { backgroundColor: colors.primary }]}>
+            <View style={[styles.avatar, { backgroundColor: colors.white }]}>
+              <User size={32} color={colors.primary} />
             </View>
             <View style={styles.userDetails}>
-              <Text style={styles.userName}>{user?.name || 'Promotor'}</Text>
-              <Text style={styles.userEmail}>{user?.email}</Text>
+              <Text style={[styles.userName, { color: colors.white }]}>{user?.name || 'Promotor'}</Text>
+              <Text style={[styles.userEmail, { color: colors.white }]}>{user?.email}</Text>
               <View style={styles.promoterBadge}>
                 <Shield size={12} color="#FFD700" />
                 <Text style={styles.promoterText}>Promotor</Text>
@@ -164,7 +163,7 @@ export default function ProfileScreen() {
               <View style={styles.nextEventOverlay}>
                 <View style={styles.nextEventHeader}>
                   <Text style={styles.nextEventName}>{nextEvent.title}</Text>
-                  <View style={styles.nextEventDate}>
+                  <View style={[styles.nextEventDate, { backgroundColor: colors.primary }]}>
                     <Calendar size={14} color="#fff" />
                     <Text style={styles.nextEventDateText}>
                       {new Date(nextEvent.date).toLocaleDateString('pt-PT', {
@@ -216,27 +215,27 @@ export default function ProfileScreen() {
                 </View>
               </View>
             </TouchableOpacity>
-            <Text style={styles.nextEventHint}>
+            <Text style={[styles.nextEventHint, { color: colors.primary }]}>
               👆 Clique para ver Compradores, Scanner e Estatísticas
             </Text>
           </View>
           
-          <View style={styles.menuItems}>
+          <View style={[styles.menuItems, { backgroundColor: colors.card }]}>
             <TouchableOpacity style={styles.menuItem} onPress={() => handleMenuItemPress('/settings')}>
-              <Settings size={20} color={COLORS.text} />
-              <Text style={styles.menuText}>Definições</Text>
+              <Settings size={20} color={colors.text} />
+              <Text style={[styles.menuText, { color: colors.text }]}>Definições</Text>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.menuItem} onPress={() => handleMenuItemPress('/help')}>
-              <HelpCircle size={20} color={COLORS.text} />
-              <Text style={styles.menuText}>Ajuda</Text>
+              <HelpCircle size={20} color={colors.text} />
+              <Text style={[styles.menuText, { color: colors.text }]}>Ajuda</Text>
             </TouchableOpacity>
             
-            <View style={styles.separator} />
+            <View style={[styles.separator, { backgroundColor: colors.border }]} />
             
             <TouchableOpacity style={styles.logoutItem} onPress={handleLogout}>
-              <LogOut size={20} color={COLORS.error} />
-              <Text style={styles.logoutText}>Terminar Sessão</Text>
+              <LogOut size={20} color={colors.error} />
+              <Text style={[styles.logoutText, { color: colors.error }]}>Terminar Sessão</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -245,21 +244,21 @@ export default function ProfileScreen() {
   }
 
   const renderUserInfo = () => (
-    <View style={styles.userInfo}>
-      <TouchableOpacity style={styles.avatar} onPress={handleLogoTap} activeOpacity={0.7}>
-        <User size={32} color={COLORS.primary} />
+    <View style={[styles.userInfo, { backgroundColor: colors.primary }]}>
+      <TouchableOpacity style={[styles.avatar, { backgroundColor: colors.white }]} onPress={handleLogoTap} activeOpacity={0.7}>
+        <User size={32} color={colors.primary} />
       </TouchableOpacity>
       <View style={styles.userDetails}>
-        <Text style={styles.userName}>{user?.name || 'Utilizador'}</Text>
-        <Text style={styles.userEmail}>{user?.email}</Text>
+        <Text style={[styles.userName, { color: colors.white }]}>{user?.name || 'Utilizador'}</Text>
+        <Text style={[styles.userEmail, { color: colors.white }]}>{user?.email}</Text>
       </View>
     </View>
   );
 
   const MenuItem = ({ icon: Icon, title, onPress }: any) => (
     <TouchableOpacity style={styles.menuItem} onPress={onPress}>
-      <Icon size={20} color={COLORS.text} />
-      <Text style={styles.menuText}>{title}</Text>
+      <Icon size={20} color={colors.text} />
+      <Text style={[styles.menuText, { color: colors.text }]}>{title}</Text>
     </TouchableOpacity>
   );
 
@@ -280,21 +279,21 @@ export default function ProfileScreen() {
       <View style={styles.themeMenuItem}>
         <View style={styles.themeLeft}>
           {isDark ? (
-            <Moon size={20} color={COLORS.text} />
+            <Moon size={20} color={colors.text} />
           ) : (
-            <Sun size={20} color={COLORS.text} />
+            <Sun size={20} color={colors.text} />
           )}
-          <Text style={styles.menuText}>Modo Noturno</Text>
+          <Text style={[styles.menuText, { color: colors.text }]}>Modo Noturno</Text>
         </View>
         <Switch
           value={theme === 'dark' || (theme === 'system' && isDark)}
           onValueChange={(value) => changeTheme(value ? 'dark' : 'light')}
-          trackColor={{ false: '#767577', true: COLORS.primary }}
+          trackColor={{ false: '#767577', true: colors.primary }}
           thumbColor={isDark ? '#fff' : '#f4f3f4'}
         />
       </View>
       
-      <View style={styles.separator} />
+      <View style={[styles.separator, { backgroundColor: colors.border }]} />
     </>
   );
 
@@ -312,21 +311,21 @@ export default function ProfileScreen() {
         onPress={() => handleMenuItemPress('/help')}
       />
       
-      <View style={styles.separator} />
+      <View style={[styles.separator, { backgroundColor: colors.border }]} />
       
       <TouchableOpacity style={styles.logoutItem} onPress={handleLogout}>
-        <LogOut size={20} color={COLORS.error} />
-        <Text style={styles.logoutText}>Terminar Sessão</Text>
+        <LogOut size={20} color={colors.error} />
+        <Text style={[styles.logoutText, { color: colors.error }]}>Terminar Sessão</Text>
       </TouchableOpacity>
     </>
   );
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top }]}>
+    <View style={[styles.container, { paddingTop: insets.top, backgroundColor: colors.background }]}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false} bounces={false}>
         {renderUserInfo()}
         
-        <View style={styles.menuItems}>
+        <View style={[styles.menuItems, { backgroundColor: colors.card }]}>
           {renderUserMenuItems()}
           {renderCommonMenuItems()}
         </View>
@@ -338,7 +337,6 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   scrollView: {
     flex: 1,
@@ -347,14 +345,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 20,
-    backgroundColor: COLORS.header,
     marginBottom: 20,
   },
   avatar: {
     width: 60,
     height: 60,
     borderRadius: 30,
-    backgroundColor: COLORS.white,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
@@ -363,13 +359,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   userName: {
-    color: COLORS.white,
     fontSize: 18,
     fontWeight: 'bold' as const,
     marginBottom: 2,
   },
   userEmail: {
-    color: COLORS.white,
     fontSize: 14,
     marginBottom: 4,
     opacity: 0.9,
@@ -388,7 +382,6 @@ const styles = StyleSheet.create({
     marginLeft: 4,
   },
   menuItems: {
-    backgroundColor: COLORS.card,
     paddingVertical: 8,
   },
   menuItem: {
@@ -398,7 +391,6 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   menuText: {
-    color: COLORS.text,
     fontSize: 16,
     marginLeft: 16,
     fontWeight: '500' as const,
@@ -417,7 +409,6 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: 1,
-    backgroundColor: COLORS.border,
     marginHorizontal: 20,
     marginVertical: 8,
   },
@@ -428,19 +419,16 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   logoutText: {
-    color: COLORS.error,
     fontSize: 16,
     marginLeft: 16,
     fontWeight: 'bold' as const,
   },
   nextEventSection: {
     padding: 20,
-    backgroundColor: COLORS.background,
   },
   nextEventTitle: {
     fontSize: 20,
     fontWeight: 'bold' as const,
-    color: COLORS.text,
     marginBottom: 12,
   },
   nextEventCard: {
@@ -481,7 +469,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: COLORS.primary,
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
@@ -541,7 +528,6 @@ const styles = StyleSheet.create({
   nextEventHint: {
     marginTop: 12,
     textAlign: 'center',
-    color: COLORS.primary,
     fontSize: 13,
     fontStyle: 'italic' as const,
   },
