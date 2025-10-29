@@ -269,18 +269,6 @@ export default function ProfileScreen() {
         title="Favoritos"
         onPress={() => handleMenuItemPress('/(tabs)/favorites')}
       />
-      
-      <MenuItem
-        icon={Users}
-        title="A seguir"
-        onPress={() => handleMenuItemPress('/following')}
-      />
-
-      <MenuItem
-        icon={Bell}
-        title="Notificações"
-        onPress={() => handleMenuItemPress('/notifications')}
-      />
 
       <View style={styles.themeMenuItem}>
         <View style={styles.themeLeft}>

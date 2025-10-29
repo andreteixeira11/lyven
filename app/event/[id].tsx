@@ -414,13 +414,8 @@ export default function EventDetailScreen() {
           
           {/* Promoter Info */}
           <View style={styles.promoterSection}>
-            <Text style={[styles.sectionTitle, { color: colors.primary }]}>Promotor</Text>
-            <TouchableOpacity 
-              style={[styles.promoterCard, { backgroundColor: colors.card, borderColor: colors.border }]}
-              onPress={() => router.push(`/promoter/${event.promoter.id}` as any)}
-              activeOpacity={0.8}
-            >
-              <Image source={{ uri: event.promoter.image }} style={styles.promoterImage} />
+            <Text style={[styles.sectionTitle, { color: colors.primary }]}>Organizado por</Text>
+            <View style={[styles.promoterCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
               <View style={styles.promoterInfo}>
                 <View style={styles.promoterHeader}>
                   <Text style={[styles.promoterName, { color: colors.primary }]}>{event.promoter.name}</Text>
@@ -431,11 +426,8 @@ export default function EventDetailScreen() {
                   )}
                 </View>
                 <Text style={[styles.promoterDescription, { color: colors.textSecondary }]}>{event.promoter.description}</Text>
-                <Text style={[styles.promoterFollowers, { color: colors.textSecondary }]}>
-                  {event.promoter.followersCount.toLocaleString()} seguidores
-                </Text>
               </View>
-            </TouchableOpacity>
+            </View>
           </View>
           
           {/* Social Links */}
