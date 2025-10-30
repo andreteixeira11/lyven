@@ -11,6 +11,7 @@ import { SocialProvider } from "@/hooks/social-context";
 import { NotificationsContext } from "@/hooks/notifications-context";
 import { ThemeProvider, useTheme } from "@/hooks/theme-context";
 import { OfflineProvider } from "@/hooks/offline-context";
+import { I18nProvider } from "@/hooks/i18n-context";
 import { trpc, trpcReactClient } from "@/lib/trpc";
 
 LogBox.ignoreLogs([
@@ -312,25 +313,27 @@ export default function RootLayout() {
   return (
     <trpc.Provider client={trpcReactClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
-        <ThemeProvider>
-          <OfflineProvider>
-            <UserProvider>
-              <NotificationsContext>
-                <FavoritesContext>
-                  <CalendarProvider>
-                    <SocialProvider>
-                      <CartProvider>
-                        <GestureHandlerRootView style={styles.container}>
-                          <RootLayoutNav />
-                        </GestureHandlerRootView>
-                      </CartProvider>
-                    </SocialProvider>
-                  </CalendarProvider>
-                </FavoritesContext>
-              </NotificationsContext>
-            </UserProvider>
-          </OfflineProvider>
-        </ThemeProvider>
+        <I18nProvider>
+          <ThemeProvider>
+            <OfflineProvider>
+              <UserProvider>
+                <NotificationsContext>
+                  <FavoritesContext>
+                    <CalendarProvider>
+                      <SocialProvider>
+                        <CartProvider>
+                          <GestureHandlerRootView style={styles.container}>
+                            <RootLayoutNav />
+                          </GestureHandlerRootView>
+                        </CartProvider>
+                      </SocialProvider>
+                    </CalendarProvider>
+                  </FavoritesContext>
+                </NotificationsContext>
+              </UserProvider>
+            </OfflineProvider>
+          </ThemeProvider>
+        </I18nProvider>
       </QueryClientProvider>
     </trpc.Provider>
   );

@@ -10,6 +10,8 @@ import { Stack, router } from 'expo-router';
 import { ArrowLeft, Check, Globe } from 'lucide-react-native';
 import { useUser } from '@/hooks/user-context';
 import { useTheme } from '@/hooks/theme-context';
+import { useI18n } from '@/hooks/i18n-context';
+import { useTranslation } from 'react-i18next';
 
 interface Language {
   code: string;
@@ -21,29 +23,19 @@ interface Language {
 const LANGUAGES: Language[] = [
   { code: 'pt', name: 'Portuguese', nativeName: 'Português', flag: '🇵🇹' },
   { code: 'en', name: 'English', nativeName: 'English', flag: '🇬🇧' },
-  { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '🇪🇸' },
-  { code: 'fr', name: 'French', nativeName: 'Français', flag: '🇫🇷' },
-  { code: 'de', name: 'German', nativeName: 'Deutsch', flag: '🇩🇪' },
-  { code: 'it', name: 'Italian', nativeName: 'Italiano', flag: '🇮🇹' },
-  { code: 'nl', name: 'Dutch', nativeName: 'Nederlands', flag: '🇳🇱' },
-  { code: 'pl', name: 'Polish', nativeName: 'Polski', flag: '🇵🇱' },
-  { code: 'ru', name: 'Russian', nativeName: 'Русский', flag: '🇷🇺' },
-  { code: 'zh', name: 'Chinese', nativeName: '中文', flag: '🇨🇳' },
-  { code: 'ja', name: 'Japanese', nativeName: '日本語', flag: '🇯🇵' },
-  { code: 'ko', name: 'Korean', nativeName: '한국어', flag: '🇰🇷' },
-  { code: 'ar', name: 'Arabic', nativeName: 'العربية', flag: '🇸🇦' },
-  { code: 'hi', name: 'Hindi', nativeName: 'हिन्दी', flag: '🇮🇳' },
 ];
 
 export default function LanguageScreen() {
   const { user, updateUser } = useUser();
   const { colors } = useTheme();
-  const [selectedLanguage, setSelectedLanguage] = useState(
-    user?.preferences?.language || 'pt'
-  );
+  const { currentLanguage, switchLanguage } = useI18n();
+  const { t } = useTranslation();
+  const [selectedLanguage, setSelectedLanguage] = useState(currentLanguage);
 
   const handleLanguageSelect = async (languageCode: string) => {
     setSelectedLanguage(languageCode);
+    
+    await switchLanguage(languageCode);
     
     await updateUser({
       preferences: {
@@ -51,10 +43,6 @@ export default function LanguageScreen() {
         language: languageCode,
       },
     });
-
-    setTimeout(() => {
-      router.back();
-    }, 300);
   };
 
   return (
@@ -62,7 +50,7 @@ export default function LanguageScreen() {
       <Stack.Screen
         options={{
           headerShown: true,
-          title: 'Idioma',
+          title: t('language.title'),
           headerStyle: { backgroundColor: colors.card },
           headerTintColor: colors.text,
           headerTitleStyle: { fontWeight: 'bold' as const },
@@ -82,10 +70,10 @@ export default function LanguageScreen() {
         <View style={[styles.header, { backgroundColor: colors.card }]}>
           <Globe size={48} color={colors.primary} />
           <Text style={[styles.headerTitle, { color: colors.text }]}>
-            Selecione o seu idioma
+            {t('language.selectLanguage')}
           </Text>
           <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-            Escolha o idioma preferido para a aplicação
+            {t('language.selectLanguage')}
           </Text>
         </View>
 
@@ -123,7 +111,7 @@ export default function LanguageScreen() {
 
         <View style={styles.footer}>
           <Text style={[styles.footerText, { color: colors.textSecondary }]}>
-            A tradução será aplicada na próxima versão da aplicação
+            {t('language.languageChanged')}
           </Text>
         </View>
       </ScrollView>
