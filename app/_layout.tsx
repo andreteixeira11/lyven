@@ -129,7 +129,8 @@ function RootLayoutNav() {
         name="create-event" 
         options={{ 
           title: t('events.createEvent'),
-          presentation: 'modal'
+          presentation: 'modal',
+          gestureEnabled: false
         }} 
       />
       <Stack.Screen 
