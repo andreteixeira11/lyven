@@ -487,6 +487,7 @@ export default function CreateEvent() {
   };
 
   const handleCancelConfirmation = () => {
+    console.log('🚪 Tentando cancelar criação do evento');
     Alert.alert(
       'Cancelar Criação',
       'Tem a certeza que pretende cancelar? Todos os dados serão perdidos.',
@@ -494,11 +495,15 @@ export default function CreateEvent() {
         {
           text: 'Não',
           style: 'cancel',
+          onPress: () => console.log('❌ Cancelamento cancelado')
         },
         {
           text: 'Sim, Cancelar',
           style: 'destructive',
-          onPress: () => router.back(),
+          onPress: () => {
+            console.log('✅ Criação cancelada pelo utilizador');
+            router.back();
+          },
         },
       ],
       { cancelable: true }
@@ -514,7 +519,11 @@ export default function CreateEvent() {
           headerStyle: { backgroundColor: '#0099a8' },
           headerTintColor: '#fff',
           headerLeft: () => (
-            <TouchableOpacity onPress={handleCancelConfirmation} style={styles.closeButton}>
+            <TouchableOpacity 
+              onPress={handleCancelConfirmation} 
+              style={styles.closeButton}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            >
               <X size={24} color="#fff" />
             </TouchableOpacity>
           ),
