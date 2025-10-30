@@ -11,7 +11,7 @@ import { SocialProvider } from "@/hooks/social-context";
 import { NotificationsContext } from "@/hooks/notifications-context";
 import { ThemeProvider, useTheme } from "@/hooks/theme-context";
 import { OfflineProvider } from "@/hooks/offline-context";
-import { I18nProvider } from "@/hooks/i18n-context";
+import { I18nProvider, useI18n } from "@/hooks/i18n-context";
 import { trpc, trpcReactClient } from "@/lib/trpc";
 
 LogBox.ignoreLogs([
@@ -33,10 +33,11 @@ const queryClient = new QueryClient({
 
 function RootLayoutNav() {
   const { colors } = useTheme();
+  const { t } = useI18n();
   
   return (
     <Stack screenOptions={{ 
-      headerBackTitle: "Voltar",
+      headerBackTitle: t('common.back'),
       headerStyle: {
         backgroundColor: colors.primary,
       },
@@ -50,14 +51,14 @@ function RootLayoutNav() {
       <Stack.Screen 
         name="event/[id]" 
         options={{ 
-          title: 'Evento',
+          title: t('events.eventDetails'),
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="checkout" 
         options={{ 
-          title: 'Finalizar Compra',
+          title: t('checkout.checkout'),
           presentation: 'modal'
         }} 
       />
@@ -78,203 +79,203 @@ function RootLayoutNav() {
       <Stack.Screen 
         name="my-tickets" 
         options={{ 
-          title: 'Meus Ingressos',
+          title: t('tickets.myTickets'),
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="promoter-dashboard" 
         options={{ 
-          title: 'Dashboard',
+          title: t('promoter.dashboard'),
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="analytics" 
         options={{ 
-          title: 'Estatísticas',
+          title: t('promoter.statistics'),
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="my-events" 
         options={{ 
-          title: 'Meus Eventos',
+          title: t('promoter.myEvents'),
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="followers" 
         options={{ 
-          title: 'Seguidores',
+          title: t('social.followers'),
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="event-buyers/[id]" 
         options={{ 
-          title: 'Compradores',
+          title: t('promoter.buyers'),
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="qr-scanner/[id]" 
         options={{ 
-          title: 'Scanner QR',
+          title: t('qrScanner.scanQR'),
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="create-event" 
         options={{ 
-          title: 'Criar Evento',
+          title: t('events.createEvent'),
           presentation: 'modal'
         }} 
       />
       <Stack.Screen 
         name="admin-dashboard" 
         options={{ 
-          title: 'Administração',
+          title: t('admin.adminDashboard'),
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="admin-approvals" 
         options={{ 
-          title: 'Aprovar Publicidades',
+          title: t('admin.pendingApprovals'),
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="admin-users" 
         options={{ 
-          title: 'Gerir Utilizadores',
+          title: t('admin.userManagement'),
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="admin-analytics" 
         options={{ 
-          title: 'Estatísticas Admin',
+          title: t('admin.analytics'),
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="admin-events" 
         options={{ 
-          title: 'Gerir Eventos',
+          title: t('admin.eventManagement'),
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="admin-promoters" 
         options={{ 
-          title: 'Gerir Promotores',
+          title: t('admin.promoterManagement'),
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="admin-settings" 
         options={{ 
-          title: 'Configurações',
+          title: t('settings.settings'),
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="settings" 
         options={{ 
-          title: 'Definições',
+          title: t('settings.settings'),
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="notifications" 
         options={{ 
-          title: 'Notificações',
+          title: t('notifications.notifications'),
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="help" 
         options={{ 
-          title: 'Ajuda',
+          title: t('help.help'),
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="faq" 
         options={{ 
-          title: 'FAQ',
+          title: t('help.faq'),
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="ad-purchase" 
         options={{ 
-          title: 'Comprar Anúncio',
+          title: t('ads.purchaseAd'),
           presentation: 'modal'
         }} 
       />
       <Stack.Screen 
         name="promoter-event/[id]" 
         options={{ 
-          title: 'Gerir Evento',
+          title: t('promoter.manageEvent'),
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="edit-profile" 
         options={{ 
-          title: 'Editar Perfil',
+          title: t('profile.editProfile'),
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="security" 
         options={{ 
-          title: 'Segurança',
+          title: t('profile.security'),
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="email-preferences" 
         options={{ 
-          title: 'Preferências de Email',
+          title: t('profile.emailPreferences'),
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="test-backend" 
         options={{ 
-          title: 'Testar Backend',
+          title: 'Test Backend',
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="test-email" 
         options={{ 
-          title: 'Testar Email',
+          title: 'Test Email',
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="ticket-details/[id]" 
         options={{ 
-          title: 'Detalhes do Bilhete',
+          title: t('tickets.ticketDetails'),
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="buyer-details/[id]" 
         options={{ 
-          title: 'Detalhes do Comprador',
+          title: t('promoter.buyerDetails'),
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="forgot-password" 
         options={{ 
-          title: 'Recuperar Senha',
+          title: t('auth.resetPassword'),
           presentation: 'card'
         }} 
       />
@@ -288,14 +289,14 @@ function RootLayoutNav() {
       <Stack.Screen 
         name="seed-admin" 
         options={{ 
-          title: 'Criar Admin',
+          title: 'Create Admin',
           presentation: 'card'
         }} 
       />
       <Stack.Screen 
         name="theme-settings" 
         options={{ 
-          title: 'Tema',
+          title: t('theme.title'),
           presentation: 'card'
         }} 
       />

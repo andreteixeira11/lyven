@@ -12,6 +12,7 @@ import AuthGuard from "@/components/AuthGuard";
 import PromoterDashboard from "@/components/PromoterDashboard";
 import { useUser } from "@/hooks/user-context";
 import { useTheme } from "@/hooks/theme-context";
+import { useI18n } from "@/hooks/i18n-context";
 import { router } from 'expo-router';
 import { mockEvents } from '@/mocks/events';
 import { Event } from '@/types/event';
@@ -38,6 +39,7 @@ interface AdminStats {
 function NormalUserExploreContent() {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
+  const { t } = useI18n();
 
   const featuredEvents = mockEvents.filter((e: Event) => e.isFeatured);
   const upcomingEvents = mockEvents.filter(
@@ -78,13 +80,13 @@ function NormalUserExploreContent() {
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.exploreContent}>
           <View style={styles.exploreHeader}>
-            <Text style={[styles.exploreTitle, { color: colors.text }]}>Explorar Eventos</Text>
-            <Text style={[styles.exploreSubtitle, { color: colors.textSecondary }]}>Descobre os melhores eventos perto de ti</Text>
+            <Text style={[styles.exploreTitle, { color: colors.text }]}>{t('events.title')}</Text>
+            <Text style={[styles.exploreSubtitle, { color: colors.textSecondary }]}>{t('search.popularEvents')}</Text>
           </View>
 
           {featuredEvents.length > 0 && (
             <View style={styles.exploreSection}>
-              <Text style={[styles.exploreSectionTitle, { color: colors.text }]}>Em Destaque</Text>
+              <Text style={[styles.exploreSectionTitle, { color: colors.text }]}>{t('events.featured')}</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                 {featuredEvents.map((event: Event) => (
                   <EventCard key={event.id} event={event} />
@@ -94,7 +96,7 @@ function NormalUserExploreContent() {
           )}
 
           <View style={styles.exploreSection}>
-            <Text style={[styles.exploreSectionTitle, { color: colors.text }]}>Próximos Eventos</Text>
+            <Text style={[styles.exploreSectionTitle, { color: colors.text }]}>{t('events.upcoming')}</Text>
             {upcomingEvents.slice(0, 10).map((event: Event) => (
               <TouchableOpacity
                 key={event.id}
@@ -135,6 +137,7 @@ function IndexContent() {
   const insets = useSafeAreaInsets();
   const { user } = useUser();
   const { colors } = useTheme();
+  const { t } = useI18n();
   const [stats] = useState<AdminStats>({
     totalUsers: 1247,
     totalPromoters: 89,
@@ -182,8 +185,8 @@ function IndexContent() {
         <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
           <View style={styles.content}>
             <View style={styles.header}>
-              <Text style={[styles.welcomeText, { color: colors.text }]}>Bem-vindo, Admin</Text>
-              <Text style={[styles.subtitleText, { color: colors.textSecondary }]}>Painel de Controlo Lyven</Text>
+              <Text style={[styles.welcomeText, { color: colors.text }]}>{t('common.welcome')}, {t('auth.admin')}</Text>
+              <Text style={[styles.subtitleText, { color: colors.textSecondary }]}>{t('admin.adminDashboard')}</Text>
             </View>
 
             {stats.pendingApprovals > 0 && (
@@ -193,21 +196,21 @@ function IndexContent() {
               >
                 <AlertCircle size={24} color={colors.warning} />
                 <View style={styles.alertContent}>
-                  <Text style={[styles.alertTitle, { color: colors.warning }]}>Aprovações Pendentes</Text>
+                  <Text style={[styles.alertTitle, { color: colors.warning }]}>{t('admin.pendingApprovals')}</Text>
                   <Text style={[styles.alertText, { color: colors.textSecondary }]}>
-                    {stats.pendingApprovals} publicidades aguardam aprovação
+                    {stats.pendingApprovals} {t('admin.pendingAds')}
                   </Text>
                 </View>
               </TouchableOpacity>
             )}
 
             <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>Visão Geral</Text>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('admin.systemAnalytics')}</Text>
               <View style={styles.statsGrid}>
                 <View style={styles.statsRow}>
                   <View style={styles.statsRowItem}>
                     <StatCard
-                      title="Total Utilizadores"
+                      title={t('admin.totalUsers')}
                       value={stats.totalUsers.toLocaleString()}
                       icon={Users}
                       onPress={() => router.push('/admin-users')}
@@ -215,7 +218,7 @@ function IndexContent() {
                   </View>
                   <View style={styles.statsRowItem}>
                     <StatCard
-                      title="Promotores"
+                      title={t('admin.promoters')}
                       value={stats.totalPromoters}
                       icon={UserCheck}
                       color={colors.success}
@@ -226,7 +229,7 @@ function IndexContent() {
                 <View style={styles.statsRow}>
                   <View style={styles.statsRowItem}>
                     <StatCard
-                      title="Total Eventos"
+                      title={t('admin.totalEvents')}
                       value={stats.totalEvents}
                       icon={Calendar}
                       color={colors.warning}
@@ -235,7 +238,7 @@ function IndexContent() {
                   </View>
                   <View style={styles.statsRowItem}>
                     <StatCard
-                      title="Receita Total"
+                      title={t('admin.totalRevenue')}
                       value={`€${stats.totalRevenue.toLocaleString()}`}
                       icon={DollarSign}
                       color={colors.success}
@@ -246,19 +249,19 @@ function IndexContent() {
             </View>
 
             <View style={styles.section}>
-              <Text style={[styles.sectionTitle, { color: colors.text }]}>Hoje</Text>
+              <Text style={[styles.sectionTitle, { color: colors.text }]}>{t('events.today')}</Text>
               <View style={[styles.todayStats, { backgroundColor: colors.card }]}>
                 <View style={styles.todayStatItem}>
                   <Text style={[styles.todayStatValue, { color: colors.primary }]}>{stats.newUsersToday}</Text>
-                  <Text style={[styles.todayStatLabel, { color: colors.textSecondary }]}>Novos Utilizadores</Text>
+                  <Text style={[styles.todayStatLabel, { color: colors.textSecondary }]}>{t('admin.users')}</Text>
                 </View>
                 <View style={styles.todayStatItem}>
                   <Text style={[styles.todayStatValue, { color: colors.primary }]}>{stats.newEventsToday}</Text>
-                  <Text style={[styles.todayStatLabel, { color: colors.textSecondary }]}>Novos Eventos</Text>
+                  <Text style={[styles.todayStatLabel, { color: colors.textSecondary }]}>{t('admin.events')}</Text>
                 </View>
                 <View style={styles.todayStatItem}>
                   <Text style={[styles.todayStatValue, { color: colors.primary }]}>{stats.activeEvents}</Text>
-                  <Text style={[styles.todayStatLabel, { color: colors.textSecondary }]}>Eventos Ativos</Text>
+                  <Text style={[styles.todayStatLabel, { color: colors.textSecondary }]}>{t('events.upcoming')}</Text>
                 </View>
               </View>
             </View>

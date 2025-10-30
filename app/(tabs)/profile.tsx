@@ -29,11 +29,13 @@ import {
 } from 'lucide-react-native';
 import { useUser } from '@/hooks/user-context';
 import { useTheme } from '@/hooks/theme-context';
+import { useI18n } from '@/hooks/i18n-context';
 import { router } from 'expo-router';
 
 export default function ProfileScreen() {
   const { user, logout } = useUser();
   const { theme, isDark, changeTheme, colors } = useTheme();
+  const { t } = useI18n();
   const insets = useSafeAreaInsets();
   const [tapCount, setTapCount] = useState(0);
   const tapTimeoutRef = useRef<number | null>(null);
@@ -61,15 +63,15 @@ export default function ProfileScreen() {
 
   const handleLogout = () => {
     Alert.alert(
-      'Terminar Sessão',
-      'Tem certeza que deseja terminar a sessão?',
+      t('auth.logout'),
+      t('profile.logout') + '?',
       [
         {
-          text: 'Cancelar',
+          text: t('common.cancel'),
           style: 'cancel',
         },
         {
-          text: 'Terminar Sessão',
+          text: t('auth.logout'),
           style: 'destructive',
           onPress: async () => {
             await logout();
@@ -93,11 +95,11 @@ export default function ProfileScreen() {
               <User size={32} color={colors.primary} />
             </View>
             <View style={styles.userDetails}>
-              <Text style={[styles.userName, { color: colors.white }]}>Administrador</Text>
+              <Text style={[styles.userName, { color: colors.white }]}>{t('auth.admin')}</Text>
               <Text style={[styles.userEmail, { color: colors.white }]}>{user?.email}</Text>
               <View style={styles.promoterBadge}>
                 <Shield size={12} color="#FFD700" />
-                <Text style={styles.promoterText}>Admin</Text>
+                <Text style={styles.promoterText}>{t('auth.admin')}</Text>
               </View>
             </View>
           </View>
@@ -105,14 +107,14 @@ export default function ProfileScreen() {
           <View style={[styles.menuItems, { backgroundColor: colors.card }]}>
             <TouchableOpacity style={styles.menuItem} onPress={() => router.push('/admin-settings')}>
               <Settings size={20} color={colors.text} />
-              <Text style={[styles.menuText, { color: colors.text }]}>Configurações do Sistema</Text>
+              <Text style={[styles.menuText, { color: colors.text }]}>{t('admin.systemSettings')}</Text>
             </TouchableOpacity>
             
             <View style={[styles.separator, { backgroundColor: colors.border }]} />
             
             <TouchableOpacity style={styles.logoutItem} onPress={handleLogout}>
               <LogOut size={20} color={colors.error} />
-              <Text style={[styles.logoutText, { color: colors.error }]}>Terminar Sessão</Text>
+              <Text style={[styles.logoutText, { color: colors.error }]}>{t('auth.logout')}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -143,11 +145,11 @@ export default function ProfileScreen() {
               <User size={32} color={colors.primary} />
             </View>
             <View style={styles.userDetails}>
-              <Text style={[styles.userName, { color: colors.white }]}>{user?.name || 'Promotor'}</Text>
+              <Text style={[styles.userName, { color: colors.white }]}>{user?.name || t('auth.promoter')}</Text>
               <Text style={[styles.userEmail, { color: colors.white }]}>{user?.email}</Text>
               <View style={styles.promoterBadge}>
                 <Shield size={12} color="#FFD700" />
-                <Text style={styles.promoterText}>Promotor</Text>
+                <Text style={styles.promoterText}>{t('auth.promoter')}</Text>
               </View>
             </View>
           </View>
@@ -217,26 +219,26 @@ export default function ProfileScreen() {
               </View>
             </TouchableOpacity>
             <Text style={[styles.nextEventHint, { color: colors.primary }]}>
-              👆 Clique para ver Compradores, Scanner e Estatísticas
+              👆 {t('promoter.eventBuyers')}, {t('promoter.scanner')}, {t('promoter.statistics')}
             </Text>
           </View>
           
           <View style={[styles.menuItems, { backgroundColor: colors.card }]}>
             <TouchableOpacity style={styles.menuItem} onPress={() => handleMenuItemPress('/settings')}>
               <Settings size={20} color={colors.text} />
-              <Text style={[styles.menuText, { color: colors.text }]}>Definições</Text>
+              <Text style={[styles.menuText, { color: colors.text }]}>{t('profile.settings')}</Text>
             </TouchableOpacity>
             
             <TouchableOpacity style={styles.menuItem} onPress={() => handleMenuItemPress('/help')}>
               <HelpCircle size={20} color={colors.text} />
-              <Text style={[styles.menuText, { color: colors.text }]}>Ajuda</Text>
+              <Text style={[styles.menuText, { color: colors.text }]}>{t('profile.help')}</Text>
             </TouchableOpacity>
             
             <View style={[styles.separator, { backgroundColor: colors.border }]} />
             
             <TouchableOpacity style={styles.logoutItem} onPress={handleLogout}>
               <LogOut size={20} color={colors.error} />
-              <Text style={[styles.logoutText, { color: colors.error }]}>Terminar Sessão</Text>
+              <Text style={[styles.logoutText, { color: colors.error }]}>{t('auth.logout')}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
@@ -250,7 +252,7 @@ export default function ProfileScreen() {
         <User size={32} color={colors.primary} />
       </TouchableOpacity>
       <View style={styles.userDetails}>
-        <Text style={[styles.userName, { color: colors.white }]}>{user?.name || 'Utilizador'}</Text>
+        <Text style={[styles.userName, { color: colors.white }]}>{user?.name || t('auth.attendee')}</Text>
         <Text style={[styles.userEmail, { color: colors.white }]}>{user?.email}</Text>
       </View>
     </View>
@@ -267,13 +269,13 @@ export default function ProfileScreen() {
     <>
       <MenuItem
         icon={Heart}
-        title="Favoritos"
+        title={t('favorites.favorites')}
         onPress={() => handleMenuItemPress('/(tabs)/favorites')}
       />
 
       <MenuItem
         icon={UserPlus}
-        title="A Seguir"
+        title={t('social.following')}
         onPress={() => handleMenuItemPress('/following')}
       />
 
@@ -284,7 +286,7 @@ export default function ProfileScreen() {
           ) : (
             <Sun size={20} color={colors.text} />
           )}
-          <Text style={[styles.menuText, { color: colors.text }]}>Modo Noturno</Text>
+          <Text style={[styles.menuText, { color: colors.text }]}>{t('settings.darkMode')}</Text>
         </View>
         <Switch
           value={theme === 'dark' || (theme === 'system' && isDark)}
@@ -302,13 +304,13 @@ export default function ProfileScreen() {
     <>
       <MenuItem
         icon={Settings}
-        title="Definições"
+        title={t('profile.settings')}
         onPress={() => handleMenuItemPress('/settings')}
       />
       
       <MenuItem
         icon={HelpCircle}
-        title="Ajuda"
+        title={t('profile.help')}
         onPress={() => handleMenuItemPress('/help')}
       />
       
@@ -316,7 +318,7 @@ export default function ProfileScreen() {
       
       <TouchableOpacity style={styles.logoutItem} onPress={handleLogout}>
         <LogOut size={20} color={colors.error} />
-        <Text style={[styles.logoutText, { color: colors.error }]}>Terminar Sessão</Text>
+        <Text style={[styles.logoutText, { color: colors.error }]}>{t('auth.logout')}</Text>
       </TouchableOpacity>
     </>
   );
