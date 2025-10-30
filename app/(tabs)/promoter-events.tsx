@@ -11,8 +11,6 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { 
   Calendar,
-  MapPin,
-  Clock,
   Eye,
   Plus,
   ChevronRight,
@@ -135,9 +133,7 @@ function PromoterEventsContent() {
 
 
   const EventCard = ({ event }: { event: Event }) => {
-    const isDemoEvent = event.id.startsWith('demo-');
     const soldTickets = event.id === 'demo-1' ? 1250 : Math.floor(Math.random() * 100) + 50;
-    const totalTickets = event.id === 'demo-1' ? 1500 : event.venue.capacity;
 
     return (
       <View style={styles.eventCard}>
@@ -151,6 +147,9 @@ function PromoterEventsContent() {
                 {new Date(event.date).toLocaleDateString('pt-PT', {
                   day: 'numeric',
                   month: 'short',
+                })} • {new Date(event.date).toLocaleTimeString('pt-PT', {
+                  hour: '2-digit',
+                  minute: '2-digit',
                 })}
               </Text>
             </View>
@@ -164,39 +163,6 @@ function PromoterEventsContent() {
         </View>
         
         <View style={styles.eventContent}>
-          <View style={styles.eventHeader}>
-            <Text style={styles.eventTitle}>{event.title}</Text>
-          </View>
-
-          <View style={styles.eventInfo}>
-            <View style={styles.infoRow}>
-              <Calendar size={16} color="#999" />
-              <Text style={styles.infoText}>
-                {new Date(event.date).toLocaleDateString('pt-PT', {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric',
-                })}
-              </Text>
-            </View>
-            
-            <View style={styles.infoRow}>
-              <Clock size={16} color="#999" />
-              <Text style={styles.infoText}>
-                {new Date(event.date).toLocaleTimeString('pt-PT', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                })}
-              </Text>
-            </View>
-
-            <View style={styles.infoRow}>
-              <MapPin size={16} color="#999" />
-              <Text style={styles.infoText}>{event.venue.name}</Text>
-            </View>
-          </View>
-
           <View style={styles.statsRow}>
             <View style={styles.statItem}>
               <Text style={styles.statValue}>{soldTickets}</Text>
@@ -410,28 +376,6 @@ const styles = StyleSheet.create({
   },
   eventContent: {
     padding: 16,
-  },
-  eventHeader: {
-    marginBottom: 12,
-  },
-  eventTitle: {
-    color: '#333',
-    fontSize: 18,
-    fontWeight: 'bold' as const,
-  },
-  eventInfo: {
-    marginBottom: 16,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  infoText: {
-    color: '#666',
-    fontSize: 14,
-    marginLeft: 8,
-    flex: 1,
   },
   statsRow: {
     flexDirection: 'row',
