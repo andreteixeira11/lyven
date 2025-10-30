@@ -15,7 +15,7 @@ export interface User {
   };
   preferences: {
     notifications: boolean;
-    language: 'pt' | 'en';
+    language: 'pt' | 'en' | 'es' | 'fr' | 'de' | 'it' | 'nl' | 'pl' | 'ru' | 'zh' | 'ja' | 'ko' | 'ar' | 'hi';
     priceRange: {
       min: number;
       max: number;

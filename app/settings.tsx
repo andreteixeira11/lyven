@@ -26,6 +26,26 @@ import {
 import { useUser } from '@/hooks/user-context';
 import { COLORS } from '@/constants/colors';
 
+const getLanguageName = (code?: string) => {
+  const languages: Record<string, string> = {
+    pt: 'Português',
+    en: 'English',
+    es: 'Español',
+    fr: 'Français',
+    de: 'Deutsch',
+    it: 'Italiano',
+    nl: 'Nederlands',
+    pl: 'Polski',
+    ru: 'Русский',
+    zh: '中文',
+    ja: '日本語',
+    ko: '한국어',
+    ar: 'العربية',
+    hi: 'हिन्दी',
+  };
+  return languages[code || 'pt'] || 'Português';
+};
+
 export default function Settings() {
   const { user, logout } = useUser();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
@@ -169,8 +189,8 @@ export default function Settings() {
           <SettingItem
             icon={Globe}
             title="Idioma"
-            subtitle="Português"
-            onPress={() => Alert.alert('Idioma', 'Funcionalidade em desenvolvimento')}
+            subtitle={getLanguageName(user?.preferences?.language)}
+            onPress={() => router.push('/language')}
           />
           <SettingItem
             icon={Smartphone}
