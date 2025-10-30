@@ -672,38 +672,38 @@ export default function PromoterEventScreen() {
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.statsGrid}>
             <View style={styles.largeStatCard}>
-              <DollarSign size={28} color="#00C851" />
+              <DollarSign size={20} color="#00C851" />
               <Text style={styles.largeStatValue}>{formatCurrency(totalRevenue)}</Text>
               <Text style={styles.largeStatLabel}>Receita Total</Text>
               <View style={styles.trendContainer}>
-                <TrendingUp size={16} color="#00C851" />
+                <TrendingUp size={14} color="#00C851" />
                 <Text style={styles.trendText}>+12.5%</Text>
               </View>
             </View>
             
             <View style={styles.largeStatCard}>
-              <Users size={28} color="#0099a8" />
+              <Users size={20} color="#0099a8" />
               <Text style={styles.largeStatValue}>{totalBuyers}</Text>
               <Text style={styles.largeStatLabel}>Total de Compradores</Text>
               <View style={styles.trendContainer}>
-                <TrendingUp size={16} color="#0099a8" />
+                <TrendingUp size={14} color="#0099a8" />
                 <Text style={styles.trendText}>+8.3%</Text>
               </View>
             </View>
 
             <View style={styles.largeStatCard}>
-              <QrCodeIcon size={28} color="#007AFF" />
+              <QrCodeIcon size={20} color="#007AFF" />
               <Text style={styles.largeStatValue}>{totalTickets}</Text>
               <Text style={styles.largeStatLabel}>Bilhetes Vendidos</Text>
               <Text style={styles.subStatText}>de {event.venue.capacity} total</Text>
             </View>
 
             <View style={styles.largeStatCard}>
-              <Eye size={28} color="#FF385C" />
+              <Eye size={20} color="#FF385C" />
               <Text style={styles.largeStatValue}>12.4K</Text>
               <Text style={styles.largeStatLabel}>Visualizações</Text>
               <View style={styles.trendContainer}>
-                <TrendingUp size={16} color="#FF385C" />
+                <TrendingUp size={14} color="#FF385C" />
                 <Text style={styles.trendText}>+15.2%</Text>
               </View>
             </View>
@@ -1226,35 +1226,35 @@ const styles = StyleSheet.create({
   largeStatCard: {
     backgroundColor: '#f5f5f5',
     borderRadius: 12,
-    padding: 20,
+    padding: 12,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#e0e0e0',
     width: '48%',
   },
   largeStatValue: {
-    fontSize: 32,
+    fontSize: 24,
     fontWeight: 'bold' as const,
     color: '#000',
-    marginVertical: 8,
+    marginVertical: 4,
   },
   largeStatLabel: {
-    fontSize: 16,
+    fontSize: 13,
     color: '#666',
-    marginBottom: 8,
+    marginBottom: 4,
   },
   subStatText: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#999',
   },
   trendContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
-    marginTop: 4,
+    gap: 3,
+    marginTop: 2,
   },
   trendText: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#00C851',
     fontWeight: '600' as const,
   },
