@@ -45,9 +45,13 @@ async function registerForPushNotificationsAsync() {
       console.log('Permissão de notificação negada');
       return;
     }
-    token = (await Notifications.getExpoPushTokenAsync({
-      projectId: 'hfa30k1ymcso2y545gvqm',
-    })).data;
+    try {
+      token = (await Notifications.getExpoPushTokenAsync()).data;
+    } catch (error) {
+      console.log('⚠️ Push notification token setup failed:', error);
+      console.log('ℹ️ This is expected in development without EAS project setup');
+      return undefined;
+    }
     console.log('Token de notificação:', token);
   } else {
     console.log('Deve usar um dispositivo físico para notificações push');
