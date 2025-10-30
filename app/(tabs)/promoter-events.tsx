@@ -143,6 +143,18 @@ function PromoterEventsContent() {
       <View style={styles.eventCard}>
         <View style={styles.eventImageContainer}>
           <Image source={{ uri: event.image }} style={styles.eventImage} />
+          <View style={styles.eventImageOverlay}>
+            <Text style={styles.eventImageTitle} numberOfLines={1}>{event.title}</Text>
+            <View style={styles.eventImageDateContainer}>
+              <Calendar size={14} color="#fff" />
+              <Text style={styles.eventImageDate}>
+                {new Date(event.date).toLocaleDateString('pt-PT', {
+                  day: 'numeric',
+                  month: 'short',
+                })}
+              </Text>
+            </View>
+          </View>
           <TouchableOpacity 
             style={styles.editButton}
             onPress={() => router.push(`/create-event?id=${event.id}` as any)}
@@ -348,6 +360,37 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     resizeMode: 'cover',
+  },
+  eventImageOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    padding: 16,
+    paddingBottom: 12,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  eventImageTitle: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold' as const,
+    marginBottom: 4,
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
+  },
+  eventImageDateContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  eventImageDate: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '500' as const,
+    textShadowColor: 'rgba(0, 0, 0, 0.75)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   editButton: {
     position: 'absolute',
