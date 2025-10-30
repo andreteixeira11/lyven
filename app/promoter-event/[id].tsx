@@ -632,60 +632,142 @@ export default function PromoterEventScreen() {
     );
   };
 
-  const renderStatsSection = () => (
-    <View style={styles.sectionContent}>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={styles.statsGrid}>
-          <View style={styles.largeStatCard}>
-            <DollarSign size={28} color="#00C851" />
-            <Text style={styles.largeStatValue}>{formatCurrency(totalRevenue)}</Text>
-            <Text style={styles.largeStatLabel}>Receita Total</Text>
-            <View style={styles.trendContainer}>
-              <TrendingUp size={16} color="#00C851" />
-              <Text style={styles.trendText}>+12.5%</Text>
+  const getSalesOverTime = () => {
+    const salesByDate: { [key: string]: { tickets: number; revenue: number } } = {};
+    
+    mockBuyers.forEach(buyer => {
+      const dateKey = new Intl.DateTimeFormat('pt-PT', {
+        day: '2-digit',
+        month: 'short'
+      }).format(buyer.purchaseDate);
+      
+      if (!salesByDate[dateKey]) {
+        salesByDate[dateKey] = { tickets: 0, revenue: 0 };
+      }
+      
+      salesByDate[dateKey].tickets += buyer.quantity;
+      salesByDate[dateKey].revenue += buyer.totalPaid;
+    });
+    
+    return Object.entries(salesByDate)
+      .sort((a, b) => {
+        const dateA = mockBuyers.find(buyer => 
+          new Intl.DateTimeFormat('pt-PT', { day: '2-digit', month: 'short' }).format(buyer.purchaseDate) === a[0]
+        )?.purchaseDate;
+        const dateB = mockBuyers.find(buyer => 
+          new Intl.DateTimeFormat('pt-PT', { day: '2-digit', month: 'short' }).format(buyer.purchaseDate) === b[0]
+        )?.purchaseDate;
+        return (dateA?.getTime() || 0) - (dateB?.getTime() || 0);
+      })
+      .map(([date, data]) => ({ date, ...data }));
+  };
+
+  const renderStatsSection = () => {
+    const salesData = getSalesOverTime();
+    const maxTickets = Math.max(...salesData.map(d => d.tickets), 1);
+    const maxRevenue = Math.max(...salesData.map(d => d.revenue), 1);
+
+    return (
+      <View style={styles.sectionContent}>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View style={styles.statsGrid}>
+            <View style={styles.largeStatCard}>
+              <DollarSign size={28} color="#00C851" />
+              <Text style={styles.largeStatValue}>{formatCurrency(totalRevenue)}</Text>
+              <Text style={styles.largeStatLabel}>Receita Total</Text>
+              <View style={styles.trendContainer}>
+                <TrendingUp size={16} color="#00C851" />
+                <Text style={styles.trendText}>+12.5%</Text>
+              </View>
             </View>
-          </View>
-          
-          <View style={styles.largeStatCard}>
-            <Users size={28} color="#0099a8" />
-            <Text style={styles.largeStatValue}>{totalBuyers}</Text>
-            <Text style={styles.largeStatLabel}>Total de Compradores</Text>
-            <View style={styles.trendContainer}>
-              <TrendingUp size={16} color="#0099a8" />
-              <Text style={styles.trendText}>+8.3%</Text>
+            
+            <View style={styles.largeStatCard}>
+              <Users size={28} color="#0099a8" />
+              <Text style={styles.largeStatValue}>{totalBuyers}</Text>
+              <Text style={styles.largeStatLabel}>Total de Compradores</Text>
+              <View style={styles.trendContainer}>
+                <TrendingUp size={16} color="#0099a8" />
+                <Text style={styles.trendText}>+8.3%</Text>
+              </View>
+            </View>
+
+            <View style={styles.largeStatCard}>
+              <QrCodeIcon size={28} color="#007AFF" />
+              <Text style={styles.largeStatValue}>{totalTickets}</Text>
+              <Text style={styles.largeStatLabel}>Bilhetes Vendidos</Text>
+              <Text style={styles.subStatText}>de {event.venue.capacity} total</Text>
+            </View>
+
+            <View style={styles.largeStatCard}>
+              <Eye size={28} color="#FF385C" />
+              <Text style={styles.largeStatValue}>12.4K</Text>
+              <Text style={styles.largeStatLabel}>Visualizações</Text>
+              <View style={styles.trendContainer}>
+                <TrendingUp size={16} color="#FF385C" />
+                <Text style={styles.trendText}>+15.2%</Text>
+              </View>
             </View>
           </View>
 
-          <View style={styles.largeStatCard}>
-            <QrCodeIcon size={28} color="#007AFF" />
-            <Text style={styles.largeStatValue}>{totalTickets}</Text>
-            <Text style={styles.largeStatLabel}>Bilhetes Vendidos</Text>
-            <Text style={styles.subStatText}>de {event.venue.capacity} total</Text>
+          <View style={styles.chartSection}>
+            <Text style={styles.chartTitle}>Vendas ao Longo do Tempo</Text>
+            {salesData.length > 0 ? (
+              <View style={styles.chartContainer}>
+                <View style={styles.chartLegend}>
+                  <View style={styles.legendItem}>
+                    <View style={[styles.legendColor, { backgroundColor: '#0099a8' }]} />
+                    <Text style={styles.legendText}>Bilhetes</Text>
+                  </View>
+                  <View style={styles.legendItem}>
+                    <View style={[styles.legendColor, { backgroundColor: '#00C851' }]} />
+                    <Text style={styles.legendText}>Receita</Text>
+                  </View>
+                </View>
+                
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={styles.chartContent}>
+                    <View style={styles.chartBarsContainer}>
+                      {salesData.map((data, index) => {
+                        const ticketHeight = (data.tickets / maxTickets) * 180;
+                        const revenueHeight = (data.revenue / maxRevenue) * 180;
+                        
+                        return (
+                          <View key={index} style={styles.barGroup}>
+                            <View style={styles.barsWrapper}>
+                              <View style={styles.barContainer}>
+                                <View style={styles.barValueContainer}>
+                                  <Text style={styles.barValue}>{data.tickets}</Text>
+                                </View>
+                                <View style={[styles.bar, styles.ticketsBar, { height: ticketHeight }]} />
+                              </View>
+                              <View style={styles.barContainer}>
+                                <View style={styles.barValueContainer}>
+                                  <Text style={styles.barValue}>€{data.revenue}</Text>
+                                </View>
+                                <View style={[styles.bar, styles.revenueBar, { height: revenueHeight }]} />
+                              </View>
+                            </View>
+                            <Text style={styles.barLabel}>{data.date}</Text>
+                          </View>
+                        );
+                      })}
+                    </View>
+                  </View>
+                </ScrollView>
+              </View>
+            ) : (
+              <View style={styles.chartPlaceholder}>
+                <BarChart3 size={48} color="#ccc" />
+                <Text style={styles.chartPlaceholderText}>
+                  Sem dados de vendas disponíveis
+                </Text>
+              </View>
+            )}
           </View>
-
-          <View style={styles.largeStatCard}>
-            <Eye size={28} color="#FF385C" />
-            <Text style={styles.largeStatValue}>12.4K</Text>
-            <Text style={styles.largeStatLabel}>Visualizações</Text>
-            <View style={styles.trendContainer}>
-              <TrendingUp size={16} color="#FF385C" />
-              <Text style={styles.trendText}>+15.2%</Text>
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.chartSection}>
-          <Text style={styles.chartTitle}>Vendas ao Longo do Tempo</Text>
-          <View style={styles.chartPlaceholder}>
-            <BarChart3 size={48} color="#ccc" />
-            <Text style={styles.chartPlaceholderText}>
-              Gráfico de vendas em tempo real
-            </Text>
-          </View>
-        </View>
-      </ScrollView>
-    </View>
-  );
+        </ScrollView>
+      </View>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -1196,6 +1278,81 @@ const styles = StyleSheet.create({
   },
   chartPlaceholderText: {
     fontSize: 14,
+    color: '#666',
+    marginTop: 8,
+    textAlign: 'center',
+  },
+  chartContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    padding: 16,
+  },
+  chartLegend: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 24,
+    marginBottom: 16,
+  },
+  legendItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  legendColor: {
+    width: 12,
+    height: 12,
+    borderRadius: 2,
+  },
+  legendText: {
+    fontSize: 13,
+    color: '#666',
+  },
+  chartContent: {
+    paddingVertical: 8,
+  },
+  chartBarsContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 20,
+    paddingHorizontal: 8,
+  },
+  barGroup: {
+    alignItems: 'center',
+    gap: 8,
+  },
+  barsWrapper: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 6,
+    height: 200,
+  },
+  barContainer: {
+    alignItems: 'center',
+    justifyContent: 'flex-end',
+  },
+  barValueContainer: {
+    marginBottom: 4,
+  },
+  barValue: {
+    fontSize: 11,
+    fontWeight: '600' as const,
+    color: '#666',
+  },
+  bar: {
+    width: 28,
+    borderRadius: 4,
+    minHeight: 8,
+  },
+  ticketsBar: {
+    backgroundColor: '#0099a8',
+  },
+  revenueBar: {
+    backgroundColor: '#00C851',
+  },
+  barLabel: {
+    fontSize: 12,
     color: '#666',
     marginTop: 8,
     textAlign: 'center',
