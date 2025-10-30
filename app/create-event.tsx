@@ -482,8 +482,27 @@ export default function CreateEvent() {
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     } else {
-      router.back();
+      handleCancelConfirmation();
     }
+  };
+
+  const handleCancelConfirmation = () => {
+    Alert.alert(
+      'Cancelar Criação',
+      'Tem a certeza que pretende cancelar? Todos os dados serão perdidos.',
+      [
+        {
+          text: 'Não',
+          style: 'cancel',
+        },
+        {
+          text: 'Sim, Cancelar',
+          style: 'destructive',
+          onPress: () => router.back(),
+        },
+      ],
+      { cancelable: true }
+    );
   };
 
   return (
@@ -495,7 +514,7 @@ export default function CreateEvent() {
           headerStyle: { backgroundColor: '#0099a8' },
           headerTintColor: '#fff',
           headerLeft: () => (
-            <TouchableOpacity onPress={() => router.back()} style={styles.closeButton}>
+            <TouchableOpacity onPress={handleCancelConfirmation} style={styles.closeButton}>
               <X size={24} color="#fff" />
             </TouchableOpacity>
           ),
