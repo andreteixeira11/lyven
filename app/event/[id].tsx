@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity, Dimensions, SafeAreaView, Platform, Alert, ActionSheetIOS } from "react-native";
+import { StyleSheet, Text, View, ScrollView, Image, TouchableOpacity, SafeAreaView, Platform, Alert, ActionSheetIOS } from "react-native";
 import { useLocalSearchParams, router, Stack } from "expo-router";
-import { Calendar, MapPin, Users, ChevronLeft, Share2, Heart, Bell, Clock, Instagram, Facebook, Globe, UserPlus } from "lucide-react-native";
+import { Calendar, MapPin, ChevronLeft, Share2, Heart, Bell, Clock, Instagram, Facebook, Globe, UserPlus } from "lucide-react-native";
 import { mockEvents } from "@/mocks/events";
 import { useState, useEffect } from "react";
 import { LinearGradient } from "expo-linear-gradient";
@@ -10,8 +10,7 @@ import { useCalendar } from "@/hooks/calendar-context";
 import { shareEvent as shareEventUtil } from '@/lib/share-utils';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '@/hooks/theme-context';
-
-const { height } = Dimensions.get('window');
+import { hp, responsiveFontSize, responsiveSpacing, moderateScale } from '@/utils/responsive-styles';
 
 export default function EventDetailScreen() {
   const { id } = useLocalSearchParams();
@@ -19,7 +18,7 @@ export default function EventDetailScreen() {
   const { addToCart } = useCart();
   const { isFavorite, addToFavorites, removeFromFavorites } = useFavorites();
   const { addToCalendar, setReminder, hasReminder, isEventInCalendar } = useCalendar();
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
   const [selectedTickets, setSelectedTickets] = useState<{ [key: string]: number }>({});
   const [isLiked, setIsLiked] = useState(false);
 
@@ -552,7 +551,7 @@ const styles = StyleSheet.create({
     marginTop: 50,
   },
   heroContainer: {
-    height: height * 0.4,
+    height: hp(40),
     position: 'relative',
   },
   heroImage: {
@@ -568,15 +567,15 @@ const styles = StyleSheet.create({
   },
   heroOverlay: {
     position: 'absolute',
-    bottom: 20,
-    left: 20,
-    right: 20,
+    bottom: responsiveSpacing(20),
+    left: responsiveSpacing(20),
+    right: responsiveSpacing(20),
   },
   heroTitle: {
-    fontSize: 28,
+    fontSize: responsiveFontSize(28),
     fontWeight: 'bold' as const,
     color: '#fff',
-    marginBottom: 8,
+    marginBottom: responsiveSpacing(8),
     textShadowColor: 'rgba(0, 0, 0, 0.75)',
     textShadowOffset: { width: 0, height: 2 },
     textShadowRadius: 8,
@@ -587,7 +586,7 @@ const styles = StyleSheet.create({
     gap: 6,
   },
   heroDate: {
-    fontSize: 14,
+    fontSize: responsiveFontSize(14),
     color: '#fff',
     textShadowColor: 'rgba(0, 0, 0, 0.75)',
     textShadowOffset: { width: 0, height: 1 },
@@ -604,9 +603,9 @@ const styles = StyleSheet.create({
     paddingTop: Platform.OS === 'ios' ? 10 : 20,
   },
   headerButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: moderateScale(40),
+    height: moderateScale(40),
+    borderRadius: moderateScale(20),
     backgroundColor: 'rgba(0,0,0,0.5)',
     alignItems: 'center',
     justifyContent: 'center',
@@ -616,7 +615,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   content: {
-    padding: 20,
+    padding: responsiveSpacing(20),
     backgroundColor: '#FFFFFF',
   },
   titleSection: {
@@ -646,10 +645,10 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: responsiveFontSize(18),
     fontWeight: 'bold' as const,
     color: '#0099a8',
-    marginBottom: 12,
+    marginBottom: responsiveSpacing(12),
   },
   artistItem: {
     flexDirection: 'row',
@@ -666,10 +665,10 @@ const styles = StyleSheet.create({
   },
   infoSection: {
     backgroundColor: '#F0F9FA',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 24,
-    gap: 16,
+    borderRadius: moderateScale(16),
+    padding: responsiveSpacing(16),
+    marginBottom: responsiveSpacing(24),
+    gap: responsiveSpacing(16),
     borderWidth: 1,
     borderColor: '#E0E0E0',
   },
@@ -847,9 +846,9 @@ const styles = StyleSheet.create({
   },
   ticketCard: {
     backgroundColor: '#F0F9FA',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
+    borderRadius: moderateScale(12),
+    padding: responsiveSpacing(16),
+    marginBottom: responsiveSpacing(12),
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -860,7 +859,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   ticketName: {
-    fontSize: 16,
+    fontSize: responsiveFontSize(16),
     fontWeight: 'bold' as const,
     color: '#0099a8',
   },
@@ -870,10 +869,10 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   ticketPrice: {
-    fontSize: 20,
+    fontSize: responsiveFontSize(20),
     fontWeight: 'bold' as const,
     color: '#0099a8',
-    marginTop: 8,
+    marginTop: responsiveSpacing(8),
   },
   ticketAvailable: {
     fontSize: 12,
@@ -898,12 +897,12 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
   },
   quantityButton: {
-    width: 32,
-    height: 32,
+    width: moderateScale(32),
+    height: moderateScale(32),
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#0099a8',
-    borderRadius: 6,
+    borderRadius: moderateScale(6),
   },
   quantityButtonText: {
     color: '#fff',
