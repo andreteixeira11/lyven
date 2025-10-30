@@ -29,7 +29,7 @@ export default function LocationStep({
 
       <View style={styles.inputContainer}>
         <View style={styles.inputLabel}>
-          <MapPin size={20} color="#007AFF" />
+          <MapPin size={20} color="#0099a8" />
           <Text style={styles.inputLabelText}>Local/Venue *</Text>
         </View>
         <TextInput
@@ -43,7 +43,7 @@ export default function LocationStep({
 
       <View style={styles.inputContainer}>
         <View style={styles.inputLabel}>
-          <MapPin size={20} color="#007AFF" />
+          <MapPin size={20} color="#0099a8" />
           <Text style={styles.inputLabelText}>Endereço *</Text>
         </View>
         <TextInput

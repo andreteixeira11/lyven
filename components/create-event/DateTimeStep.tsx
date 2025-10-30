@@ -85,7 +85,7 @@ export default function DateTimeStep({
 
       <View style={styles.inputContainer}>
         <View style={styles.inputLabel}>
-          <Calendar size={20} color="#007AFF" />
+          <Calendar size={20} color="#0099a8" />
           <Text style={styles.inputLabelText}>Data do Evento *</Text>
         </View>
         <TouchableOpacity style={styles.dateButton} onPress={() => setShowDatePicker(true)}>
@@ -95,7 +95,7 @@ export default function DateTimeStep({
 
       <View style={styles.inputContainer}>
         <View style={styles.inputLabel}>
-          <Clock size={20} color="#007AFF" />
+          <Clock size={20} color="#0099a8" />
           <Text style={styles.inputLabelText}>Hora do Evento</Text>
         </View>
         <TouchableOpacity style={styles.dateButton} onPress={() => setShowTimePicker(true)}>
@@ -266,7 +266,7 @@ const styles = StyleSheet.create({
   },
   iosPickerButton: {
     fontSize: 16,
-    color: '#007AFF',
+    color: '#0099a8',
   },
   iosPickerButtonDone: {
     fontWeight: '600' as const,

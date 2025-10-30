@@ -48,7 +48,7 @@ export default function BasicInfoStep({
 
       <View style={styles.inputContainer}>
         <View style={styles.inputLabel}>
-          <FileText size={20} color="#007AFF" />
+          <FileText size={20} color="#0099a8" />
           <Text style={styles.inputLabelText}>Título do Evento *</Text>
         </View>
         <TextInput
@@ -62,7 +62,7 @@ export default function BasicInfoStep({
 
       <View style={styles.inputContainer}>
         <View style={styles.inputLabel}>
-          <FileText size={20} color="#007AFF" />
+          <FileText size={20} color="#0099a8" />
           <Text style={styles.inputLabelText}>Descrição (opcional)</Text>
         </View>
         <TextInput
@@ -78,7 +78,7 @@ export default function BasicInfoStep({
 
       <View style={styles.inputContainer}>
         <View style={styles.inputLabel}>
-          <Tag size={20} color="#007AFF" />
+          <Tag size={20} color="#0099a8" />
           <Text style={styles.inputLabelText}>Categoria *</Text>
         </View>
         <TouchableOpacity 

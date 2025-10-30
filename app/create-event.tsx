@@ -492,7 +492,7 @@ export default function CreateEvent() {
         options={{
           headerShown: true,
           title: isEditMode ? 'Editar Evento' : 'Criar Evento',
-          headerStyle: { backgroundColor: '#007AFF' },
+          headerStyle: { backgroundColor: '#0099a8' },
           headerTintColor: '#fff',
           headerLeft: () => (
             <TouchableOpacity onPress={() => router.back()} style={styles.closeButton}>
@@ -504,7 +504,7 @@ export default function CreateEvent() {
       
       {isLoading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#007AFF" />
+          <ActivityIndicator size="large" color="#0099a8" />
           <Text style={styles.loadingText}>Carregando evento...</Text>
         </View>
       ) : (
@@ -573,7 +573,7 @@ export default function CreateEvent() {
               style={styles.backButton}
               onPress={handleBack}
             >
-              <ChevronLeft size={20} color="#007AFF" />
+              <ChevronLeft size={20} color="#0099a8" />
               <Text style={styles.backButtonText}>
                 {currentStep === 0 ? 'Cancelar' : 'Voltar'}
               </Text>
@@ -612,7 +612,7 @@ export default function CreateEvent() {
               disabled={isSubmitting}
             >
               <View style={styles.publishModalButtonIcon}>
-                <Save size={24} color="#007AFF" />
+                <Save size={24} color="#0099a8" />
               </View>
               <View style={styles.publishModalButtonContent}>
                 <Text style={styles.publishModalButtonTitle}>Publicar</Text>
@@ -722,7 +722,7 @@ const styles = StyleSheet.create({
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#007AFF',
+    backgroundColor: '#0099a8',
     borderRadius: 2,
   },
   progressText: {
@@ -757,7 +757,7 @@ const styles = StyleSheet.create({
   backButtonText: {
     fontSize: 16,
     fontWeight: '600' as const,
-    color: '#007AFF',
+    color: '#0099a8',
   },
   nextButton: {
     flex: 2,
@@ -765,7 +765,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 14,
-    backgroundColor: '#007AFF',
+    backgroundColor: '#0099a8',
     borderRadius: 12,
     gap: 4,
   },
@@ -816,8 +816,8 @@ const styles = StyleSheet.create({
     borderColor: '#e0e0e0',
   },
   publishModalButtonPromote: {
-    backgroundColor: '#007AFF',
-    borderColor: '#007AFF',
+    backgroundColor: '#0099a8',
+    borderColor: '#0099a8',
   },
   publishModalButtonIcon: {
     width: 48,

@@ -74,11 +74,11 @@ export default function TicketsStep({
 
       <View style={styles.header}>
         <View style={styles.headerLeft}>
-          <Ticket size={20} color="#007AFF" />
+          <Ticket size={20} color="#0099a8" />
           <Text style={styles.headerTitle}>Tipos de Bilhetes *</Text>
         </View>
         <TouchableOpacity onPress={onAddTicket} style={styles.addButton}>
-          <Plus size={18} color="#007AFF" />
+          <Plus size={18} color="#0099a8" />
           <Text style={styles.addButtonText}>Adicionar</Text>
         </TouchableOpacity>
       </View>
@@ -120,7 +120,7 @@ export default function TicketsStep({
                       <Trash2 size={18} color="#ff3b30" />
                     </TouchableOpacity>
                   )}
-                  {isExpanded ? <ChevronUp size={20} color="#007AFF" /> : <ChevronDown size={20} color="#007AFF" />}
+                  {isExpanded ? <ChevronUp size={20} color="#0099a8" /> : <ChevronDown size={20} color="#0099a8" />}
                 </View>
               </TouchableOpacity>
 
@@ -249,13 +249,13 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingHorizontal: 12,
     paddingVertical: 6,
-    backgroundColor: '#e8f4ff',
+    backgroundColor: '#e0f5f7',
     borderRadius: 8,
   },
   addButtonText: {
     fontSize: 14,
     fontWeight: '600' as const,
-    color: '#007AFF',
+    color: '#0099a8',
   },
   ticketsList: {
     flex: 1,
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
   ticketTitle: {
     fontSize: 16,
     fontWeight: '600' as const,
-    color: '#007AFF',
+    color: '#0099a8',
   },
   ticketSubtitle: {
     fontSize: 13,

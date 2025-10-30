@@ -56,7 +56,7 @@ export default function ImageStep({
       </Text>
 
       <View style={styles.inputLabel}>
-        <ImageIcon size={20} color="#007AFF" />
+        <ImageIcon size={20} color="#0099a8" />
         <Text style={styles.inputLabelText}>Imagem do Evento *</Text>
       </View>
       
@@ -65,7 +65,7 @@ export default function ImageStep({
           style={[styles.imageModeButton, imageMode === 'upload' && styles.imageModeButtonActive]}
           onPress={() => setImageMode('upload')}
         >
-          <Upload size={16} color={imageMode === 'upload' ? '#007AFF' : '#666'} />
+          <Upload size={16} color={imageMode === 'upload' ? '#0099a8' : '#666'} />
           <Text style={[styles.imageModeButtonText, imageMode === 'upload' && styles.imageModeButtonTextActive]}>
             Upload
           </Text>
@@ -74,7 +74,7 @@ export default function ImageStep({
           style={[styles.imageModeButton, imageMode === 'url' && styles.imageModeButtonActive]}
           onPress={() => setImageMode('url')}
         >
-          <Link2 size={16} color={imageMode === 'url' ? '#007AFF' : '#666'} />
+          <Link2 size={16} color={imageMode === 'url' ? '#0099a8' : '#666'} />
           <Text style={[styles.imageModeButtonText, imageMode === 'url' && styles.imageModeButtonTextActive]}>
             URL
           </Text>
@@ -84,7 +84,7 @@ export default function ImageStep({
       {imageMode === 'upload' ? (
         <>
           <TouchableOpacity style={styles.uploadButton} onPress={pickImage}>
-            <Upload size={24} color="#007AFF" />
+            <Upload size={24} color="#0099a8" />
             <Text style={styles.uploadButtonText}>
               {imageUri ? 'Alterar Imagem' : 'Escolher Imagem'}
             </Text>
@@ -159,8 +159,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   imageModeButtonActive: {
-    backgroundColor: '#e8f4ff',
-    borderColor: '#007AFF',
+    backgroundColor: '#e0f5f7',
+    borderColor: '#0099a8',
   },
   imageModeButtonText: {
     fontSize: 14,
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   imageModeButtonTextActive: {
-    color: '#007AFF',
+    color: '#0099a8',
   },
   uploadButton: {
     flexDirection: 'row',
@@ -176,16 +176,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 12,
     paddingVertical: 32,
-    backgroundColor: '#e8f4ff',
+    backgroundColor: '#e0f5f7',
     borderWidth: 2,
-    borderColor: '#007AFF',
+    borderColor: '#0099a8',
     borderRadius: 12,
     borderStyle: 'dashed',
   },
   uploadButtonText: {
     fontSize: 16,
     fontWeight: '600' as const,
-    color: '#007AFF',
+    color: '#0099a8',
   },
   input: {
     backgroundColor: '#fff',
