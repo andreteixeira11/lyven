@@ -5,15 +5,16 @@ import type { AppRouter } from "@/backend/trpc/app-router";
 export const trpc = createTRPCReact<AppRouter>();
 
 const getBaseUrl = () => {
-  const baseUrl = process.env.EXPO_PUBLIC_RORK_API_BASE_URL;
+  const envUrl = process.env.EXPO_PUBLIC_RORK_API_BASE_URL;
   
-  if (baseUrl) {
-    console.log('🌐 TRPC Base URL (backend):', baseUrl);
-    return baseUrl;
+  if (envUrl) {
+    console.log('🌐 TRPC Base URL (backend):', envUrl);
+    return envUrl;
   }
   
-  console.log('⚠️ EXPO_PUBLIC_RORK_API_BASE_URL não configurada');
-  return '';
+  const rorkUrl = `https://rork.app/pa/hfa30k1ymcso2y545gvqm/backend`;
+  console.log('🌐 Using default Rork backend URL:', rorkUrl);
+  return rorkUrl;
 };
 
 export const trpcReactClient = trpc.createClient({
