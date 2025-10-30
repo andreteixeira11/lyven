@@ -402,40 +402,40 @@ export default function PromoterEventScreen() {
 
   const renderBuyersSection = () => (
     <View style={styles.sectionContent}>
-      <View style={styles.searchContainer}>
-        <View style={styles.searchInput}>
-          <Search size={20} color="#666" />
-          <TextInput
-            style={styles.searchText}
-            placeholder="Pesquisar compradores..."
-            placeholderTextColor="#666"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-        </View>
-      </View>
-
-      <View style={styles.filtersContainer}>
-        {(['all', 'validated', 'pending'] as const).map((filter) => (
-          <TouchableOpacity
-            key={filter}
-            style={[
-              styles.filterChip,
-              filterValidated === filter && styles.filterChipActive
-            ]}
-            onPress={() => setFilterValidated(filter)}
-          >
-            <Text style={[
-              styles.filterText,
-              filterValidated === filter && styles.filterTextActive
-            ]}>
-              {filter === 'all' ? 'Todos' : filter === 'validated' ? 'Validados' : 'Pendentes'}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
       <ScrollView style={styles.buyersList} showsVerticalScrollIndicator={false}>
+        <View style={styles.searchContainer}>
+          <View style={styles.searchInput}>
+            <Search size={20} color="#666" />
+            <TextInput
+              style={styles.searchText}
+              placeholder="Pesquisar compradores..."
+              placeholderTextColor="#666"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+          </View>
+        </View>
+
+        <View style={styles.filtersContainer}>
+          {(['all', 'validated', 'pending'] as const).map((filter) => (
+            <TouchableOpacity
+              key={filter}
+              style={[
+                styles.filterChip,
+                filterValidated === filter && styles.filterChipActive
+              ]}
+              onPress={() => setFilterValidated(filter)}
+            >
+              <Text style={[
+                styles.filterText,
+                filterValidated === filter && styles.filterTextActive
+              ]}>
+                {filter === 'all' ? 'Todos' : filter === 'validated' ? 'Validados' : 'Pendentes'}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
         <Text style={styles.resultsCount}>
           {filteredBuyers.length} {filteredBuyers.length === 1 ? 'comprador' : 'compradores'}
         </Text>
@@ -903,7 +903,7 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     paddingHorizontal: 16,
-    marginTop: 16,
+    marginTop: 0,
     marginBottom: 16,
   },
   searchInput: {
@@ -948,18 +948,19 @@ const styles = StyleSheet.create({
   },
   buyersList: {
     flex: 1,
-    paddingHorizontal: 16,
   },
   resultsCount: {
     fontSize: 14,
     color: '#999',
     marginBottom: 16,
+    paddingHorizontal: 16,
   },
   buyerCard: {
     backgroundColor: '#fff',
     borderRadius: 12,
     padding: 16,
     marginBottom: 12,
+    marginHorizontal: 16,
     borderWidth: 1,
     borderColor: '#e0e0e0',
   },
