@@ -4,44 +4,25 @@ import {
   Text,
   StyleSheet,
   ScrollView,
-  TextInput,
   TouchableOpacity,
   Alert,
-  Platform,
-  Image,
   Modal,
   ActivityIndicator,
 } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
 import {
-  Calendar,
-  Clock,
-  MapPin,
-  Image as ImageIcon,
-  Upload,
-  Link2,
-  ChevronDown,
-  ChevronUp,
-  Tag,
-  FileText,
   Save,
   X,
-  Plus,
-  Trash2,
-  Ticket,
+  ChevronLeft,
+  ChevronRight,
+  Upload,
 } from 'lucide-react-native';
 import { router, Stack, useLocalSearchParams } from 'expo-router';
 import { trpcClient } from '@/lib/trpc';
-import DateTimePicker from '@react-native-community/datetimepicker';
-
-interface TicketTypeForm {
-  id: string;
-  name: string;
-  stage: string;
-  price: string;
-  quantity: string;
-  description: string;
-}
+import BasicInfoStep from '@/components/create-event/BasicInfoStep';
+import LocationStep from '@/components/create-event/LocationStep';
+import DateTimeStep from '@/components/create-event/DateTimeStep';
+import TicketsStep, { TicketTypeForm } from '@/components/create-event/TicketsStep';
+import ImageStep from '@/components/create-event/ImageStep';
 
 interface EventFormData {
   title: string;
@@ -56,37 +37,15 @@ interface EventFormData {
   imageUri?: string;
 }
 
-const categories = [
-  'Música',
-  'Teatro',
-  'Dança',
-  'Comédia',
-  'Festival',
-  'Conferência',
-  'Desporto',
-  'Arte',
-  'Outro'
-];
 
-const ticketStages = [
-  'Early Bird',
-  'Normal',
-  'VIP',
-  'Premium',
-  'Gold',
-  'Silver',
-  'Bronze',
-  'Mesa',
-  'Pista',
-  'Camarote',
-  'Balcão',
-  'Geral',
-];
 
 export default function CreateEvent() {
   const params = useLocalSearchParams();
   const eventId = params.id as string | undefined;
   const isEditMode = !!eventId;
+
+  const [currentStep, setCurrentStep] = useState(0);
+  const totalSteps = 5;
 
   const [formData, setFormData] = useState<EventFormData>({
     title: '',
@@ -110,14 +69,8 @@ export default function CreateEvent() {
     imageUri: undefined,
   });
 
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false);
-  const [showCategoryPicker, setShowCategoryPicker] = useState(false);
-  const [showStagePicker, setShowStagePicker] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [expandedTickets, setExpandedTickets] = useState<Set<string>>(new Set(['1']));
-  const [imageMode, setImageMode] = useState<'url' | 'upload'>('upload');
   const [showPublishModal, setShowPublishModal] = useState(false);
   const [showCancelEventModal, setShowCancelEventModal] = useState(false);
 
@@ -169,12 +122,7 @@ export default function CreateEvent() {
         imageUri: undefined,
       });
 
-      const expandedIds = new Set<string>(ticketTypes.map((t: any) => t.id as string));
-      setExpandedTickets(expandedIds);
 
-      if (event.image) {
-        setImageMode('url');
-      }
     } catch (error) {
       console.error('❌ Erro ao carregar evento:', error);
       Alert.alert('Erro', 'Não foi possível carregar os dados do evento.');
@@ -188,39 +136,7 @@ export default function CreateEvent() {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleDateChange = (event: any, selectedDate?: Date) => {
-    if (Platform.OS === 'android') {
-      setShowDatePicker(false);
-      if (selectedDate && selectedDate instanceof Date && !isNaN(selectedDate.getTime())) {
-        updateFormData('date', selectedDate);
-      }
-    } else if (Platform.OS === 'ios') {
-      if (selectedDate && selectedDate instanceof Date && !isNaN(selectedDate.getTime())) {
-        updateFormData('date', selectedDate);
-      }
-    }
-    
-    if (event.type === 'dismissed') {
-      setShowDatePicker(false);
-    }
-  };
 
-  const handleTimeChange = (event: any, selectedTime?: Date) => {
-    if (Platform.OS === 'android') {
-      setShowTimePicker(false);
-      if (selectedTime && selectedTime instanceof Date && !isNaN(selectedTime.getTime())) {
-        updateFormData('time', selectedTime);
-      }
-    } else if (Platform.OS === 'ios') {
-      if (selectedTime && selectedTime instanceof Date && !isNaN(selectedTime.getTime())) {
-        updateFormData('time', selectedTime);
-      }
-    }
-    
-    if (event.type === 'dismissed') {
-      setShowTimePicker(false);
-    }
-  };
 
   const validateForm = (): boolean => {
     if (!formData.title || formData.title.trim() === '') {
@@ -330,7 +246,6 @@ export default function CreateEvent() {
         },
       ],
     }));
-    setExpandedTickets(prev => new Set([...prev, newId]));
   };
 
   const removeTicketType = (id: string) => {
@@ -342,11 +257,6 @@ export default function CreateEvent() {
       ...prev,
       ticketTypes: prev.ticketTypes.filter(t => t.id !== id),
     }));
-    setExpandedTickets(prev => {
-      const newSet = new Set(prev);
-      newSet.delete(id);
-      return newSet;
-    });
   };
 
   const updateTicketType = (id: string, field: keyof TicketTypeForm, value: string) => {
@@ -474,9 +384,7 @@ export default function CreateEvent() {
     }
   };
 
-  const handleCancelEvent = () => {
-    setShowCancelEventModal(true);
-  };
+
 
   const handleConfirmCancelEvent = async () => {
     setShowCancelEventModal(false);
@@ -503,142 +411,80 @@ export default function CreateEvent() {
     }
   };
 
-  const formatDate = (date?: Date): string => {
-    if (!date) return '';
-    return new Intl.DateTimeFormat('pt-PT', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    }).format(date);
-  };
-
-  const formatTime = (time?: Date): string => {
-    if (!time) return 'Selecionar hora (opcional)';
-    return new Intl.DateTimeFormat('pt-PT', {
-      hour: '2-digit',
-      minute: '2-digit'
-    }).format(time);
-  };
-
-  const toggleTicketExpansion = (id: string) => {
-    setExpandedTickets(prev => {
-      const newSet = new Set(prev);
-      if (newSet.has(id)) {
-        newSet.delete(id);
-      } else {
-        newSet.add(id);
-      }
-      return newSet;
-    });
-  };
-
-  const isTicketFilled = (ticket: TicketTypeForm): boolean => {
-    return !!(ticket.name && ticket.stage && ticket.price && ticket.quantity);
-  };
-
-  const pickImage = async () => {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permissão Negada', 'Necessitamos de acesso à galeria para escolher uma imagem.');
-      return;
-    }
-
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      allowsEditing: true,
-      aspect: [16, 9],
-      quality: 0.8,
-    });
-
-    if (!result.canceled && result.assets[0]) {
-      updateFormData('imageUri', result.assets[0].uri);
-      updateFormData('imageUrl', '');
-    }
-  };
-
-  const renderInput = (
-    label: string,
-    value: string,
-    onChangeText: (text: string) => void,
-    placeholder: string,
-    icon: React.ReactNode,
-    multiline = false,
-    keyboardType: 'default' | 'numeric' | 'email-address' = 'default'
-  ) => (
-    <View style={styles.inputContainer}>
-      <View style={styles.inputLabel}>
-        {icon}
-        <Text style={styles.inputLabelText}>{label}</Text>
-      </View>
-      <TextInput
-        style={[styles.input, multiline && styles.textArea]}
-        value={value}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor="#999"
-        multiline={multiline}
-        numberOfLines={multiline ? 4 : 1}
-        keyboardType={keyboardType}
-      />
-    </View>
-  );
-
-  const renderDateTimePicker = (
-    label: string,
-    value: Date | undefined,
-    onPress: () => void,
-    icon: React.ReactNode,
-    formatter: (date?: Date) => string
-  ) => (
-    <View style={styles.inputContainer}>
-      <View style={styles.inputLabel}>
-        {icon}
-        <Text style={styles.inputLabelText}>{label}</Text>
-      </View>
-      <TouchableOpacity style={styles.dateTimeButton} onPress={onPress}>
-        <Text style={[styles.dateTimeButtonText, !value && styles.placeholder]}>{formatter(value)}</Text>
-      </TouchableOpacity>
-    </View>
-  );
-
-  const renderCategoryPicker = () => (
-    <View style={styles.inputContainer}>
-      <View style={styles.inputLabel}>
-        <Tag size={20} color="#666" />
-        <Text style={styles.inputLabelText}>Categoria *</Text>
-      </View>
-      <TouchableOpacity 
-        style={styles.categoryButton} 
-        onPress={() => setShowCategoryPicker(!showCategoryPicker)}
-      >
-        <Text style={[styles.categoryButtonText, !formData.category && styles.placeholder]}>
-          {formData.category || 'Selecionar categoria'}
-        </Text>
-        <ChevronDown size={20} color="#666" />
-      </TouchableOpacity>
+  const validateCurrentStep = (): boolean => {
+    switch (currentStep) {
+      case 0:
+        if (!formData.title || formData.title.trim() === '') {
+          Alert.alert('Erro', 'Por favor, preencha o título do evento.');
+          return false;
+        }
+        if (!formData.category || formData.category.trim() === '') {
+          Alert.alert('Erro', 'Por favor, selecione uma categoria.');
+          return false;
+        }
+        return true;
       
-      {showCategoryPicker && (
-        <View style={styles.categoryListContainer}>
-          <ScrollView style={styles.categoryList} nestedScrollEnabled showsVerticalScrollIndicator={false}>
-            {categories.map((category) => (
-              <TouchableOpacity
-                key={category}
-                style={styles.categoryItem}
-                onPress={() => {
-                  if (category && category.trim()) {
-                    updateFormData('category', category.trim());
-                    setShowCategoryPicker(false);
-                  }
-                }}
-              >
-                <Text style={styles.categoryItemText}>{category}</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
-        </View>
-      )}
-    </View>
-  );
+      case 1:
+        if (!formData.venue || formData.venue.trim() === '') {
+          Alert.alert('Erro', 'Por favor, preencha o local do evento.');
+          return false;
+        }
+        if (!formData.address || formData.address.trim() === '') {
+          Alert.alert('Erro', 'Por favor, preencha o endereço do evento.');
+          return false;
+        }
+        return true;
+      
+      case 2:
+        if (!formData.date) {
+          Alert.alert('Erro', 'Por favor, selecione a data do evento.');
+          return false;
+        }
+        return true;
+      
+      case 3:
+        const hasValidTicket = formData.ticketTypes.some(ticket => 
+          ticket.name && ticket.name.trim() !== '' &&
+          ticket.stage && ticket.stage.trim() !== '' &&
+          ticket.price && ticket.price.trim() !== '' &&
+          ticket.quantity && ticket.quantity.trim() !== ''
+        );
+
+        if (!hasValidTicket) {
+          Alert.alert('Erro', 'Por favor, preencha pelo menos um bilhete completamente.');
+          return false;
+        }
+        return true;
+      
+      case 4:
+        if (!formData.imageUri && !formData.imageUrl) {
+          Alert.alert('Erro', 'Por favor, adicione uma imagem do evento.');
+          return false;
+        }
+        return true;
+      
+      default:
+        return true;
+    }
+  };
+
+  const handleNext = () => {
+    if (validateCurrentStep()) {
+      if (currentStep < totalSteps - 1) {
+        setCurrentStep(currentStep + 1);
+      } else {
+        handleSubmit();
+      }
+    }
+  };
+
+  const handleBack = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    } else {
+      router.back();
+    }
+  };
 
   return (
     <View style={styles.fullContainer}>
@@ -662,361 +508,89 @@ export default function CreateEvent() {
           <Text style={styles.loadingText}>Carregando evento...</Text>
         </View>
       ) : (
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      <View style={styles.content}>
-        <Text style={styles.subtitle}>
-          {isEditMode 
-            ? 'Edite os detalhes do seu evento. As alterações serão revisadas antes da publicação.'
-            : 'Preencha os detalhes do seu evento. Todos os eventos são revisados antes da publicação.'
-          }
-        </Text>
-
-        {renderInput(
-          'Título do Evento *',
-          formData.title,
-          (text) => updateFormData('title', text?.trim() || ''),
-          'Ex: Concerto dos Arctic Monkeys',
-          <FileText size={20} color="#666" />
-        )}
-
-        {renderInput(
-          'Descrição (opcional)',
-          formData.description,
-          (text) => updateFormData('description', text?.trim() || ''),
-          'Descreva o seu evento em detalhe...',
-          <FileText size={20} color="#666" />,
-          true
-        )}
-
-        {renderInput(
-          'Local/Venue *',
-          formData.venue,
-          (text) => updateFormData('venue', text?.trim() || ''),
-          'Ex: Coliseu dos Recreios',
-          <MapPin size={20} color="#666" />
-        )}
-
-        {renderInput(
-          'Endereço *',
-          formData.address,
-          (text) => updateFormData('address', text?.trim() || ''),
-          'Endereço completo do evento',
-          <MapPin size={20} color="#666" />
-        )}
-
-        {renderDateTimePicker(
-          'Data do Evento *',
-          formData.date,
-          () => setShowDatePicker(true),
-          <Calendar size={20} color="#666" />,
-          formatDate
-        )}
-
-        {renderDateTimePicker(
-          'Hora do Evento',
-          formData.time,
-          () => setShowTimePicker(true),
-          <Clock size={20} color="#666" />,
-          formatTime
-        )}
-
-        {renderCategoryPicker()}
-
-        <View style={styles.ticketTypesSection}>
-          <View style={styles.sectionHeader}>
-            <View style={styles.sectionTitleRow}>
-              <Ticket size={20} color="#666" />
-              <Text style={styles.sectionTitle}>Tipos de Bilhetes *</Text>
+        <View style={styles.mainContainer}>
+          <View style={styles.progressContainer}>
+            <View style={styles.progressBar}>
+              <View style={[styles.progressFill, { width: `${((currentStep + 1) / totalSteps) * 100}%` }]} />
             </View>
-            <TouchableOpacity onPress={addTicketType} style={styles.addButton}>
-              <Plus size={18} color="#007AFF" />
-              <Text style={styles.addButtonText}>Adicionar</Text>
-            </TouchableOpacity>
+            <Text style={styles.progressText}>Passo {currentStep + 1} de {totalSteps}</Text>
           </View>
 
-          {formData.ticketTypes.map((ticket, index) => {
-            const isExpanded = expandedTickets.has(ticket.id);
-            const isFilled = isTicketFilled(ticket);
-            
-            return (
-            <View key={ticket.id} style={[styles.ticketTypeCard, !isExpanded && isFilled && styles.ticketTypeCardCollapsed]}>
-              <TouchableOpacity 
-                style={styles.ticketTypeHeader}
-                onPress={() => toggleTicketExpansion(ticket.id)}
-                activeOpacity={0.7}
-              >
-                <View style={styles.ticketTypeHeaderLeft}>
-                  <Text style={styles.ticketTypeTitle}>
-                    {ticket.name || `Bilhete ${index + 1}`}
-                  </Text>
-                  {!isExpanded && isFilled && (
-                    <Text style={styles.ticketTypeSubtitle}>
-                      {ticket.stage} • €{ticket.price} • {ticket.quantity} bilhetes
-                    </Text>
-                  )}
-                </View>
-                <View style={styles.ticketTypeHeaderRight}>
-                  {formData.ticketTypes.length > 1 && (
-                    <TouchableOpacity 
-                      onPress={(e) => {
-                        e.stopPropagation();
-                        removeTicketType(ticket.id);
-                      }}
-                      style={styles.deleteButton}
-                    >
-                      <Trash2 size={18} color="#ff3b30" />
-                    </TouchableOpacity>
-                  )}
-                  {isExpanded ? <ChevronUp size={20} color="#007AFF" /> : <ChevronDown size={20} color="#007AFF" />}
-                </View>
-              </TouchableOpacity>
+          <ScrollView style={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+            <View style={styles.content}>
 
-              {isExpanded && (
-              <>
-              <TextInput
-                style={styles.input}
-                value={ticket.name}
-                onChangeText={(text) => updateTicketType(ticket.id, 'name', text)}
-                placeholder="Nome do bilhete (ex: Bilhete Normal)"
-                placeholderTextColor="#999"
-              />
+              {currentStep === 0 && (
+                <BasicInfoStep
+                  title={formData.title}
+                  description={formData.description}
+                  category={formData.category}
+                  onTitleChange={(text) => updateFormData('title', text?.trim() || '')}
+                  onDescriptionChange={(text) => updateFormData('description', text?.trim() || '')}
+                  onCategoryChange={(category) => updateFormData('category', category)}
+                />
+              )}
 
-              <View style={styles.inputContainer}>
-                <Text style={styles.inputLabelText}>Stage / Tipo</Text>
-                <TouchableOpacity 
-                  style={styles.stageButton} 
-                  onPress={() => setShowStagePicker(showStagePicker === ticket.id ? null : ticket.id)}
-                >
-                  <Text style={[styles.stageButtonText, !ticket.stage && styles.placeholder]}>
-                    {ticket.stage || 'Selecionar stage'}
-                  </Text>
-                  <ChevronDown size={20} color="#666" />
-                </TouchableOpacity>
-                
-                {showStagePicker === ticket.id && (
-                  <View style={styles.stageListContainer}>
-                    <ScrollView style={styles.stageList} nestedScrollEnabled showsVerticalScrollIndicator={false}>
-                      {ticketStages.map((stage) => (
-                        <TouchableOpacity
-                          key={stage}
-                          style={styles.stageItem}
-                          onPress={() => {
-                            updateTicketType(ticket.id, 'stage', stage);
-                            setShowStagePicker(null);
-                          }}
-                        >
-                          <Text style={styles.stageItemText}>{stage}</Text>
-                        </TouchableOpacity>
-                      ))}
-                    </ScrollView>
-                  </View>
-                )}
-              </View>
+              {currentStep === 1 && (
+                <LocationStep
+                  venue={formData.venue}
+                  address={formData.address}
+                  onVenueChange={(text) => updateFormData('venue', text?.trim() || '')}
+                  onAddressChange={(text) => updateFormData('address', text?.trim() || '')}
+                />
+              )}
 
-              <View style={styles.row}>
-                <View style={[styles.inputContainer, styles.halfWidth]}>
-                  <Text style={styles.inputLabelText}>Preço (€)</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={ticket.price}
-                    onChangeText={(text) => updateTicketType(ticket.id, 'price', text)}
-                    placeholder="0.00"
-                    placeholderTextColor="#999"
-                    keyboardType="numeric"
-                  />
-                </View>
+              {currentStep === 2 && (
+                <DateTimeStep
+                  date={formData.date}
+                  time={formData.time}
+                  onDateChange={(date) => updateFormData('date', date)}
+                  onTimeChange={(time) => updateFormData('time', time)}
+                />
+              )}
 
-                <View style={[styles.inputContainer, styles.halfWidth]}>
-                  <Text style={styles.inputLabelText}>Quantidade</Text>
-                  <TextInput
-                    style={styles.input}
-                    value={ticket.quantity}
-                    onChangeText={(text) => updateTicketType(ticket.id, 'quantity', text)}
-                    placeholder="100"
-                    placeholderTextColor="#999"
-                    keyboardType="numeric"
-                  />
-                </View>
-              </View>
+              {currentStep === 3 && (
+                <TicketsStep
+                  tickets={formData.ticketTypes}
+                  onAddTicket={addTicketType}
+                  onRemoveTicket={removeTicketType}
+                  onUpdateTicket={updateTicketType}
+                />
+              )}
 
-              <TextInput
-                style={[styles.input, styles.textArea]}
-                value={ticket.description}
-                onChangeText={(text) => updateTicketType(ticket.id, 'description', text)}
-                placeholder="Descrição (opcional)"
-                placeholderTextColor="#999"
-                multiline
-                numberOfLines={2}
-              />
-              </>
+              {currentStep === 4 && (
+                <ImageStep
+                  imageUrl={formData.imageUrl}
+                  imageUri={formData.imageUri}
+                  onImageUrlChange={(url) => updateFormData('imageUrl', url)}
+                  onImageUriChange={(uri) => updateFormData('imageUri', uri)}
+                />
               )}
             </View>
-            );
-          })}
-        </View>
+          </ScrollView>
 
-        <View style={styles.inputContainer}>
-          <View style={styles.inputLabel}>
-            <ImageIcon size={20} color="#666" />
-            <Text style={styles.inputLabelText}>Imagem do Evento *</Text>
-          </View>
-          
-          <View style={styles.imageModeSelector}>
+          <View style={styles.navigationContainer}>
             <TouchableOpacity 
-              style={[styles.imageModeButton, imageMode === 'upload' && styles.imageModeButtonActive]}
-              onPress={() => setImageMode('upload')}
+              style={styles.backButton}
+              onPress={handleBack}
             >
-              <Upload size={16} color={imageMode === 'upload' ? '#007AFF' : '#666'} />
-              <Text style={[styles.imageModeButtonText, imageMode === 'upload' && styles.imageModeButtonTextActive]}>
-                Upload
+              <ChevronLeft size={20} color="#007AFF" />
+              <Text style={styles.backButtonText}>
+                {currentStep === 0 ? 'Cancelar' : 'Voltar'}
               </Text>
             </TouchableOpacity>
+
             <TouchableOpacity 
-              style={[styles.imageModeButton, imageMode === 'url' && styles.imageModeButtonActive]}
-              onPress={() => setImageMode('url')}
+              style={[styles.nextButton, isSubmitting && styles.nextButtonDisabled]}
+              onPress={handleNext}
+              disabled={isSubmitting}
             >
-              <Link2 size={16} color={imageMode === 'url' ? '#007AFF' : '#666'} />
-              <Text style={[styles.imageModeButtonText, imageMode === 'url' && styles.imageModeButtonTextActive]}>
-                URL
+              <Text style={styles.nextButtonText}>
+                {isSubmitting ? 'A criar...' : currentStep === totalSteps - 1 ? 'Criar Evento' : 'Continuar'}
               </Text>
+              {currentStep < totalSteps - 1 && <ChevronRight size={20} color="#fff" />}
             </TouchableOpacity>
           </View>
-
-          {imageMode === 'upload' ? (
-            <>
-              <TouchableOpacity style={styles.uploadButton} onPress={pickImage}>
-                <Upload size={20} color="#007AFF" />
-                <Text style={styles.uploadButtonText}>
-                  {formData.imageUri ? 'Alterar Imagem' : 'Escolher Imagem'}
-                </Text>
-              </TouchableOpacity>
-              {formData.imageUri && (
-                <Image source={{ uri: formData.imageUri }} style={styles.imagePreview} />
-              )}
-            </>
-          ) : (
-            <TextInput
-              style={styles.input}
-              value={formData.imageUrl}
-              onChangeText={(text) => {
-                updateFormData('imageUrl', text?.trim() || '');
-                updateFormData('imageUri', undefined);
-              }}
-              placeholder="https://exemplo.com/imagem.jpg"
-              placeholderTextColor="#999"
-            />
-          )}
         </View>
-
-        <TouchableOpacity 
-          style={[styles.submitButton, isSubmitting && styles.submitButtonDisabled]} 
-          onPress={handleSubmit}
-          disabled={isSubmitting}
-        >
-          <Save size={20} color="#fff" />
-          <Text style={styles.submitButtonText}>
-            {isSubmitting ? (isEditMode ? 'Salvando...' : 'Criando...') : (isEditMode ? 'Salvar Alterações' : 'Criar Evento')}
-          </Text>
-        </TouchableOpacity>
-
-        {isEditMode && (
-          <TouchableOpacity 
-            style={[styles.cancelEventButton, isSubmitting && styles.submitButtonDisabled]} 
-            onPress={handleCancelEvent}
-            disabled={isSubmitting}
-          >
-            <X size={20} color="#fff" />
-            <Text style={styles.cancelEventButtonText}>Cancelar Evento</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-      </ScrollView>
-      )}
-
-      <Modal
-        visible={showDatePicker && Platform.OS === 'ios'}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowDatePicker(false)}
-      >
-        <TouchableOpacity 
-          style={styles.modalOverlay} 
-          activeOpacity={1} 
-          onPress={() => setShowDatePicker(false)}
-        >
-          <View style={styles.modalContent}>
-            <View style={styles.iosPickerContainer}>
-              <View style={styles.iosPickerHeader}>
-                <TouchableOpacity onPress={() => setShowDatePicker(false)}>
-                  <Text style={styles.iosPickerButton}>Cancelar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => setShowDatePicker(false)}>
-                  <Text style={[styles.iosPickerButton, styles.iosPickerButtonDone]}>Confirmar</Text>
-                </TouchableOpacity>
-              </View>
-              <DateTimePicker
-                value={formData.date}
-                mode="date"
-                display="spinner"
-                onChange={handleDateChange}
-                minimumDate={new Date()}
-                style={styles.iosPicker}
-              />
-            </View>
-          </View>
-        </TouchableOpacity>
-      </Modal>
-
-      <Modal
-        visible={showTimePicker && Platform.OS === 'ios'}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowTimePicker(false)}
-      >
-        <TouchableOpacity 
-          style={styles.modalOverlay} 
-          activeOpacity={1} 
-          onPress={() => setShowTimePicker(false)}
-        >
-          <View style={styles.modalContent}>
-            <View style={styles.iosPickerContainer}>
-              <View style={styles.iosPickerHeader}>
-                <TouchableOpacity onPress={() => setShowTimePicker(false)}>
-                  <Text style={styles.iosPickerButton}>Cancelar</Text>
-                </TouchableOpacity>
-                <TouchableOpacity onPress={() => setShowTimePicker(false)}>
-                  <Text style={[styles.iosPickerButton, styles.iosPickerButtonDone]}>Confirmar</Text>
-                </TouchableOpacity>
-              </View>
-              <DateTimePicker
-                value={formData.time || new Date()}
-                mode="time"
-                display="spinner"
-                onChange={handleTimeChange}
-                style={styles.iosPicker}
-              />
-            </View>
-          </View>
-        </TouchableOpacity>
-      </Modal>
-
-      {showDatePicker && Platform.OS === 'android' && (
-        <DateTimePicker
-          value={formData.date}
-          mode="date"
-          display="default"
-          onChange={handleDateChange}
-          minimumDate={new Date()}
-        />
-      )}
-
-      {showTimePicker && Platform.OS === 'android' && (
-        <DateTimePicker
-          value={formData.time || new Date()}
-          mode="time"
-          display="default"
-          onChange={handleTimeChange}
-        />
       )}
 
       <Modal
@@ -1106,7 +680,7 @@ export default function CreateEvent() {
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.cancelModalButtonPrimary, isSubmitting && styles.submitButtonDisabled]}
+                style={[styles.cancelModalButtonPrimary, isSubmitting && styles.nextButtonDisabled]}
                 onPress={handleConfirmCancelEvent}
                 disabled={isSubmitting}
               >
@@ -1127,316 +701,81 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f8f9fa',
   },
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f9fa',
-  },
   closeButton: {
     padding: 8,
+  },
+  mainContainer: {
+    flex: 1,
+  },
+  progressContainer: {
+    padding: 20,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  progressBar: {
+    height: 4,
+    backgroundColor: '#e0e0e0',
+    borderRadius: 2,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+  progressFill: {
+    height: '100%',
+    backgroundColor: '#007AFF',
+    borderRadius: 2,
+  },
+  progressText: {
+    fontSize: 14,
+    color: '#666',
+    textAlign: 'center',
+  },
+  scrollContainer: {
+    flex: 1,
   },
   content: {
     padding: 20,
   },
-  subtitle: {
-    fontSize: 16,
-    color: '#666',
-    marginBottom: 24,
-    lineHeight: 22,
-  },
-  inputContainer: {
-    marginBottom: 20,
-  },
-  inputLabel: {
+  navigationContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-    gap: 8,
-  },
-  inputLabelText: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: '#333',
-  },
-  input: {
+    padding: 16,
     backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 16,
-    color: '#333',
-  },
-  textArea: {
-    height: 100,
-    textAlignVertical: 'top',
-  },
-  dateTimeButton: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-  },
-  dateTimeButtonText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  categoryButton: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  categoryButtonText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  placeholder: {
-    color: '#999',
-  },
-  categoryListContainer: {
-    marginTop: 4,
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  categoryList: {
-    maxHeight: 200,
-  },
-  categoryItem: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  categoryItemText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  row: {
-    flexDirection: 'row',
+    borderTopWidth: 1,
+    borderTopColor: '#e0e0e0',
     gap: 12,
   },
-  halfWidth: {
+  backButton: {
     flex: 1,
-  },
-  submitButton: {
-    backgroundColor: '#007AFF',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
-    borderRadius: 8,
-    marginTop: 20,
-    gap: 8,
+    paddingVertical: 14,
+    backgroundColor: '#f0f0f0',
+    borderRadius: 12,
+    gap: 4,
   },
-  submitButtonDisabled: {
+  backButtonText: {
+    fontSize: 16,
+    fontWeight: '600' as const,
+    color: '#007AFF',
+  },
+  nextButton: {
+    flex: 2,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 14,
+    backgroundColor: '#007AFF',
+    borderRadius: 12,
+    gap: 4,
+  },
+  nextButtonDisabled: {
     backgroundColor: '#ccc',
   },
-  submitButtonText: {
+  nextButtonText: {
+    fontSize: 16,
+    fontWeight: '600' as const,
     color: '#fff',
-    fontSize: 18,
-    fontWeight: '600' as const,
-  },
-  ticketTypesSection: {
-    marginTop: 8,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  sectionTitleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: '700' as const,
-    color: '#333',
-  },
-  addButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    backgroundColor: '#e8f4ff',
-    borderRadius: 6,
-  },
-  addButtonText: {
-    fontSize: 14,
-    fontWeight: '600' as const,
-    color: '#007AFF',
-  },
-  ticketTypeCard: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 16,
-  },
-  ticketTypeHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  ticketTypeTitle: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: '#007AFF',
-  },
-  deleteButton: {
-    padding: 4,
-  },
-  stageButton: {
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    marginTop: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  stageButtonText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  stageListContainer: {
-    marginTop: 4,
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  stageList: {
-    maxHeight: 200,
-  },
-  stageItem: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  stageItemText: {
-    fontSize: 16,
-    color: '#333',
-  },
-  ticketTypeCardCollapsed: {
-    padding: 12,
-  },
-  ticketTypeHeaderLeft: {
-    flex: 1,
-  },
-  ticketTypeHeaderRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  ticketTypeSubtitle: {
-    fontSize: 13,
-    color: '#666',
-    marginTop: 4,
-  },
-  imageModeSelector: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 12,
-  },
-  imageModeButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    paddingVertical: 10,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 8,
-    backgroundColor: '#fff',
-  },
-  imageModeButtonActive: {
-    backgroundColor: '#e8f4ff',
-    borderColor: '#007AFF',
-  },
-  imageModeButtonText: {
-    fontSize: 14,
-    fontWeight: '600' as const,
-    color: '#666',
-  },
-  imageModeButtonTextActive: {
-    color: '#007AFF',
-  },
-  uploadButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    paddingVertical: 12,
-    backgroundColor: '#e8f4ff',
-    borderWidth: 1,
-    borderColor: '#007AFF',
-    borderRadius: 8,
-    borderStyle: 'dashed',
-  },
-  uploadButtonText: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    color: '#007AFF',
-  },
-  imagePreview: {
-    width: '100%',
-    height: 200,
-    borderRadius: 8,
-    marginTop: 12,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
-  },
-  modalContent: {
-    backgroundColor: 'transparent',
-  },
-  iosPickerContainer: {
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
-  },
-  iosPickerHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-  iosPickerButton: {
-    fontSize: 16,
-    color: '#007AFF',
-  },
-  iosPickerButtonDone: {
-    fontWeight: '600' as const,
-  },
-  iosPicker: {
-    height: 200,
   },
   publishModalOverlay: {
     flex: 1,
