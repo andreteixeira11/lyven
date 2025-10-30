@@ -23,6 +23,7 @@ import {
 } from 'lucide-react-native';
 import { PromoterEvent } from '@/types/event';
 import { router } from 'expo-router';
+import { useUser } from '@/hooks/user-context';
 
 interface PromoterDashboardProps {
   promoterId: string;
@@ -31,6 +32,7 @@ interface PromoterDashboardProps {
 const { width } = Dimensions.get('window');
 
 const PromoterDashboard: React.FC<PromoterDashboardProps> = ({ promoterId }) => {
+  const { user } = useUser();
 
   const mockPromoterEvents: PromoterEvent[] = [
     {
@@ -106,6 +108,9 @@ const PromoterDashboard: React.FC<PromoterDashboardProps> = ({ promoterId }) => 
   return (
     <View style={styles.wrapper}>
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <View style={styles.welcomeContainer}>
+        <Text style={styles.welcomeText}>Bem-vindo, {user?.name || 'Promotor'}</Text>
+      </View>
       <View style={styles.statsGrid}>
         {renderStatCard(
           'Receita Total',
@@ -291,11 +296,21 @@ const styles = StyleSheet.create({
     elevation: 8
   },
 
+  welcomeContainer: {
+    paddingHorizontal: 16,
+    paddingTop: 20,
+    paddingBottom: 8
+  },
+  welcomeText: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#1a1a1a'
+  },
   statsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingTop: 8,
     gap: 12
   },
   statCard: {
