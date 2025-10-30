@@ -739,6 +739,7 @@ const styles = StyleSheet.create({
   navigationContainer: {
     flexDirection: 'row',
     padding: 16,
+    paddingBottom: 32,
     backgroundColor: '#fff',
     borderTopWidth: 1,
     borderTopColor: '#e0e0e0',
