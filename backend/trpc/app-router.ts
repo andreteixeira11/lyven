@@ -77,6 +77,12 @@ import { verifyCodeProcedure } from "./routes/auth/verify-code";
 import { getSmartRecommendationsProcedure } from "./routes/recommendations/get-smart-recommendations";
 import { getAIRecommendationsProcedure } from "./routes/recommendations/get-ai-recommendations";
 
+import { listPaymentMethodsProcedure } from "./routes/payment-methods/list";
+import { createPaymentMethodProcedure } from "./routes/payment-methods/create";
+import { updatePaymentMethodProcedure } from "./routes/payment-methods/update";
+import { deletePaymentMethodProcedure } from "./routes/payment-methods/delete";
+import { setPrimaryPaymentMethodProcedure } from "./routes/payment-methods/set-primary";
+
 export const appRouter = createTRPCRouter({
   example: createTRPCRouter({
     hi: hiRoute,
@@ -183,6 +189,14 @@ export const appRouter = createTRPCRouter({
   recommendations: createTRPCRouter({
     smart: getSmartRecommendationsProcedure,
     ai: getAIRecommendationsProcedure,
+  }),
+  
+  paymentMethods: createTRPCRouter({
+    list: listPaymentMethodsProcedure,
+    create: createPaymentMethodProcedure,
+    update: updatePaymentMethodProcedure,
+    delete: deletePaymentMethodProcedure,
+    setPrimary: setPrimaryPaymentMethodProcedure,
   }),
 });
 

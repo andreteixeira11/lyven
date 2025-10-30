@@ -175,3 +175,20 @@ export const verificationCodes = sqliteTable('verification_codes', {
   isUsed: integer('is_used', { mode: 'boolean' }).notNull().default(false),
   createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
 });
+
+export const paymentMethods = sqliteTable('payment_methods', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id),
+  type: text('type', { enum: ['bank_transfer', 'mbway', 'paypal', 'stripe'] }).notNull(),
+  isPrimary: integer('is_primary', { mode: 'boolean' }).notNull().default(false),
+  accountHolderName: text('account_holder_name'),
+  bankName: text('bank_name'),
+  iban: text('iban'),
+  swift: text('swift'),
+  phoneNumber: text('phone_number'),
+  email: text('email'),
+  accountId: text('account_id'),
+  isVerified: integer('is_verified', { mode: 'boolean' }).notNull().default(false),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+  updatedAt: text('updated_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+});

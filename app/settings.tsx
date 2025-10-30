@@ -133,7 +133,7 @@ export default function Settings() {
               icon={CreditCard}
               title="Métodos de Pagamento"
               subtitle="Gerir formas de recebimento"
-              onPress={() => Alert.alert('Pagamentos', 'Funcionalidade em desenvolvimento')}
+              onPress={() => router.push('/payment-methods')}
             />
           )}
         </View>
