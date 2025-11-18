@@ -5,6 +5,7 @@ import { appRouter } from "./trpc/app-router";
 import { createContext } from "./trpc/create-context";
 import { initDatabase } from "./db/init";
 import { seedDatabase } from "./db/seed";
+import { seedNormalUser } from "./db/seed-normal-user";
 
 console.log('🚀 Initializing backend server...');
 
@@ -114,6 +115,18 @@ app.post("/seed", async (c) => {
     return c.text('Database seeded successfully!');
   } catch (error) {
     console.error('❌ Seed error:', error);
+    return c.json({ error: error instanceof Error ? error.message : String(error) }, 500);
+  }
+});
+
+app.post("/seed-normal-user", async (c) => {
+  console.log('🌱 Seed normal user endpoint accessed');
+  try {
+    await seedNormalUser();
+    console.log('✅ Normal user seeded successfully');
+    return c.json({ success: true, message: 'Normal user created successfully!' });
+  } catch (error) {
+    console.error('❌ Seed normal user error:', error);
     return c.json({ error: error instanceof Error ? error.message : String(error) }, 500);
   }
 });

@@ -1,6 +1,6 @@
 import { publicProcedure } from '../../create-context';
 import { z } from 'zod';
-import { generateObject } from '@rork/toolkit-sdk';
+import { generateObject } from '@rork-ai/toolkit-sdk';
 import { db } from '../../../db';
 import { events, tickets, users } from '../../../db/schema';
 import { eq, and, gte } from 'drizzle-orm';
