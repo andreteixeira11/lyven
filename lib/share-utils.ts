@@ -27,7 +27,7 @@ export async function shareEvent(params: ShareEventParams): Promise<boolean> {
   } = params;
   
   const deepLink = Linking.createURL(`/event/${eventId}`);
-  const webShareUrl = `https://rork.app/event/${eventId}`;
+  const webShareUrl = `https://www.lyven.pt/event/${eventId}`;
   
   let shareMessage = `🎉 ${eventTitle}\n`;
   
@@ -206,7 +206,7 @@ export async function shareEventWithImage(params: ShareEventParams & { imageUri?
   }
   
   try {
-    const webShareUrl = `https://rork.app/event/${eventId}`;
+    const webShareUrl = `https://www.lyven.pt/event/${eventId}`;
     
     let shareMessage = `🎉 ${eventTitle}\n`;
     
