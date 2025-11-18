@@ -133,6 +133,41 @@ app.post("/seed-normal-user", async (c) => {
   }
 });
 
+app.get("/.well-known/apple-app-site-association", (c) => {
+  console.log('🍎 Apple App Site Association requested');
+  const aasa = {
+    applinks: {
+      apps: [],
+      details: [
+        {
+          appID: "TEAM_ID.app.lyven",
+          paths: ["/event/*"]
+        }
+      ]
+    }
+  };
+  c.header('Content-Type', 'application/json');
+  c.header('Access-Control-Allow-Origin', '*');
+  return c.json(aasa);
+});
+
+app.get("/.well-known/assetlinks.json", (c) => {
+  console.log('🤖 Android Asset Links requested');
+  const assetlinks = [{
+    relation: ["delegate_permission/common.handle_all_urls"],
+    target: {
+      namespace: "android_app",
+      package_name: "app.lyven",
+      sha256_cert_fingerprints: [
+        "SHA256_FINGERPRINT_AQUI"
+      ]
+    }
+  }];
+  c.header('Content-Type', 'application/json');
+  c.header('Access-Control-Allow-Origin', '*');
+  return c.json(assetlinks);
+});
+
 app.get("/event/:id", async (c) => {
   console.log('🎫 Event page accessed:', c.req.param('id'));
   try {
