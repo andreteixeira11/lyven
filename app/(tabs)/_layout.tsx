@@ -2,6 +2,7 @@ import { Tabs } from "expo-router";
 import { Search, Ticket, Home, User, BarChart3, Calendar, Target, Users, Eye, Settings as SettingsIcon, TrendingUp } from "lucide-react-native";
 import React, { useEffect, useRef } from "react";
 import { View, Text, StyleSheet, Animated, Platform } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useCart } from "@/hooks/cart-context";
 import { useUser } from "@/hooks/user-context";
 import { useTheme } from "@/hooks/theme-context";
@@ -10,6 +11,7 @@ export default function TabLayout() {
   const { getTotalItems } = useCart();
   const { user } = useUser();
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const totalItems = getTotalItems();
   const isPromoter = user?.userType === 'promoter';
   const isAdmin = user?.email === 'geral@lyven.pt';
@@ -129,8 +131,8 @@ export default function TabLayout() {
           tabBarStyle: {
             backgroundColor: colors.card,
             borderTopWidth: 0,
-            height: 65,
-            paddingBottom: 8,
+            height: 60 + insets.bottom,
+            paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
             paddingTop: 8,
             elevation: 0,
             shadowOpacity: 0,
@@ -224,8 +226,8 @@ export default function TabLayout() {
           tabBarStyle: {
             backgroundColor: colors.card,
             borderTopWidth: 0,
-            height: 65,
-            paddingBottom: 8,
+            height: 60 + insets.bottom,
+            paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
             paddingTop: 8,
             elevation: 0,
             shadowOpacity: 0,
@@ -314,8 +316,8 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: colors.card,
           borderTopWidth: 0,
-          height: 65,
-          paddingBottom: 8,
+          height: 60 + insets.bottom,
+          paddingBottom: insets.bottom > 0 ? insets.bottom : 8,
           paddingTop: 8,
           elevation: 0,
           shadowOpacity: 0,
