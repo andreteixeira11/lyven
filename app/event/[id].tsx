@@ -7,7 +7,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useCart } from "@/hooks/cart-context";
 import { useFavorites } from "@/hooks/favorites-context";
 import { useCalendar } from "@/hooks/calendar-context";
-import { shareEvent as shareEventUtil } from '@/lib/share-utils';
+import { shareEvent as shareEventUtil, shareEventWithImage } from '@/lib/share-utils';
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '@/hooks/theme-context';
 import { hp, responsiveFontSize, responsiveSpacing, moderateScale } from '@/utils/responsive-styles';
@@ -126,6 +126,7 @@ export default function EventDetailScreen() {
       eventDate: event.date,
       eventVenue: `${event.venue.name}, ${event.venue.city}`,
       eventPrice: minPrice,
+      imageUri: event.image,
     };
     
     const shareOptions = [
@@ -133,6 +134,7 @@ export default function EventDetailScreen() {
       'Facebook', 
       'Instagram',
       'Twitter',
+      'Imagem + Mensagem',
       'Copiar Link',
       'Cancelar'
     ];
@@ -146,6 +148,11 @@ export default function EventDetailScreen() {
         },
         async (buttonIndex) => {
           if (buttonIndex === shareOptions.length - 1) return;
+          
+          if (buttonIndex === 4) {
+            await shareEventWithImage(shareParams);
+            return;
+          }
           
           const platforms: ('whatsapp' | 'facebook' | 'instagram' | 'twitter' | 'copy')[] = [
             'whatsapp', 'facebook', 'instagram', 'twitter', 'copy'
@@ -179,6 +186,10 @@ export default function EventDetailScreen() {
             onPress: () => shareEventUtil({ ...shareParams, platform: 'twitter' })
           },
           {
+            text: 'Imagem + Mensagem',
+            onPress: () => shareEventWithImage(shareParams)
+          },
+          {
             text: 'Copiar Link',
             onPress: () => shareEventUtil({ ...shareParams, platform: 'copy' })
           },
@@ -189,7 +200,7 @@ export default function EventDetailScreen() {
         ]
       );
     } else {
-      await shareEventUtil(shareParams);
+      await shareEventWithImage(shareParams);
     }
   };
   

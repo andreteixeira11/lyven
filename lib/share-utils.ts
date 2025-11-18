@@ -26,6 +26,7 @@ export async function shareEvent(params: ShareEventParams): Promise<boolean> {
   } = params;
   
   const deepLink = Linking.createURL(`/event/${eventId}`);
+  const webShareUrl = `https://rork.app/event/${eventId}`;
   
   let shareMessage = `🎉 ${eventTitle}\n`;
   
@@ -55,9 +56,7 @@ export async function shareEvent(params: ShareEventParams): Promise<boolean> {
     shareMessage += `\n\n${shortDescription}`;
   }
   
-  shareMessage += `\n\n🎫 Compra os teus bilhetes aqui:\n${deepLink}`;
-  
-  const webShareUrl = `https://rork.app/event/${eventId}`;
+  shareMessage += `\n\n🎫 Compra os teus bilhetes aqui:\n${webShareUrl}`;
   
   try {
     if (platform === 'copy') {
@@ -67,6 +66,11 @@ export async function shareEvent(params: ShareEventParams): Promise<boolean> {
     }
 
     if (platform === 'whatsapp') {
+      if (Platform.OS === 'web') {
+        window.open(`https://wa.me/?text=${encodeURIComponent(shareMessage)}`, '_blank');
+        return true;
+      }
+      
       const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(shareMessage)}`;
       const canOpen = await Linking.canOpenURL(whatsappUrl);
       
@@ -74,13 +78,8 @@ export async function shareEvent(params: ShareEventParams): Promise<boolean> {
         await Linking.openURL(whatsappUrl);
         return true;
       } else {
-        if (Platform.OS === 'web') {
-          window.open(`https://wa.me/?text=${encodeURIComponent(shareMessage)}`, '_blank');
-          return true;
-        } else {
-          Alert.alert('WhatsApp não encontrado', 'Por favor, instala o WhatsApp para partilhar.');
-          return false;
-        }
+        Alert.alert('WhatsApp não encontrado', 'Por favor, instala o WhatsApp para partilhar.');
+        return false;
       }
     }
 
@@ -166,11 +165,16 @@ export async function shareEvent(params: ShareEventParams): Promise<boolean> {
       }
     }
 
-    const shareResult = await Share.share({
+    const shareOptions: any = {
       message: shareMessage,
-      url: deepLink,
       title: eventTitle,
-    });
+    };
+    
+    if (Platform.OS === 'ios') {
+      shareOptions.url = webShareUrl;
+    }
+
+    const shareResult = await Share.share(shareOptions);
 
     return shareResult.action !== Share.dismissedAction;
   } catch (error) {
@@ -180,22 +184,64 @@ export async function shareEvent(params: ShareEventParams): Promise<boolean> {
   }
 }
 
-export async function shareEventWithImage(params: ShareEventParams & { imageUri: string }): Promise<boolean> {
-  const { imageUri, eventTitle } = params;
+export async function shareEventWithImage(params: ShareEventParams & { imageUri?: string }): Promise<boolean> {
+  const { 
+    imageUri,
+    eventId, 
+    eventTitle, 
+    platform = 'system' 
+  } = params;
+  
+  if (!imageUri || Platform.OS === 'web') {
+    return shareEvent(params);
+  }
   
   try {
-    const isAvailable = await Sharing.isAvailableAsync();
+    const webShareUrl = `https://rork.app/event/${eventId}`;
     
-    if (!isAvailable) {
-      return shareEvent(params);
-    }
+    if (platform === 'system') {
+      const isAvailable = await Sharing.isAvailableAsync();
+      
+      if (!isAvailable) {
+        return shareEvent(params);
+      }
 
-    await Sharing.shareAsync(imageUri, {
-      dialogTitle: `Partilhar ${eventTitle}`,
-      mimeType: 'image/jpeg',
-    });
+      await Sharing.shareAsync(imageUri, {
+        dialogTitle: `Partilhar ${eventTitle}`,
+        mimeType: 'image/jpeg',
+      });
+      
+      return true;
+    }
     
-    return true;
+    if (platform === 'instagram') {
+      const instagramUrl = 'instagram://';
+      const canOpen = await Linking.canOpenURL(instagramUrl);
+      
+      if (canOpen) {
+        await Linking.openURL(instagramUrl);
+        Alert.alert(
+          'Instagram', 
+          'Copia este link para partilhar!',
+          [
+            { text: 'Cancelar', style: 'cancel' },
+            { 
+              text: 'Copiar Link', 
+              onPress: async () => {
+                await Clipboard.setStringAsync(webShareUrl);
+                Alert.alert('Sucesso', 'Link copiado!');
+              }
+            }
+          ]
+        );
+        return true;
+      } else {
+        Alert.alert('Instagram não encontrado', 'Por favor, instala o Instagram para partilhar.');
+        return false;
+      }
+    }
+    
+    return shareEvent(params);
   } catch (error) {
     console.error('Error sharing event with image:', error);
     return shareEvent(params);
