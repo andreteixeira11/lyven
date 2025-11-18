@@ -1,7 +1,7 @@
 import { Tabs } from "expo-router";
 import { Search, Ticket, Home, User, BarChart3, Calendar, Target, Users, Eye, Settings as SettingsIcon, TrendingUp } from "lucide-react-native";
 import React, { useEffect, useRef } from "react";
-import { View, Text, StyleSheet, Animated } from "react-native";
+import { View, Text, StyleSheet, Animated, Platform } from "react-native";
 import { useCart } from "@/hooks/cart-context";
 import { useUser } from "@/hooks/user-context";
 import { useTheme } from "@/hooks/theme-context";
@@ -25,66 +25,97 @@ export default function TabLayout() {
     focused: boolean; 
     children?: React.ReactNode;
   }) => {
-    const scaleAnim = useRef(new Animated.Value(1)).current;
-    const bounceAnim = useRef(new Animated.Value(0)).current;
+    const scaleAnim = useRef(new Animated.Value(focused ? 1 : 0.9)).current;
+    const glowAnim = useRef(new Animated.Value(focused ? 1 : 0)).current;
+    const slideAnim = useRef(new Animated.Value(focused ? 1 : 0)).current;
 
     useEffect(() => {
       if (focused) {
-        Animated.sequence([
-          Animated.timing(scaleAnim, {
-            toValue: 1.2,
-            duration: 150,
+        Animated.parallel([
+          Animated.spring(scaleAnim, {
+            toValue: 1,
+            tension: 100,
+            friction: 8,
             useNativeDriver: true,
           }),
-          Animated.spring(scaleAnim, {
-            toValue: 1.1,
-            tension: 300,
-            friction: 10,
+          Animated.spring(glowAnim, {
+            toValue: 1,
+            tension: 100,
+            friction: 8,
+            useNativeDriver: true,
+          }),
+          Animated.spring(slideAnim, {
+            toValue: 1,
+            tension: 100,
+            friction: 8,
             useNativeDriver: true,
           }),
         ]).start();
-
-        Animated.spring(bounceAnim, {
-          toValue: 1,
-          tension: 300,
-          friction: 10,
-          useNativeDriver: true,
-        }).start();
       } else {
-        Animated.timing(scaleAnim, {
-          toValue: 1,
-          duration: 150,
-          useNativeDriver: true,
-        }).start();
-
-        Animated.timing(bounceAnim, {
-          toValue: 0,
-          duration: 150,
-          useNativeDriver: true,
-        }).start();
+        Animated.parallel([
+          Animated.spring(scaleAnim, {
+            toValue: 0.9,
+            tension: 100,
+            friction: 8,
+            useNativeDriver: true,
+          }),
+          Animated.spring(glowAnim, {
+            toValue: 0,
+            tension: 100,
+            friction: 8,
+            useNativeDriver: true,
+          }),
+          Animated.spring(slideAnim, {
+            toValue: 0,
+            tension: 100,
+            friction: 8,
+            useNativeDriver: true,
+          }),
+        ]).start();
       }
-    }, [focused, scaleAnim, bounceAnim]);
+    }, [focused, scaleAnim, glowAnim, slideAnim]);
+
+    const glowOpacity = glowAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, 1],
+    });
+
+    const translateY = slideAnim.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, -3],
+    });
 
     return (
-      <Animated.View
-        style={[
-          styles.iconContainer,
-          {
-            transform: [
-              { scale: scaleAnim },
-              {
-                translateY: bounceAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: [0, -2],
-                }),
-              },
-            ],
-          },
-        ]}
-      >
-        <Icon size={24} color={color} />
-        {children}
-      </Animated.View>
+      <View style={styles.iconWrapper}>
+        <Animated.View
+          style={[
+            styles.glowContainer,
+            {
+              opacity: glowOpacity,
+              transform: [{ scale: glowAnim }],
+            },
+          ]}
+        >
+          <View style={[styles.glowEffect, { 
+            backgroundColor: colors.primary,
+            shadowColor: colors.primary,
+          }]} />
+        </Animated.View>
+        <Animated.View
+          style={[
+            styles.iconContainer,
+            {
+              transform: [
+                { scale: scaleAnim },
+                { translateY },
+              ],
+            },
+          ]}
+        >
+          <Icon size={24} color={color} strokeWidth={focused ? 2.5 : 2} />
+          {children}
+        </Animated.View>
+      </View>
     );
   };
 
@@ -97,8 +128,17 @@ export default function TabLayout() {
           tabBarInactiveTintColor: colors.textSecondary,
           tabBarStyle: {
             backgroundColor: colors.card,
-            borderTopColor: colors.border,
-            borderTopWidth: 1,
+            borderTopWidth: 0,
+            height: 65,
+            paddingBottom: 8,
+            paddingTop: 8,
+            elevation: 0,
+            shadowOpacity: 0,
+          },
+          tabBarLabelStyle: {
+            fontSize: 11,
+            fontWeight: '600' as const,
+            marginTop: 4,
           },
         }}
       >
@@ -183,8 +223,17 @@ export default function TabLayout() {
           tabBarInactiveTintColor: colors.textSecondary,
           tabBarStyle: {
             backgroundColor: colors.card,
-            borderTopColor: colors.border,
-            borderTopWidth: 1,
+            borderTopWidth: 0,
+            height: 65,
+            paddingBottom: 8,
+            paddingTop: 8,
+            elevation: 0,
+            shadowOpacity: 0,
+          },
+          tabBarLabelStyle: {
+            fontSize: 11,
+            fontWeight: '600' as const,
+            marginTop: 4,
           },
         }}
       >
@@ -264,8 +313,17 @@ export default function TabLayout() {
         tabBarInactiveTintColor: colors.textSecondary,
         tabBarStyle: {
           backgroundColor: colors.card,
-          borderTopColor: colors.border,
-          borderTopWidth: 1,
+          borderTopWidth: 0,
+          height: 65,
+          paddingBottom: 8,
+          paddingTop: 8,
+          elevation: 0,
+          shadowOpacity: 0,
+        },
+        tabBarLabelStyle: {
+          fontSize: 11,
+          fontWeight: '600' as const,
+          marginTop: 4,
         },
       }}
     >
@@ -344,9 +402,41 @@ export default function TabLayout() {
 }
 
 const styles = StyleSheet.create({
+  iconWrapper: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 60,
+    height: 45,
+  },
   iconContainer: {
     alignItems: 'center',
     justifyContent: 'center',
+    zIndex: 2,
+  },
+  glowContainer: {
+    position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 1,
+  },
+  glowEffect: {
+    width: 52,
+    height: 52,
+    borderRadius: 26,
+    opacity: 0.15,
+    ...Platform.select({
+      ios: {
+        shadowOffset: { width: 0, height: 0 },
+        shadowOpacity: 0.4,
+        shadowRadius: 12,
+      },
+      android: {
+        elevation: 8,
+      },
+      web: {
+        boxShadow: '0 0 20px rgba(0, 153, 168, 0.4)',
+      },
+    }),
   },
   badge: {
     position: 'absolute',
@@ -358,6 +448,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 4,
+    zIndex: 3,
   },
   badgeText: {
     fontSize: 12,
