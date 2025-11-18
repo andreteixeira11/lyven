@@ -22,6 +22,7 @@ export async function shareEvent(params: ShareEventParams): Promise<boolean> {
     eventDate,
     eventVenue,
     eventPrice,
+    eventImage,
     platform = 'system' 
   } = params;
   
@@ -66,6 +67,10 @@ export async function shareEvent(params: ShareEventParams): Promise<boolean> {
     }
 
     if (platform === 'whatsapp') {
+      if (eventImage) {
+        return await shareEventWithImage({ ...params, imageUri: eventImage, platform: 'whatsapp' });
+      }
+      
       if (Platform.OS === 'web') {
         window.open(`https://wa.me/?text=${encodeURIComponent(shareMessage)}`, '_blank');
         return true;
@@ -188,7 +193,11 @@ export async function shareEventWithImage(params: ShareEventParams & { imageUri?
   const { 
     imageUri,
     eventId, 
-    eventTitle, 
+    eventTitle,
+    eventDescription,
+    eventDate,
+    eventVenue,
+    eventPrice,
     platform = 'system' 
   } = params;
   
@@ -198,6 +207,56 @@ export async function shareEventWithImage(params: ShareEventParams & { imageUri?
   
   try {
     const webShareUrl = `https://rork.app/event/${eventId}`;
+    
+    let shareMessage = `🎉 ${eventTitle}\n`;
+    
+    if (eventDate) {
+      const formattedDate = new Intl.DateTimeFormat('pt-PT', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(eventDate);
+      shareMessage += `\n📅 ${formattedDate}`;
+    }
+    
+    if (eventVenue) {
+      shareMessage += `\n📍 ${eventVenue}`;
+    }
+    
+    if (eventPrice !== undefined && eventPrice > 0) {
+      shareMessage += `\n💰 A partir de €${eventPrice}`;
+    }
+    
+    if (eventDescription) {
+      const shortDescription = eventDescription.length > 100 
+        ? eventDescription.substring(0, 100) + '...' 
+        : eventDescription;
+      shareMessage += `\n\n${shortDescription}`;
+    }
+    
+    shareMessage += `\n\n🎫 Compra os teus bilhetes aqui:\n${webShareUrl}`;
+    
+    if (platform === 'whatsapp') {
+      const isAvailable = await Sharing.isAvailableAsync();
+      
+      if (!isAvailable) {
+        return shareEvent(params);
+      }
+
+      await Sharing.shareAsync(imageUri, {
+        dialogTitle: `Partilhar ${eventTitle} no WhatsApp`,
+        mimeType: 'image/jpeg',
+        UTI: 'public.jpeg',
+      });
+      
+      setTimeout(() => {
+        Clipboard.setStringAsync(shareMessage);
+      }, 500);
+      
+      return true;
+    }
     
     if (platform === 'system') {
       const isAvailable = await Sharing.isAvailableAsync();
@@ -245,6 +304,168 @@ export async function shareEventWithImage(params: ShareEventParams & { imageUri?
   } catch (error) {
     console.error('Error sharing event with image:', error);
     return shareEvent(params);
+  }
+}
+
+export interface ShareTicketParams {
+  ticketId: string;
+  eventTitle: string;
+  eventDate: Date;
+  eventVenue: string;
+  eventImage?: string;
+  qrCode: string;
+  platform?: 'whatsapp' | 'facebook' | 'instagram' | 'twitter' | 'copy' | 'system';
+}
+
+export async function shareTicket(params: ShareTicketParams): Promise<boolean> {
+  const { 
+    ticketId,
+    eventTitle, 
+    eventDate,
+    eventVenue,
+    eventImage,
+    platform = 'system' 
+  } = params;
+  
+  const formattedDate = new Intl.DateTimeFormat('pt-PT', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  }).format(eventDate);
+  
+  let shareMessage = `🎫 ${eventTitle}\n`;
+  shareMessage += `\n📅 ${formattedDate}`;
+  shareMessage += `\n📍 ${eventVenue}`;
+  shareMessage += `\n\n✨ Vou estar presente neste evento!`;
+  
+  try {
+    if (platform === 'copy') {
+      await Clipboard.setStringAsync(shareMessage);
+      Alert.alert('Copiado', 'Informação do bilhete copiada!');
+      return true;
+    }
+
+    if (platform === 'whatsapp') {
+      if (eventImage) {
+        return await shareTicketWithImage({ ...params, imageUri: eventImage, platform: 'whatsapp' });
+      }
+      
+      if (Platform.OS === 'web') {
+        window.open(`https://wa.me/?text=${encodeURIComponent(shareMessage)}`, '_blank');
+        return true;
+      }
+      
+      const whatsappUrl = `whatsapp://send?text=${encodeURIComponent(shareMessage)}`;
+      const canOpen = await Linking.canOpenURL(whatsappUrl);
+      
+      if (canOpen) {
+        await Linking.openURL(whatsappUrl);
+        return true;
+      } else {
+        Alert.alert('WhatsApp não encontrado', 'Por favor, instala o WhatsApp para partilhar.');
+        return false;
+      }
+    }
+
+    if (Platform.OS === 'web') {
+      const shareData = {
+        title: `Bilhete - ${eventTitle}`,
+        text: shareMessage,
+      };
+
+      if (navigator.share && navigator.canShare(shareData)) {
+        await navigator.share(shareData);
+        return true;
+      } else {
+        await Clipboard.setStringAsync(shareMessage);
+        Alert.alert('Copiado', 'Informação do bilhete copiada!');
+        return true;
+      }
+    }
+
+    const shareOptions: any = {
+      message: shareMessage,
+      title: `Bilhete - ${eventTitle}`,
+    };
+
+    const shareResult = await Share.share(shareOptions);
+    return shareResult.action !== Share.dismissedAction;
+  } catch (error) {
+    console.error('Error sharing ticket:', error);
+    Alert.alert('Erro', 'Não foi possível partilhar o bilhete. Tenta novamente.');
+    return false;
+  }
+}
+
+export async function shareTicketWithImage(params: ShareTicketParams & { imageUri?: string }): Promise<boolean> {
+  const { 
+    imageUri,
+    ticketId,
+    eventTitle,
+    eventDate,
+    eventVenue,
+    platform = 'system' 
+  } = params;
+  
+  if (!imageUri || Platform.OS === 'web') {
+    return shareTicket(params);
+  }
+  
+  try {
+    const formattedDate = new Intl.DateTimeFormat('pt-PT', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    }).format(eventDate);
+    
+    let shareMessage = `🎫 ${eventTitle}\n`;
+    shareMessage += `\n📅 ${formattedDate}`;
+    shareMessage += `\n📍 ${eventVenue}`;
+    shareMessage += `\n\n✨ Vou estar presente neste evento!`;
+    
+    if (platform === 'whatsapp') {
+      const isAvailable = await Sharing.isAvailableAsync();
+      
+      if (!isAvailable) {
+        return shareTicket(params);
+      }
+
+      await Sharing.shareAsync(imageUri, {
+        dialogTitle: `Partilhar bilhete no WhatsApp`,
+        mimeType: 'image/jpeg',
+        UTI: 'public.jpeg',
+      });
+      
+      setTimeout(() => {
+        Clipboard.setStringAsync(shareMessage);
+      }, 500);
+      
+      return true;
+    }
+    
+    if (platform === 'system') {
+      const isAvailable = await Sharing.isAvailableAsync();
+      
+      if (!isAvailable) {
+        return shareTicket(params);
+      }
+
+      await Sharing.shareAsync(imageUri, {
+        dialogTitle: `Partilhar bilhete - ${eventTitle}`,
+        mimeType: 'image/jpeg',
+      });
+      
+      return true;
+    }
+    
+    return shareTicket(params);
+  } catch (error) {
+    console.error('Error sharing ticket with image:', error);
+    return shareTicket(params);
   }
 }
 

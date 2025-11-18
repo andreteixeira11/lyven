@@ -134,7 +134,7 @@ export default function EventDetailScreen() {
       'Facebook', 
       'Instagram',
       'Twitter',
-      'Imagem + Mensagem',
+      'Outro',
       'Copiar Link',
       'Cancelar'
     ];
@@ -186,7 +186,7 @@ export default function EventDetailScreen() {
             onPress: () => shareEventUtil({ ...shareParams, platform: 'twitter' })
           },
           {
-            text: 'Imagem + Mensagem',
+            text: 'Outro',
             onPress: () => shareEventWithImage(shareParams)
           },
           {

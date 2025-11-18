@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image, Platform, Alert, Linking } from "react-native";
-import { ShoppingCart, Ticket, Calendar, MapPin, ChevronRight, Info, ChevronLeft, Wallet } from "lucide-react-native";
+import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image, Platform, Alert, Linking, ActionSheetIOS } from "react-native";
+import { ShoppingCart, Ticket, Calendar, MapPin, ChevronRight, Info, ChevronLeft, Wallet, Share2 } from "lucide-react-native";
 import { useCart } from "@/hooks/cart-context";
 import { mockEvents } from "@/mocks/events";
 import { router } from "expo-router";
@@ -7,6 +7,7 @@ import { useState } from "react";
 import { COLORS } from "@/constants/colors";
 import QRCode from '@/components/QRCode';
 import { trpc } from '@/lib/trpc';
+import { shareTicket } from '@/lib/share-utils';
 
 export default function MyTicketsScreen() {
   const { cartItems, purchasedTickets, getTotalPrice, removeFromCart } = useCart();
@@ -60,6 +61,89 @@ export default function MyTicketsScreen() {
         `Não foi possível adicionar o bilhete à ${platformName}. Tente novamente.`,
         [{ text: 'OK' }]
       );
+    }
+  };
+  
+  const handleShareTicket = async (ticket: any) => {
+    const event = getEventById(ticket.eventId);
+    if (!event) return;
+    
+    const shareParams = {
+      ticketId: ticket.id,
+      eventTitle: event.title,
+      eventDate: event.date,
+      eventVenue: `${event.venue.name}, ${event.venue.city}`,
+      eventImage: event.image,
+      qrCode: ticket.qrCode,
+    };
+    
+    const shareOptions = [
+      'WhatsApp',
+      'Facebook', 
+      'Instagram',
+      'Twitter',
+      'Outro',
+      'Copiar',
+      'Cancelar'
+    ];
+    
+    if (Platform.OS === 'ios') {
+      ActionSheetIOS.showActionSheetWithOptions(
+        {
+          options: shareOptions,
+          cancelButtonIndex: shareOptions.length - 1,
+          title: 'Partilhar Bilhete'
+        },
+        async (buttonIndex) => {
+          if (buttonIndex === shareOptions.length - 1) return;
+          
+          const platforms: ('whatsapp' | 'facebook' | 'instagram' | 'twitter' | 'system' | 'copy')[] = [
+            'whatsapp', 'facebook', 'instagram', 'twitter', 'system', 'copy'
+          ];
+          
+          await shareTicket({
+            ...shareParams,
+            platform: platforms[buttonIndex]
+          });
+        }
+      );
+    } else if (Platform.OS === 'android') {
+      Alert.alert(
+        'Partilhar Bilhete',
+        'Escolhe onde queres partilhar:',
+        [
+          {
+            text: 'WhatsApp',
+            onPress: () => shareTicket({ ...shareParams, platform: 'whatsapp' })
+          },
+          {
+            text: 'Facebook',
+            onPress: () => shareTicket({ ...shareParams, platform: 'facebook' })
+          },
+          {
+            text: 'Instagram',
+            onPress: () => shareTicket({ ...shareParams, platform: 'instagram' })
+          },
+          {
+            text: 'Twitter/X',
+            onPress: () => shareTicket({ ...shareParams, platform: 'twitter' })
+          },
+          {
+            text: 'Outro',
+            onPress: () => shareTicket({ ...shareParams, platform: 'system' })
+          },
+          {
+            text: 'Copiar',
+            onPress: () => shareTicket({ ...shareParams, platform: 'copy' })
+          },
+          {
+            text: 'Cancelar',
+            style: 'cancel'
+          }
+        ]
+      );
+    } else {
+      await shareTicket(shareParams);
     }
   };
 
@@ -182,12 +266,17 @@ export default function MyTicketsScreen() {
                 if (!event || !ticketType) return null;
 
                 return (
-                  <TouchableOpacity 
+                  <View 
                     key={ticket.id} 
                     style={styles.ticketCard}
-                    activeOpacity={0.9}
                   >
                     <Image source={{ uri: event.image }} style={styles.ticketImage} />
+                    <TouchableOpacity 
+                      style={styles.shareTicketButton}
+                      onPress={() => handleShareTicket(ticket)}
+                    >
+                      <Share2 size={20} color={COLORS.white} />
+                    </TouchableOpacity>
                     <View style={styles.ticketContent}>
                       <Text style={styles.ticketTitle}>{event.title}</Text>
                       <Text style={styles.ticketType}>{ticketType.name} • {ticket.quantity} ingresso(s)</Text>
@@ -226,7 +315,7 @@ export default function MyTicketsScreen() {
                         </Text>
                       </TouchableOpacity>
                     </View>
-                  </TouchableOpacity>
+                  </View>
                 );
               })}
             </>
@@ -485,5 +574,22 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontSize: 15,
     fontWeight: '600' as const,
+  },
+  shareTicketButton: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    backgroundColor: COLORS.primary,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 10,
+    elevation: 5,
+    shadowColor: COLORS.black,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
 });
