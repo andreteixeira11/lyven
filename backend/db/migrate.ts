@@ -23,7 +23,8 @@ async function migrate() {
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
-    user_type TEXT NOT NULL CHECK(user_type IN ('normal', 'promoter')),
+    user_type TEXT NOT NULL CHECK(user_type IN ('normal', 'promoter', 'admin')),
+    phone TEXT,
     interests TEXT NOT NULL,
     location_latitude REAL,
     location_longitude REAL,
@@ -99,7 +100,7 @@ async function migrate() {
     website_link TEXT,
     latitude REAL,
     longitude REAL,
-    status TEXT NOT NULL DEFAULT 'published' CHECK(status IN ('draft', 'published', 'cancelled', 'completed')),
+    status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('draft', 'pending', 'published', 'cancelled', 'completed')),
     created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
 
@@ -112,6 +113,8 @@ async function migrate() {
     price REAL NOT NULL,
     qr_code TEXT NOT NULL,
     is_used INTEGER NOT NULL DEFAULT 0,
+    validated_at TEXT,
+    validated_by TEXT,
     purchase_date TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
     valid_until TEXT NOT NULL,
     added_to_calendar INTEGER DEFAULT 0,
@@ -159,12 +162,63 @@ async function migrate() {
     last_updated TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
   );
 
+  CREATE TABLE IF NOT EXISTS push_tokens (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES users(id),
+    token TEXT NOT NULL,
+    platform TEXT NOT NULL CHECK(platform IN ('ios', 'android', 'web')),
+    is_active INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_used TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS notifications (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES users(id),
+    type TEXT NOT NULL CHECK(type IN ('event_approved', 'ad_approved', 'ticket_sold', 'event_reminder', 'follower', 'system', 'new_promoter_event')),
+    title TEXT NOT NULL,
+    message TEXT NOT NULL,
+    data TEXT,
+    is_read INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS verification_codes (
+    id TEXT PRIMARY KEY,
+    email TEXT NOT NULL,
+    code TEXT NOT NULL,
+    name TEXT NOT NULL,
+    password TEXT NOT NULL,
+    expires_at TEXT NOT NULL,
+    is_used INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+
+  CREATE TABLE IF NOT EXISTS payment_methods (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL REFERENCES users(id),
+    type TEXT NOT NULL CHECK(type IN ('bank_transfer', 'mbway', 'paypal', 'stripe')),
+    is_primary INTEGER NOT NULL DEFAULT 0,
+    account_holder_name TEXT,
+    bank_name TEXT,
+    iban TEXT,
+    swift TEXT,
+    phone_number TEXT,
+    email TEXT,
+    account_id TEXT,
+    is_verified INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  );
+
   CREATE INDEX IF NOT EXISTS idx_events_category ON events(category);
   CREATE INDEX IF NOT EXISTS idx_events_city ON events(venue_city);
   CREATE INDEX IF NOT EXISTS idx_events_promoter ON events(promoter_id);
   CREATE INDEX IF NOT EXISTS idx_tickets_user ON tickets(user_id);
   CREATE INDEX IF NOT EXISTS idx_tickets_event ON tickets(event_id);
   CREATE INDEX IF NOT EXISTS idx_tickets_qr ON tickets(qr_code);
+  CREATE INDEX IF NOT EXISTS idx_notifications_user ON notifications(user_id);
+  CREATE INDEX IF NOT EXISTS idx_push_tokens_user ON push_tokens(user_id);
 `);
 
   console.log('✅ Database tables created successfully on Turso!');

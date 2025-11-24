@@ -1,0 +1,6 @@
+# Turso Database Configuration
+TURSO_DATABASE_URL=libsql://lyvendb-lyven.aws-eu-west-1.turso.io
+TURSO_AUTH_TOKEN=eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJhIjoicnciLCJpYXQiOjE3NjM5NzkxNjEsImlkIjoiZTY3NGY2YTItNjgyYi00MzhhLThmNTMtZGZlY2U5YjJjZDY2IiwicmlkIjoiMTMxOTkzODAtOTFlZi00YmQ1LWJiZTctM2M1YjUwZmRhOTQ1In0.fwnKOfzXNPNrshnPUN01d1PxF8LL7sWpfKCxgxUKVy_i-JgQG-mLQ3gWT9WiQaxKD-LXXXID1DW1J9c5qzoKBw
+
+# Expo Public (accessible in frontend)
+EXPO_PUBLIC_TOOLKIT_URL=https://toolkit.rork.com
