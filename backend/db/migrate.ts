@@ -1,10 +1,24 @@
-import Database from 'better-sqlite3';
+import { createClient } from '@libsql/client';
 
-const sqlite = new Database('events.db');
+const tursoUrl = process.env.TURSO_DATABASE_URL;
+const tursoToken = process.env.TURSO_AUTH_TOKEN;
 
-console.log('🚀 Creating database tables...');
+if (!tursoUrl || !tursoToken) {
+  throw new Error(
+    '❌ Missing Turso credentials!\n' +
+    'Please set TURSO_DATABASE_URL and TURSO_AUTH_TOKEN in your .env file'
+  );
+}
 
-sqlite.exec(`
+const client = createClient({
+  url: tursoUrl,
+  authToken: tursoToken,
+});
+
+console.log('🚀 Creating database tables on Turso...');
+
+async function migrate() {
+  await client.execute(`
   CREATE TABLE IF NOT EXISTS users (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
@@ -153,7 +167,11 @@ sqlite.exec(`
   CREATE INDEX IF NOT EXISTS idx_tickets_qr ON tickets(qr_code);
 `);
 
-console.log('✅ Database tables created successfully!');
-console.log('📊 Database ready at: events.db');
+  console.log('✅ Database tables created successfully on Turso!');
+  console.log('📊 Database URL:', tursoUrl);
+}
 
-sqlite.close();
+migrate().catch((error) => {
+  console.error('❌ Migration failed:', error);
+  process.exit(1);
+});
