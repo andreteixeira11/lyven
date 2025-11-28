@@ -10,20 +10,20 @@ export const sendPushNotificationProcedure = publicProcedure
       type: z.enum(['event_approved', 'ad_approved', 'ticket_sold', 'event_reminder', 'follower', 'system']),
       title: z.string(),
       message: z.string(),
-      data: z.record(z.any()).optional(),
+      data: z.record(z.string(), z.any()).optional(),
     })
   )
   .mutation(async ({ input }) => {
     console.log('🔔 Enviando notificação push:', input.title);
 
-    const notifId = `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const notifId = `notif_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
     const notification = await db.insert(notifications).values({
       id: notifId,
       userId: input.userId,
       type: input.type,
       title: input.title,
       message: input.message,
-      data: input.data ? JSON.stringify(input.data) : undefined,
+      data: input.data ? JSON.stringify(input.data) : null,
       isRead: false,
     }).returning();
 

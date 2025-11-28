@@ -101,16 +101,19 @@ export const [UserProvider, useUser] = createContextHook(() => {
     };
     
     try {
+      const language = userData.preferences?.language;
+      const supportedLanguage = language === 'pt' || language === 'en' ? language : 'pt';
+      
       await trpcClient.users.updateOnboarding.mutate({
         id: user.id,
         phone: userData.phone,
         interests: userData.interests,
-        locationCity: userData.locationCity,
-        locationRegion: userData.locationRegion,
+        locationCity: userData.location?.city,
+        locationRegion: userData.location?.region,
         locationLatitude: userData.location?.latitude,
         locationLongitude: userData.location?.longitude,
         preferencesNotifications: userData.preferences?.notifications,
-        preferencesLanguage: userData.preferences?.language,
+        preferencesLanguage: supportedLanguage,
         preferencesPriceMin: userData.preferences?.priceRange?.min,
         preferencesPriceMax: userData.preferences?.priceRange?.max,
         preferencesEventTypes: userData.preferences?.eventTypes,

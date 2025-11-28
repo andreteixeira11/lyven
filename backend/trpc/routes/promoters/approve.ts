@@ -25,7 +25,7 @@ export const approvePromoterProcedure = publicProcedure
       .get();
 
     if (promoter) {
-      const notificationId = `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const notificationId = `notif_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
       await db.insert(notifications).values({
         id: notificationId,
         userId: promoter.userId,

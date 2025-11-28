@@ -37,12 +37,16 @@ export default function LanguageScreen() {
     
     await switchLanguage(languageCode);
     
-    await updateUser({
-      preferences: {
-        ...user?.preferences,
-        language: languageCode,
-      },
-    });
+    if (languageCode === 'pt' || languageCode === 'en') {
+      await updateUser({
+        preferences: {
+          notifications: user?.preferences?.notifications ?? true,
+          language: languageCode,
+          priceRange: user?.preferences?.priceRange ?? { min: 0, max: 1000 },
+          eventTypes: user?.preferences?.eventTypes ?? [],
+        },
+      });
+    }
   };
 
   return (
