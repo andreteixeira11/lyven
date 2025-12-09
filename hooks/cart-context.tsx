@@ -14,6 +14,7 @@ interface CartContextType {
   getTotalPrice: () => number;
   getTotalItems: () => number;
   completePurchase: (userId: string) => Promise<boolean>;
+  oneClickCheckout: (eventId: string, ticketTypeId: string, userId: string) => Promise<boolean>;
 }
 
 export const [CartProvider, useCart] = createContextHook<CartContextType>(() => {
@@ -157,6 +158,46 @@ export const [CartProvider, useCart] = createContextHook<CartContextType>(() => 
     }
   };
 
+  const oneClickCheckout = async (eventId: string, ticketTypeId: string, userId: string, price: number = 0): Promise<boolean> => {
+    try {
+      const timestamp = Date.now();
+      const uniqueSuffix = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+      const ticketId = `ticket_${timestamp}_${uniqueSuffix}`;
+      const qrCode = `LYVEN_${ticketId}_${eventId}_${uniqueSuffix.toUpperCase()}`;
+      const validUntil = new Date();
+      validUntil.setMonth(validUntil.getMonth() + 6);
+
+      const ticketToCreate = {
+        id: ticketId,
+        eventId,
+        userId,
+        ticketTypeId,
+        quantity: 1,
+        price,
+        qrCode,
+        validUntil: validUntil.toISOString(),
+      };
+
+      await trpcClient.tickets.batchCreate.mutate({ tickets: [ticketToCreate] });
+      console.log('✅ Bilhete 1-Click criado com sucesso');
+
+      const newTicket: PurchasedTicket = {
+        id: ticketToCreate.id,
+        eventId: ticketToCreate.eventId,
+        ticketTypeId: ticketToCreate.ticketTypeId,
+        quantity: ticketToCreate.quantity,
+        purchaseDate: new Date(),
+        qrCode: ticketToCreate.qrCode,
+      };
+
+      setPurchasedTickets((prev) => [...prev, newTicket]);
+      return true;
+    } catch (error) {
+      console.error('❌ Erro no checkout 1-click:', error);
+      return false;
+    }
+  };
+
   return {
     cartItems,
     purchasedTickets,
@@ -166,6 +207,7 @@ export const [CartProvider, useCart] = createContextHook<CartContextType>(() => 
     clearCart,
     getTotalPrice,
     getTotalItems,
-    completePurchase
+    completePurchase,
+    oneClickCheckout
   };
 });

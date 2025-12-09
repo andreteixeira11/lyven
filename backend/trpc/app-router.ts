@@ -76,6 +76,23 @@ import { sendVerificationCodeProcedure } from "./routes/auth/send-verification-c
 import { verifyCodeProcedure } from "./routes/auth/verify-code";
 import { getSmartRecommendationsProcedure } from "./routes/recommendations/get-smart-recommendations";
 import { getAIRecommendationsProcedure } from "./routes/recommendations/get-ai-recommendations";
+import { trackView } from "./routes/events/track-view";
+import { getActiveViewers } from "./routes/events/get-active-viewers";
+import { searchEventsProcedure } from "./routes/events/search";
+import { getSearchSuggestionsProcedure } from "./routes/events/search-suggestions";
+import { createAffiliateProcedure } from "./routes/affiliates/create";
+import { getAffiliateByUserProcedure } from "./routes/affiliates/get-by-user";
+import { getAffiliateByCodeProcedure } from "./routes/affiliates/get-by-code";
+import { recordAffiliateSaleProcedure } from "./routes/affiliates/record-sale";
+import { getAffiliateStatsProcedure } from "./routes/affiliates/stats";
+import { createBundleProcedure } from "./routes/bundles/create";
+import { listBundlesProcedure } from "./routes/bundles/list";
+import { getBundleProcedure } from "./routes/bundles/get";
+import { createPriceAlertProcedure } from "./routes/price-alerts/create";
+import { listPriceAlertsProcedure } from "./routes/price-alerts/list";
+import { deletePriceAlertProcedure } from "./routes/price-alerts/delete";
+import { createVerificationProcedure } from "./routes/identity/create-verification";
+import { getVerificationStatusProcedure } from "./routes/identity/get-status";
 
 import { listPaymentMethodsProcedure } from "./routes/payment-methods/list";
 import { createPaymentMethodProcedure } from "./routes/payment-methods/create";
@@ -121,6 +138,10 @@ export const appRouter = createTRPCRouter({
     getPendingDetails: getPendingEventDetailsProcedure,
     setFeatured: setEventFeaturedProcedure,
     statistics: getEventStatisticsProcedure,
+    trackView: trackView,
+    getActiveViewers: getActiveViewers,
+    search: searchEventsProcedure,
+    searchSuggestions: getSearchSuggestionsProcedure,
   }),
   
   tickets: createTRPCRouter({
@@ -197,6 +218,31 @@ export const appRouter = createTRPCRouter({
     update: updatePaymentMethodProcedure,
     delete: deletePaymentMethodProcedure,
     setPrimary: setPrimaryPaymentMethodProcedure,
+  }),
+  
+  affiliates: createTRPCRouter({
+    create: createAffiliateProcedure,
+    getByUser: getAffiliateByUserProcedure,
+    getByCode: getAffiliateByCodeProcedure,
+    recordSale: recordAffiliateSaleProcedure,
+    stats: getAffiliateStatsProcedure,
+  }),
+  
+  bundles: createTRPCRouter({
+    create: createBundleProcedure,
+    list: listBundlesProcedure,
+    get: getBundleProcedure,
+  }),
+  
+  priceAlerts: createTRPCRouter({
+    create: createPriceAlertProcedure,
+    list: listPriceAlertsProcedure,
+    delete: deletePriceAlertProcedure,
+  }),
+  
+  identity: createTRPCRouter({
+    createVerification: createVerificationProcedure,
+    getStatus: getVerificationStatusProcedure,
   }),
 });
 

@@ -192,3 +192,63 @@ export const paymentMethods = sqliteTable('payment_methods', {
   createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
   updatedAt: text('updated_at').notNull().default(sql`CURRENT_TIMESTAMP`),
 });
+
+export const eventViews = sqliteTable('event_views', {
+  id: text('id').primaryKey(),
+  eventId: text('event_id').notNull().references(() => events.id),
+  userId: text('user_id'),
+  sessionId: text('session_id').notNull(),
+  viewedAt: text('viewed_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+  lastActiveAt: text('last_active_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const affiliates = sqliteTable('affiliates', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id),
+  code: text('code').notNull().unique(),
+  commissionRate: real('commission_rate').notNull().default(0.1),
+  totalEarnings: real('total_earnings').notNull().default(0),
+  totalSales: integer('total_sales').notNull().default(0),
+  isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const affiliateSales = sqliteTable('affiliate_sales', {
+  id: text('id').primaryKey(),
+  affiliateId: text('affiliate_id').notNull().references(() => affiliates.id),
+  ticketId: text('ticket_id').notNull().references(() => tickets.id),
+  commission: real('commission').notNull(),
+  status: text('status', { enum: ['pending', 'approved', 'paid'] }).notNull().default('pending'),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const eventBundles = sqliteTable('event_bundles', {
+  id: text('id').primaryKey(),
+  name: text('name').notNull(),
+  description: text('description').notNull(),
+  eventIds: text('event_ids').notNull(),
+  discount: real('discount').notNull(),
+  image: text('image').notNull(),
+  isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+  validUntil: text('valid_until').notNull(),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const priceAlerts = sqliteTable('price_alerts', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id),
+  eventId: text('event_id').notNull().references(() => events.id),
+  targetPrice: real('target_price').notNull(),
+  isActive: integer('is_active', { mode: 'boolean' }).notNull().default(true),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+});
+
+export const identityVerifications = sqliteTable('identity_verifications', {
+  id: text('id').primaryKey(),
+  userId: text('user_id').notNull().references(() => users.id),
+  documentType: text('document_type', { enum: ['passport', 'id_card', 'drivers_license'] }).notNull(),
+  documentNumber: text('document_number').notNull(),
+  status: text('status', { enum: ['pending', 'approved', 'rejected'] }).notNull().default('pending'),
+  verifiedAt: text('verified_at'),
+  createdAt: text('created_at').notNull().default(sql`CURRENT_TIMESTAMP`),
+});
