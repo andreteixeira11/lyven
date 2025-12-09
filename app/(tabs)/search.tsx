@@ -36,6 +36,8 @@ import { useUser } from '@/hooks/user-context';
 import AuthGuard from '@/components/AuthGuard';
 import { Event } from '@/types/event';
 import { mockEvents } from '@/mocks/events';
+import { trpcClient } from '@/lib/trpc';
+import { useQuery } from '@tanstack/react-query';
 
 interface AdminUser {
   id: string;
@@ -73,6 +75,22 @@ function NormalUserSearchContent() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
+  const { data: searchResults, isLoading: isSearching } = useQuery({
+    queryKey: ['eventSearch', searchQuery, selectedCategory],
+    queryFn: () => trpcClient.events.search.query({
+      query: searchQuery,
+      category: selectedCategory === 'all' ? undefined : selectedCategory,
+      limit: 50,
+    }),
+    enabled: searchQuery.length > 0,
+  });
+
+  const { data: suggestions } = useQuery({
+    queryKey: ['searchSuggestions', searchQuery],
+    queryFn: () => trpcClient.events.searchSuggestions.query({ query: searchQuery }),
+    enabled: searchQuery.length >= 2,
+  });
+
   const categories = [
     { id: 'all', label: 'Todos', icon: '🎉' },
     { id: 'music', label: 'Música', icon: '🎵' },
@@ -82,13 +100,33 @@ function NormalUserSearchContent() {
     { id: 'dance', label: 'Dança', icon: '💃' },
   ];
 
-  const filteredEvents = mockEvents.filter((event: Event) => {
-    const matchesSearch = event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         event.venue.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         event.venue.city.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || event.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  const filteredEvents = searchQuery.length > 0 && searchResults
+    ? searchResults.map((result: any) => ({
+        ...result,
+        date: new Date(result.date),
+        venue: {
+          id: result.venueId || 'unknown',
+          name: result.venueName || '',
+          address: result.venueAddress || '',
+          city: result.venueCity || '',
+          capacity: result.venueCapacity || 0
+        },
+        promoter: {
+          id: result.promoterId || 'unknown',
+          name: result.promoterName || 'Unknown',
+          verified: true,
+          followersCount: 0,
+          image: '',
+          description: ''
+        },
+        ticketTypes: [],
+        artists: [],
+        isSoldOut: false
+      }))
+    : mockEvents.filter((event: Event) => {
+        const matchesCategory = selectedCategory === 'all' || event.category === selectedCategory;
+        return matchesCategory;
+      });
 
   const featuredEvents = filteredEvents.filter(e => e.isFeatured);
   const regularEvents = filteredEvents.filter(e => !e.isFeatured);
@@ -151,10 +189,10 @@ function NormalUserSearchContent() {
         <View style={styles.eventCardInfo}>
           <MapPin size={14} color={colors.textSecondary} />
           <Text style={[styles.eventCardText, { color: colors.textSecondary }]} numberOfLines={1}>
-            {event.venue.city}
+            {event.venue?.city || ''}
           </Text>
         </View>
-        {event.ticketTypes.length > 0 && (
+        {event.ticketTypes && event.ticketTypes.length > 0 && (
           <View style={styles.eventCardPrice}>
             <Text style={styles.eventCardPriceText}>
               €{Math.min(...event.ticketTypes.map(t => t.price))}
@@ -168,15 +206,32 @@ function NormalUserSearchContent() {
   return (
     <View style={[styles.container, { paddingTop: insets.top, backgroundColor: colors.background }]}>
       <View style={[styles.searchHeader, { backgroundColor: colors.background }]}>
-        <View style={[styles.searchInputWrapper, { backgroundColor: colors.card }]}>
-          <SearchIcon size={20} color={colors.textSecondary} />
-          <TextInput
-            style={[styles.searchInput, { color: colors.text }]}
-            placeholder="Procurar eventos..."
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            placeholderTextColor={colors.textSecondary}
-          />
+        <View>
+          <View style={[styles.searchInputWrapper, { backgroundColor: colors.card }]}>
+            <SearchIcon size={20} color={colors.textSecondary} />
+            <TextInput
+              style={[styles.searchInput, { color: colors.text }]}
+              placeholder="Procurar eventos..."
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              placeholderTextColor={colors.textSecondary}
+            />
+          </View>
+          
+          {suggestions && suggestions.length > 0 && searchQuery.length >= 2 && (
+            <View style={[styles.suggestionsContainer, { backgroundColor: colors.card }]}>
+              {suggestions.map((suggestion: string, index: number) => (
+                <TouchableOpacity
+                  key={index}
+                  style={[styles.suggestionItem, { borderBottomColor: colors.border }]}
+                  onPress={() => setSearchQuery(suggestion)}
+                >
+                  <SearchIcon size={16} color={colors.textSecondary} />
+                  <Text style={[styles.suggestionText, { color: colors.text }]}>{suggestion}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
         </View>
       </View>
 
@@ -211,7 +266,11 @@ function NormalUserSearchContent() {
       </ScrollView>
 
       <ScrollView style={styles.contentScroll} showsVerticalScrollIndicator={false}>
-        {filteredEvents.length > 0 ? (
+        {isSearching ? (
+          <View style={styles.loadingContainer}>
+            <Text style={[styles.loadingText, { color: colors.textSecondary }]}>A procurar...</Text>
+          </View>
+        ) : filteredEvents.length > 0 ? (
           <View style={styles.eventsContent}>
             {featuredEvents.length > 0 && (
               <View style={styles.section}>
@@ -1460,5 +1519,38 @@ const styles = StyleSheet.create({
     fontSize: 15,
     marginTop: 8,
     textAlign: 'center',
+  },
+  suggestionsContainer: {
+    position: 'absolute',
+    top: 60,
+    left: 0,
+    right: 0,
+    borderRadius: 12,
+    marginHorizontal: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 6,
+    zIndex: 1000,
+  },
+  suggestionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    gap: 12,
+    borderBottomWidth: 1,
+  },
+  suggestionText: {
+    fontSize: 15,
+    flex: 1,
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 40,
+  },
+  loadingText: {
+    fontSize: 16,
   },
 });

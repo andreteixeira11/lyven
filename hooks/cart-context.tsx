@@ -14,7 +14,7 @@ interface CartContextType {
   getTotalPrice: () => number;
   getTotalItems: () => number;
   completePurchase: (userId: string) => Promise<boolean>;
-  oneClickCheckout: (eventId: string, ticketTypeId: string, userId: string) => Promise<boolean>;
+  oneClickCheckout: (eventId: string, ticketTypeId: string, userId: string, price?: number) => Promise<boolean>;
 }
 
 export const [CartProvider, useCart] = createContextHook<CartContextType>(() => {
@@ -158,7 +158,7 @@ export const [CartProvider, useCart] = createContextHook<CartContextType>(() => 
     }
   };
 
-  const oneClickCheckout = async (eventId: string, ticketTypeId: string, userId: string, price: number = 0): Promise<boolean> => {
+  const oneClickCheckout = async (eventId: string, ticketTypeId: string, userId: string, price?: number): Promise<boolean> => {
     try {
       const timestamp = Date.now();
       const uniqueSuffix = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
@@ -173,7 +173,7 @@ export const [CartProvider, useCart] = createContextHook<CartContextType>(() => 
         userId,
         ticketTypeId,
         quantity: 1,
-        price,
+        price: price || 0,
         qrCode,
         validUntil: validUntil.toISOString(),
       };

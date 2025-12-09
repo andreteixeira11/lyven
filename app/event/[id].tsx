@@ -11,14 +11,18 @@ import { shareEvent as shareEventUtil, shareEventWithImage } from '@/lib/share-u
 import * as Haptics from 'expo-haptics';
 import { useTheme } from '@/hooks/theme-context';
 import { hp, responsiveFontSize, responsiveSpacing, moderateScale } from '@/utils/responsive-styles';
+import { SocialProof } from '@/components/SocialProof';
+import { FOMOAlert } from '@/components/FOMOAlert';
+import { useUser } from '@/hooks/user-context';
 
 export default function EventDetailScreen() {
   const { id } = useLocalSearchParams();
   const event = mockEvents.find(e => e.id === id);
-  const { addToCart } = useCart();
+  const { addToCart, oneClickCheckout } = useCart();
   const { isFavorite, addToFavorites, removeFromFavorites } = useFavorites();
   const { addToCalendar, setReminder, hasReminder, isEventInCalendar } = useCalendar();
   const { colors } = useTheme();
+  const { user } = useUser();
   const [selectedTickets, setSelectedTickets] = useState<{ [key: string]: number }>({});
   const [isLiked, setIsLiked] = useState(false);
 
@@ -97,6 +101,35 @@ export default function EventDetailScreen() {
     
     setSelectedTickets({});
     router.push('/(tabs)/tickets');
+  };
+
+  const handleOneClickBuy = async (ticketId: string, price: number) => {
+    if (!user?.id) {
+      Alert.alert('Erro', 'É necessário fazer login para comprar bilhetes');
+      return;
+    }
+
+    if (Platform.OS !== 'web') {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    }
+
+    const success = await oneClickCheckout(event.id, ticketId, user.id, price);
+
+    if (success) {
+      Alert.alert(
+        'Sucesso! 🎉',
+        'O teu bilhete foi comprado com sucesso!',
+        [
+          {
+            text: 'Ver Bilhete',
+            onPress: () => router.push('/my-tickets' as any)
+          },
+          { text: 'OK' }
+        ]
+      );
+    } else {
+      Alert.alert('Erro', 'Não foi possível completar a compra. Tenta novamente.');
+    }
   };
 
   const toggleLike = async () => {
@@ -330,6 +363,11 @@ export default function EventDetailScreen() {
 
         {/* Content */}
         <View style={[styles.content, { backgroundColor: colors.background }]}>
+          {/* Social Proof */}
+          {typeof id === 'string' && <SocialProof eventId={id} />}
+
+          {/* FOMO Alert */}
+          {!event.isSoldOut && <FOMOAlert ticketTypes={event.ticketTypes} />}
           {event.isSoldOut && (
             <View style={styles.titleSection}>
               <View style={[styles.soldOutBadge, { backgroundColor: colors.primary }]}>
@@ -503,25 +541,33 @@ export default function EventDetailScreen() {
                     {ticket.available === 0 ? (
                       <Text style={[styles.soldOutTicket, { color: colors.primary }]}>Esgotado</Text>
                     ) : (
-                      <View style={[styles.quantitySelector, { backgroundColor: colors.background, borderColor: colors.border }]}>
-                        <TouchableOpacity 
-                          style={[styles.quantityButton, { backgroundColor: colors.primary }]}
-                          onPress={() => handleTicketChange(ticket.id, -1)}
-                          disabled={!selectedTickets[ticket.id]}
+                      <>
+                        <TouchableOpacity
+                          style={[styles.oneClickButton, { backgroundColor: colors.primary }]}
+                          onPress={() => handleOneClickBuy(ticket.id, ticket.price)}
                         >
-                          <Text style={styles.quantityButtonText}>−</Text>
+                          <Text style={styles.oneClickButtonText}>Comprar Já</Text>
                         </TouchableOpacity>
-                        <Text style={[styles.quantityText, { color: colors.primary }]}>
-                          {selectedTickets[ticket.id] || 0}
-                        </Text>
-                        <TouchableOpacity 
-                          style={[styles.quantityButton, { backgroundColor: colors.primary }]}
-                          onPress={() => handleTicketChange(ticket.id, 1)}
-                          disabled={selectedTickets[ticket.id] >= ticket.maxPerPerson}
-                        >
-                          <Text style={styles.quantityButtonText}>+</Text>
-                        </TouchableOpacity>
-                      </View>
+                        <View style={[styles.quantitySelector, { backgroundColor: colors.background, borderColor: colors.border }]}>
+                          <TouchableOpacity 
+                            style={[styles.quantityButton, { backgroundColor: colors.primary }]}
+                            onPress={() => handleTicketChange(ticket.id, -1)}
+                            disabled={!selectedTickets[ticket.id]}
+                          >
+                            <Text style={styles.quantityButtonText}>−</Text>
+                          </TouchableOpacity>
+                          <Text style={[styles.quantityText, { color: colors.primary }]}>
+                            {selectedTickets[ticket.id] || 0}
+                          </Text>
+                          <TouchableOpacity 
+                            style={[styles.quantityButton, { backgroundColor: colors.primary }]}
+                            onPress={() => handleTicketChange(ticket.id, 1)}
+                            disabled={selectedTickets[ticket.id] >= ticket.maxPerPerson}
+                          >
+                            <Text style={styles.quantityButtonText}>+</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </>
                     )}
                   </View>
                 </View>
@@ -891,7 +937,21 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   ticketActions: {
+    flexDirection: 'column',
+    alignItems: 'stretch',
+    gap: 8,
+  },
+  oneClickButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 8,
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  oneClickButtonText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold' as const,
   },
   soldOutTicket: {
     color: '#0099a8',
