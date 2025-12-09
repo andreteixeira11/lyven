@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
   },
   infoCard: {
     padding: 30,
-    borderRadius: 12,
+    borderRadius: 24,
     marginBottom: 20,
     alignItems: 'center',
   },
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
   },
   detailsCard: {
     padding: 20,
-    borderRadius: 12,
+    borderRadius: 24,
     marginBottom: 20,
   },
   detailsTitle: {
@@ -216,7 +216,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 24,
     gap: 8,
     marginBottom: 12,
   },
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 24,
     borderWidth: 2,
     marginBottom: 20,
   },
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
   },
   noteCard: {
     padding: 16,
-    borderRadius: 12,
+    borderRadius: 24,
   },
   noteText: {
     fontSize: 13,

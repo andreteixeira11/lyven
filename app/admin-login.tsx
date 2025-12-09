@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.white,
-    borderRadius: 12,
+    borderRadius: 24,
     marginBottom: 16,
     paddingHorizontal: 16,
     borderWidth: 1,
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
   },
   button: {
     backgroundColor: COLORS.primary,
-    borderRadius: 12,
+    borderRadius: 24,
     height: 50,
     justifyContent: 'center',
     alignItems: 'center',
