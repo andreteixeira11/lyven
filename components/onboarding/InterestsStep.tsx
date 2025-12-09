@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   tabs: {
     flexDirection: 'row',
     backgroundColor: COLORS.card,
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 4,
     marginBottom: 20,
   },
@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 12,
     paddingHorizontal: 16,
-    borderRadius: 8,
+    borderRadius: 12,
     alignItems: 'center',
   },
   tabActive: {

@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.white,
     borderWidth: 2,
     borderColor: COLORS.primary,
-    borderRadius: 12,
+    borderRadius: 20,
     marginTop: 8,
   },
   changeButtonText: {
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     height: 50,
-    borderRadius: 12,
+    borderRadius: 25,
     paddingHorizontal: 24,
     gap: 8,
   },

@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     backgroundColor: COLORS.card,
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 16,
   },
   preferenceContent: {
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
   },
   priceRange: {
     backgroundColor: COLORS.card,
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 16,
     borderWidth: 1,
     borderColor: COLORS.primary,
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
   languageOption: {
     flex: 1,
     backgroundColor: COLORS.card,
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 16,
     borderWidth: 1,
     borderColor: COLORS.primary,
