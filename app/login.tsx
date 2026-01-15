@@ -434,6 +434,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: 52,
     fontSize: 16,
+    outlineStyle: 'none' as const,
   },
   button: {
     borderRadius: RADIUS.md,
