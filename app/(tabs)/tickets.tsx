@@ -97,8 +97,12 @@ function NormalUserTicketsContent() {
 
   const panResponder = useRef(
     PanResponder.create({
+      onStartShouldSetPanResponder: () => false,
       onMoveShouldSetPanResponder: (_, gestureState) => {
-        return Math.abs(gestureState.dx) > 10 && Math.abs(gestureState.dy) < 30;
+        return Math.abs(gestureState.dx) > 15 && Math.abs(gestureState.dy) < 20;
+      },
+      onMoveShouldSetPanResponderCapture: (_, gestureState) => {
+        return Math.abs(gestureState.dx) > 15 && Math.abs(gestureState.dy) < 20;
       },
       onPanResponderMove: (_, gestureState) => {
         translateX.setValue(gestureState.dx);
@@ -119,6 +123,7 @@ function NormalUserTicketsContent() {
           friction: 10,
         }).start();
       },
+      onPanResponderTerminationRequest: () => false,
     })
   ).current;
 
