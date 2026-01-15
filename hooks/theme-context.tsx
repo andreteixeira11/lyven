@@ -7,45 +7,63 @@ export type Theme = 'light' | 'dark' | 'system';
 
 interface ThemeColors {
   primary: string;
+  primaryLight: string;
   background: string;
   card: string;
+  cardElevated: string;
+  surface: string;
   text: string;
   textSecondary: string;
+  textLight: string;
   border: string;
+  borderLight: string;
   notification: string;
   success: string;
   error: string;
   warning: string;
+  info: string;
   white: string;
   black: string;
 }
 
 const lightColors: ThemeColors = {
   primary: '#0099a8',
+  primaryLight: '#E6F6F7',
   background: '#FFFFFF',
-  card: '#F0F9FA',
-  text: '#000000',
-  textSecondary: '#666666',
-  border: '#E0E0E0',
-  notification: '#FF385C',
-  success: '#4CAF50',
-  error: '#F44336',
-  warning: '#FF9800',
+  card: '#FFFFFF',
+  cardElevated: '#FFFFFF',
+  surface: '#F9FAFB',
+  text: '#1A1A1A',
+  textSecondary: '#6B7280',
+  textLight: '#9CA3AF',
+  border: '#E5E7EB',
+  borderLight: '#F3F4F6',
+  notification: '#EF4444',
+  success: '#10B981',
+  error: '#EF4444',
+  warning: '#F59E0B',
+  info: '#3B82F6',
   white: '#FFFFFF',
   black: '#000000',
 };
 
 const darkColors: ThemeColors = {
-  primary: '#00C4D8',
-  background: '#121212',
-  card: '#1E1E1E',
-  text: '#FFFFFF',
-  textSecondary: '#B0B0B0',
-  border: '#2C2C2C',
-  notification: '#FF6B85',
-  success: '#66BB6A',
-  error: '#EF5350',
-  warning: '#FFA726',
+  primary: '#00B4C6',
+  primaryLight: '#1A3A3D',
+  background: '#0F0F0F',
+  card: '#1A1A1A',
+  cardElevated: '#242424',
+  surface: '#141414',
+  text: '#F9FAFB',
+  textSecondary: '#9CA3AF',
+  textLight: '#6B7280',
+  border: '#2D2D2D',
+  borderLight: '#1F1F1F',
+  notification: '#F87171',
+  success: '#34D399',
+  error: '#F87171',
+  warning: '#FBBF24',
+  info: '#60A5FA',
   white: '#FFFFFF',
   black: '#000000',
 };

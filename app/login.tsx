@@ -17,8 +17,8 @@ import {
 import { User, Mail, Eye, EyeOff, Building2 } from 'lucide-react-native';
 import { useUser } from '@/hooks/user-context';
 import { router } from 'expo-router';
-import { COLORS } from '@/constants/colors';
-import { trpcClient } from '@/lib/trpc';
+import { RADIUS, SHADOWS, SPACING } from '@/constants/colors';
+import { useTheme } from '@/hooks/theme-context';
 
 export default function LoginScreen() {
   const [userType, setUserType] = useState<'normal' | 'promoter'>('normal');
@@ -32,7 +32,8 @@ export default function LoginScreen() {
   const [logoClickCount, setLogoClickCount] = useState(0);
   const logoClickTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   
-  const { createUser, updateUser } = useUser();
+  const { updateUser } = useUser();
+  const { colors } = useTheme();
   
   const saveUser = async (userData: any) => {
     await updateUser(userData);
@@ -181,8 +182,8 @@ export default function LoginScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.gradient}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={[styles.gradient, { backgroundColor: colors.background }]}>
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={styles.keyboardView}
@@ -218,18 +219,20 @@ export default function LoginScreen() {
                 <TouchableOpacity
                   style={[
                     styles.userTypeButton,
-                    userType === 'normal' && styles.userTypeButtonActive,
+                    { backgroundColor: colors.card, borderColor: colors.border },
+                    userType === 'normal' && { backgroundColor: colors.primary, borderColor: colors.primary },
                   ]}
                   onPress={() => {
                     setUserType('normal');
                     setIsLogin(true);
                   }}
                 >
-                  <User size={20} color={userType === 'normal' ? COLORS.white : COLORS.primary} />
+                  <User size={20} color={userType === 'normal' ? colors.white : colors.primary} />
                   <Text
                     style={[
                       styles.userTypeText,
-                      userType === 'normal' && styles.userTypeTextActive,
+                      { color: colors.primary },
+                      userType === 'normal' && { color: colors.white },
                     ]}
                   >
                     Utilizador
@@ -239,18 +242,20 @@ export default function LoginScreen() {
                 <TouchableOpacity
                   style={[
                     styles.userTypeButton,
-                    userType === 'promoter' && styles.userTypeButtonActive,
+                    { backgroundColor: colors.card, borderColor: colors.border },
+                    userType === 'promoter' && { backgroundColor: colors.primary, borderColor: colors.primary },
                   ]}
                   onPress={() => {
                     setUserType('promoter');
                     setIsLogin(true);
                   }}
                 >
-                  <Building2 size={20} color={userType === 'promoter' ? COLORS.white : COLORS.primary} />
+                  <Building2 size={20} color={userType === 'promoter' ? colors.white : colors.primary} />
                   <Text
                     style={[
                       styles.userTypeText,
-                      userType === 'promoter' && styles.userTypeTextActive,
+                      { color: colors.primary },
+                      userType === 'promoter' && { color: colors.white },
                     ]}
                   >
                     Promotor
@@ -258,12 +263,12 @@ export default function LoginScreen() {
                 </TouchableOpacity>
               </View>
 
-              <View style={styles.inputContainer}>
-                <Mail size={20} color="#666" style={styles.inputIcon} />
+              <View style={[styles.inputContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                <Mail size={20} color={colors.textSecondary} style={styles.inputIcon} />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: colors.text }]}
                   placeholder="Email"
-                  placeholderTextColor="#666"
+                  placeholderTextColor={colors.textSecondary}
                   value={email}
                   onChangeText={setEmail}
                   keyboardType="email-address"
@@ -273,12 +278,12 @@ export default function LoginScreen() {
               </View>
 
               {!isLogin && userType === 'normal' && (
-                <View style={styles.inputContainer}>
-                  <User size={20} color="#666" style={styles.inputIcon} />
+                <View style={[styles.inputContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
+                  <User size={20} color={colors.textSecondary} style={styles.inputIcon} />
                   <TextInput
-                    style={styles.input}
+                    style={[styles.input, { color: colors.text }]}
                     placeholder="Nome completo"
-                    placeholderTextColor="#666"
+                    placeholderTextColor={colors.textSecondary}
                     value={name}
                     onChangeText={setName}
                     autoCapitalize="words"
@@ -286,21 +291,21 @@ export default function LoginScreen() {
                 </View>
               )}
 
-              <View style={styles.inputContainer}>
+              <View style={[styles.inputContainer, { backgroundColor: colors.card, borderColor: colors.border }]}>
                 <TouchableOpacity
                   onPress={() => setShowPassword(!showPassword)}
                   style={styles.inputIcon}
                 >
                   {showPassword ? (
-                    <EyeOff size={20} color="#666" />
+                    <EyeOff size={20} color={colors.textSecondary} />
                   ) : (
-                    <Eye size={20} color="#666" />
+                    <Eye size={20} color={colors.textSecondary} />
                   )}
                 </TouchableOpacity>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: colors.text }]}
                   placeholder="Palavra-passe"
-                  placeholderTextColor="#666"
+                  placeholderTextColor={colors.textSecondary}
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry={!showPassword}
@@ -313,22 +318,22 @@ export default function LoginScreen() {
                   style={styles.forgotPasswordButton}
                   onPress={() => router.push('/forgot-password')}
                 >
-                  <Text style={styles.forgotPasswordText}>Esqueceu a palavra-passe?</Text>
+                  <Text style={[styles.forgotPasswordText, { color: colors.primary }]}>Esqueceu a palavra-passe?</Text>
                 </TouchableOpacity>
               )}
 
               {errorMessage ? (
-                <View style={styles.errorContainer}>
-                  <Text style={styles.errorText}>{errorMessage}</Text>
+                <View style={[styles.errorContainer, { backgroundColor: colors.error + '15', borderColor: colors.error + '30' }]}>
+                  <Text style={[styles.errorText, { color: colors.error }]}>{errorMessage}</Text>
                 </View>
               ) : null}
 
               <TouchableOpacity
-                style={[styles.button, isLoading && styles.buttonDisabled]}
+                style={[styles.button, { backgroundColor: colors.primary }, isLoading && styles.buttonDisabled]}
                 onPress={handleAuth}
                 disabled={isLoading}
               >
-                <Text style={styles.buttonText}>
+                <Text style={[styles.buttonText, { color: colors.white }]}>
                   {isLoading ? 'Aguarde...' : isLogin ? 'Entrar' : 'Criar Conta'}
                 </Text>
               </TouchableOpacity>
@@ -338,9 +343,9 @@ export default function LoginScreen() {
                   style={styles.switchButton}
                   onPress={() => setIsLogin(!isLogin)}
                 >
-                  <Text style={styles.switchText}>
+                  <Text style={[styles.switchText, { color: colors.text }]}>
                     {isLogin ? 'Não tem conta? ' : 'Já tem conta? '}
-                    <Text style={styles.switchTextBold}>
+                    <Text style={[styles.switchTextBold, { color: colors.primary }]}>
                       {isLogin ? 'Criar conta' : 'Entrar'}
                     </Text>
                   </Text>
@@ -348,9 +353,9 @@ export default function LoginScreen() {
               )}
 
               {userType === 'promoter' && !isLogin && (
-                <View style={styles.promoterInfoBox}>
-                  <Building2 size={16} color={COLORS.primary} />
-                  <Text style={styles.promoterInfoText}>
+                <View style={[styles.promoterInfoBox, { backgroundColor: colors.warning + '15', borderColor: colors.warning + '30' }]}>
+                  <Building2 size={16} color={colors.warning} />
+                  <Text style={[styles.promoterInfoText, { color: colors.warning }]}>
                     Promotores devem registar-se na plataforma web
                   </Text>
                 </View>
@@ -369,7 +374,6 @@ const styles = StyleSheet.create({
   },
   gradient: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   keyboardView: {
     flex: 1,
@@ -377,7 +381,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     flexGrow: 1,
     justifyContent: 'center',
-    padding: 20,
+    padding: SPACING.xl,
   },
   header: {
     alignItems: 'center',
@@ -391,124 +395,102 @@ const styles = StyleSheet.create({
     width: 300,
     height: 120,
   },
-
   form: {
     width: '100%',
   },
   userTypeContainer: {
     flexDirection: 'row',
-    gap: 12,
-    marginBottom: 24,
+    gap: SPACING.md,
+    marginBottom: SPACING.xxl,
   },
   userTypeButton: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.white,
-    borderRadius: 24,
+    borderRadius: RADIUS.lg,
     height: 56,
-    borderWidth: 2,
-    borderColor: COLORS.border,
-    gap: 8,
-  },
-  userTypeButtonActive: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
+    borderWidth: 1.5,
+    gap: SPACING.sm,
+    ...SHADOWS.sm,
   },
   userTypeText: {
-    color: COLORS.primary,
     fontSize: 15,
     fontWeight: '600' as const,
-  },
-  userTypeTextActive: {
-    color: COLORS.white,
   },
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.white,
-    borderRadius: 24,
-    marginBottom: 16,
-    paddingHorizontal: 16,
+    borderRadius: RADIUS.md,
+    marginBottom: SPACING.lg,
+    paddingHorizontal: SPACING.lg,
     borderWidth: 1,
-    borderColor: COLORS.border,
+    ...SHADOWS.sm,
   },
   inputIcon: {
-    marginRight: 12,
+    marginRight: SPACING.md,
   },
   input: {
     flex: 1,
-    height: 50,
-    color: COLORS.text,
+    height: 52,
     fontSize: 16,
   },
   button: {
-    backgroundColor: COLORS.primary,
-    borderRadius: 24,
-    height: 50,
+    borderRadius: RADIUS.md,
+    height: 52,
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 20,
+    marginTop: SPACING.xl,
+    ...SHADOWS.md,
   },
   buttonDisabled: {
     opacity: 0.6,
   },
   buttonText: {
-    color: COLORS.white,
     fontSize: 16,
-    fontWeight: 'bold' as const,
+    fontWeight: '600' as const,
   },
   switchButton: {
-    marginTop: 30,
+    marginTop: SPACING.xxxl,
     alignItems: 'center',
   },
   switchText: {
-    color: '#000',
     fontSize: 14,
   },
   switchTextBold: {
-    color: COLORS.primary,
-    fontWeight: 'bold' as const,
+    fontWeight: '600' as const,
   },
   promoterInfoBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF3E0',
-    borderRadius: 24,
-    padding: 16,
-    marginTop: 24,
-    gap: 12,
+    borderRadius: RADIUS.md,
+    padding: SPACING.lg,
+    marginTop: SPACING.xxl,
+    gap: SPACING.md,
     borderWidth: 1,
-    borderColor: '#FFE0B2',
   },
   promoterInfoText: {
     flex: 1,
-    color: '#E65100',
     fontSize: 13,
     lineHeight: 18,
   },
   forgotPasswordButton: {
     alignSelf: 'flex-end',
-    marginBottom: 8,
+    marginBottom: SPACING.sm,
   },
   forgotPasswordText: {
-    color: COLORS.primary,
     fontSize: 14,
     fontWeight: '600' as const,
   },
   errorContainer: {
-    backgroundColor: '#FFEBEE',
-    borderRadius: 24,
-    padding: 16,
-    marginBottom: 16,
+    borderRadius: RADIUS.md,
+    padding: SPACING.lg,
+    marginBottom: SPACING.lg,
     borderWidth: 1,
-    borderColor: '#FFCDD2',
   },
   errorText: {
-    color: '#C62828',
     fontSize: 14,
     lineHeight: 20,
-    textAlign: 'center',
+    textAlign: 'center' as const,
   },
 });

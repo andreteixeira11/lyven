@@ -26,7 +26,8 @@ import {
   Users,
   Calendar,
 } from 'lucide-react-native';
-import { COLORS } from '@/constants/colors';
+import { useTheme } from '@/hooks/theme-context';
+import { RADIUS, SHADOWS, SPACING } from '@/constants/colors';
 
 interface FAQItem {
   id: string;
@@ -36,6 +37,7 @@ interface FAQItem {
 }
 
 export default function Help() {
+  const { colors } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedFAQ, setExpandedFAQ] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -129,59 +131,56 @@ export default function Help() {
   };
 
   const ContactCard = ({ icon: Icon, title, subtitle, onPress }: any) => (
-    <TouchableOpacity style={styles.contactCard} onPress={onPress}>
-      <View style={styles.contactIcon}>
-        <Icon size={24} color={COLORS.primary} />
+    <TouchableOpacity style={[styles.contactCard, { borderBottomColor: colors.border }]} onPress={onPress}>
+      <View style={[styles.contactIcon, { backgroundColor: colors.primary + '15' }]}>
+        <Icon size={24} color={colors.primary} />
       </View>
       <View style={styles.contactContent}>
-        <Text style={styles.contactTitle}>{title}</Text>
-        <Text style={styles.contactSubtitle}>{subtitle}</Text>
+        <Text style={[styles.contactTitle, { color: colors.text }]}>{title}</Text>
+        <Text style={[styles.contactSubtitle, { color: colors.textSecondary }]}>{subtitle}</Text>
       </View>
-      <ExternalLink size={20} color={COLORS.gray} />
+      <ExternalLink size={20} color={colors.textSecondary} />
     </TouchableOpacity>
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Stack.Screen 
         options={{
           headerShown: true,
           title: 'Centro de Ajuda',
-          headerStyle: { backgroundColor: COLORS.header },
-          headerTintColor: COLORS.headerText,
-          headerTitleStyle: { fontWeight: 'bold' as const },
+          headerStyle: { backgroundColor: colors.primary },
+          headerTintColor: colors.white,
+          headerTitleStyle: { fontWeight: '600' as const },
           headerLeft: () => (
             <TouchableOpacity onPress={() => router.back()}>
-              <ArrowLeft size={24} color={COLORS.headerText} />
+              <ArrowLeft size={24} color={colors.white} />
             </TouchableOpacity>
           ),
         }} 
       />
       
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Como podemos ajudar?</Text>
-          <Text style={styles.headerSubtitle}>
+        <View style={[styles.header, { backgroundColor: colors.card }, SHADOWS.sm]}>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Como podemos ajudar?</Text>
+          <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
             Encontre respostas para as perguntas mais frequentes ou entre em contato conosco
           </Text>
         </View>
 
-        {/* Search */}
         <View style={styles.searchContainer}>
-          <View style={styles.searchInput}>
-            <Search size={20} color={COLORS.gray} />
+          <View style={[styles.searchInput, { backgroundColor: colors.card, borderColor: colors.border }, SHADOWS.sm]}>
+            <Search size={20} color={colors.textSecondary} />
             <TextInput
-              style={styles.searchText}
+              style={[styles.searchText, { color: colors.text }]}
               placeholder="Buscar ajuda..."
-              placeholderTextColor={COLORS.gray}
+              placeholderTextColor={colors.textSecondary}
               value={searchQuery}
               onChangeText={setSearchQuery}
             />
           </View>
         </View>
 
-        {/* Categories */}
         <View style={styles.categoriesContainer}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.categories}>
@@ -192,17 +191,19 @@ export default function Help() {
                     key={category.id}
                     style={[
                       styles.categoryChip,
-                      selectedCategory === category.id && styles.categoryChipActive
+                      { backgroundColor: colors.card, borderColor: colors.border },
+                      selectedCategory === category.id && { backgroundColor: colors.primary, borderColor: colors.primary }
                     ]}
                     onPress={() => setSelectedCategory(category.id)}
                   >
                     <Icon 
                       size={16} 
-                      color={selectedCategory === category.id ? COLORS.white : COLORS.textSecondary} 
+                      color={selectedCategory === category.id ? colors.white : colors.textSecondary} 
                     />
                     <Text style={[
                       styles.categoryText,
-                      selectedCategory === category.id && styles.categoryTextActive
+                      { color: colors.text },
+                      selectedCategory === category.id && { color: colors.white }
                     ]}>
                       {category.name}
                     </Text>
@@ -213,36 +214,35 @@ export default function Help() {
           </ScrollView>
         </View>
 
-        {/* FAQ Section */}
-        <View style={styles.faqSection}>
-          <Text style={styles.sectionTitle}>Perguntas Frequentes</Text>
+        <View style={[styles.faqSection, { backgroundColor: colors.card }, SHADOWS.sm]}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Perguntas Frequentes</Text>
           
           {filteredFAQ.length === 0 ? (
             <View style={styles.emptyState}>
-              <HelpCircle size={48} color={COLORS.gray} />
-              <Text style={styles.emptyText}>Nenhuma pergunta encontrada</Text>
-              <Text style={styles.emptySubtext}>
+              <HelpCircle size={48} color={colors.textSecondary} />
+              <Text style={[styles.emptyText, { color: colors.text }]}>Nenhuma pergunta encontrada</Text>
+              <Text style={[styles.emptySubtext, { color: colors.textSecondary }]}>
                 Tente buscar com outras palavras ou entre em contato conosco
               </Text>
             </View>
           ) : (
             filteredFAQ.map((item) => (
-              <View key={item.id} style={styles.faqItem}>
+              <View key={item.id} style={[styles.faqItem, { borderBottomColor: colors.border }]}>
                 <TouchableOpacity
                   style={styles.faqQuestion}
                   onPress={() => toggleFAQ(item.id)}
                 >
-                  <Text style={styles.faqQuestionText}>{item.question}</Text>
+                  <Text style={[styles.faqQuestionText, { color: colors.text }]}>{item.question}</Text>
                   {expandedFAQ === item.id ? (
-                    <ChevronUp size={20} color={COLORS.primary} />
+                    <ChevronUp size={20} color={colors.primary} />
                   ) : (
-                    <ChevronDown size={20} color={COLORS.gray} />
+                    <ChevronDown size={20} color={colors.textSecondary} />
                   )}
                 </TouchableOpacity>
                 
                 {expandedFAQ === item.id && (
-                  <View style={styles.faqAnswer}>
-                    <Text style={styles.faqAnswerText}>{item.answer}</Text>
+                  <View style={[styles.faqAnswer, { backgroundColor: colors.surface }]}>
+                    <Text style={[styles.faqAnswerText, { color: colors.textSecondary }]}>{item.answer}</Text>
                   </View>
                 )}
               </View>
@@ -250,10 +250,9 @@ export default function Help() {
           )}
         </View>
 
-        {/* Contact Support */}
-        <View style={styles.contactSection}>
-          <Text style={styles.sectionTitle}>Ainda precisa de ajuda?</Text>
-          <Text style={styles.contactDescription}>
+        <View style={[styles.contactSection, { backgroundColor: colors.card }, SHADOWS.sm]}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Ainda precisa de ajuda?</Text>
+          <Text style={[styles.contactDescription, { color: colors.textSecondary }]}>
             Nossa equipe de suporte está disponível para ajudá-lo
           </Text>
           
@@ -279,26 +278,25 @@ export default function Help() {
           />
         </View>
 
-        {/* Additional Resources */}
-        <View style={styles.resourcesSection}>
-          <Text style={styles.sectionTitle}>Recursos Adicionais</Text>
+        <View style={[styles.resourcesSection, { backgroundColor: colors.card }, SHADOWS.sm]}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Recursos Adicionais</Text>
           
-          <TouchableOpacity style={styles.resourceItem}>
-            <Shield size={20} color={COLORS.info} />
+          <TouchableOpacity style={[styles.resourceItem, { borderBottomColor: colors.border }]}>
+            <Shield size={20} color={colors.info} />
             <View style={styles.resourceContent}>
-              <Text style={styles.resourceTitle}>Política de Privacidade</Text>
-              <Text style={styles.resourceSubtitle}>Como protegemos seus dados</Text>
+              <Text style={[styles.resourceTitle, { color: colors.text }]}>Política de Privacidade</Text>
+              <Text style={[styles.resourceSubtitle, { color: colors.textSecondary }]}>Como protegemos seus dados</Text>
             </View>
-            <ExternalLink size={16} color={COLORS.gray} />
+            <ExternalLink size={16} color={colors.textSecondary} />
           </TouchableOpacity>
           
-          <TouchableOpacity style={styles.resourceItem}>
-            <Book size={20} color={COLORS.success} />
+          <TouchableOpacity style={[styles.resourceItem, { borderBottomColor: colors.border }]}>
+            <Book size={20} color={colors.success} />
             <View style={styles.resourceContent}>
-              <Text style={styles.resourceTitle}>Termos de Uso</Text>
-              <Text style={styles.resourceSubtitle}>Condições de utilização</Text>
+              <Text style={[styles.resourceTitle, { color: colors.text }]}>Termos de Uso</Text>
+              <Text style={[styles.resourceSubtitle, { color: colors.textSecondary }]}>Condições de utilização</Text>
             </View>
-            <ExternalLink size={16} color={COLORS.gray} />
+            <ExternalLink size={16} color={colors.textSecondary} />
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -309,195 +307,173 @@ export default function Help() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   scrollView: {
     flex: 1,
   },
   header: {
-    padding: 20,
-    backgroundColor: COLORS.card,
+    padding: SPACING.xl,
+    margin: SPACING.lg,
+    borderRadius: RADIUS.lg,
   },
   headerTitle: {
     fontSize: 24,
-    fontWeight: 'bold' as const,
-    color: COLORS.black,
-    marginBottom: 8,
+    fontWeight: '700' as const,
+    marginBottom: SPACING.sm,
   },
   headerSubtitle: {
-    fontSize: 16,
-    color: COLORS.black,
+    fontSize: 15,
     lineHeight: 22,
   },
   searchContainer: {
-    padding: 20,
+    paddingHorizontal: SPACING.lg,
+    marginBottom: SPACING.lg,
   },
   searchInput: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.card,
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 12,
+    borderRadius: RADIUS.md,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+    gap: SPACING.md,
     borderWidth: 1,
-    borderColor: COLORS.border,
   },
   searchText: {
     flex: 1,
     fontSize: 16,
-    color: COLORS.black,
   },
   categoriesContainer: {
-    paddingHorizontal: 20,
-    marginBottom: 20,
+    paddingHorizontal: SPACING.lg,
+    marginBottom: SPACING.lg,
   },
   categories: {
     flexDirection: 'row',
-    gap: 12,
+    gap: SPACING.md,
   },
   categoryChip: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: COLORS.card,
-    borderRadius: 20,
-    gap: 8,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.full,
+    gap: SPACING.sm,
     borderWidth: 1,
-    borderColor: COLORS.border,
-  },
-  categoryChipActive: {
-    backgroundColor: COLORS.primary,
-    borderColor: COLORS.primary,
   },
   categoryText: {
     fontSize: 14,
-    color: COLORS.black,
-  },
-  categoryTextActive: {
-    color: COLORS.white,
-    fontWeight: 'bold' as const,
+    fontWeight: '500' as const,
   },
   sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold' as const,
-    color: COLORS.headerText,
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: COLORS.header,
+    fontSize: 18,
+    fontWeight: '600' as const,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.lg,
   },
   faqSection: {
-    backgroundColor: COLORS.card,
-    marginBottom: 20,
+    marginHorizontal: SPACING.lg,
+    marginBottom: SPACING.lg,
+    borderRadius: RADIUS.lg,
+    overflow: 'hidden',
   },
   faqItem: {
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
   },
   faqQuestion: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.lg,
   },
   faqQuestionText: {
     fontSize: 16,
-    color: COLORS.black,
+    fontWeight: '500' as const,
     flex: 1,
-    marginRight: 12,
+    marginRight: SPACING.md,
   },
   faqAnswer: {
-    paddingHorizontal: 20,
-    paddingBottom: 16,
-    backgroundColor: COLORS.background,
+    paddingHorizontal: SPACING.lg,
+    paddingBottom: SPACING.lg,
   },
   faqAnswerText: {
     fontSize: 14,
-    color: COLORS.black,
     lineHeight: 20,
   },
   contactSection: {
-    backgroundColor: COLORS.card,
-    marginBottom: 20,
+    marginHorizontal: SPACING.lg,
+    marginBottom: SPACING.lg,
+    borderRadius: RADIUS.lg,
+    overflow: 'hidden',
   },
   contactDescription: {
     fontSize: 14,
-    color: COLORS.black,
-    paddingHorizontal: 20,
-    paddingBottom: 16,
+    paddingHorizontal: SPACING.lg,
+    paddingBottom: SPACING.lg,
   },
   contactCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.lg,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
   },
   contactIcon: {
     width: 48,
     height: 48,
-    borderRadius: 24,
-    backgroundColor: `${COLORS.primary}20`,
+    borderRadius: RADIUS.full,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: SPACING.lg,
   },
   contactContent: {
     flex: 1,
   },
   contactTitle: {
     fontSize: 16,
-    fontWeight: 'bold' as const,
-    color: COLORS.black,
+    fontWeight: '600' as const,
     marginBottom: 4,
   },
   contactSubtitle: {
     fontSize: 14,
-    color: COLORS.black,
   },
   resourcesSection: {
-    backgroundColor: COLORS.card,
-    marginBottom: 20,
+    marginHorizontal: SPACING.lg,
+    marginBottom: SPACING.xl,
+    borderRadius: RADIUS.lg,
+    overflow: 'hidden',
   },
   resourceItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.lg,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
   },
   resourceContent: {
     flex: 1,
-    marginLeft: 16,
+    marginLeft: SPACING.lg,
   },
   resourceTitle: {
     fontSize: 16,
-    color: COLORS.black,
+    fontWeight: '500' as const,
     marginBottom: 4,
   },
   resourceSubtitle: {
     fontSize: 14,
-    color: COLORS.black,
   },
   emptyState: {
     alignItems: 'center',
-    padding: 40,
+    padding: SPACING.xxxl,
   },
   emptyText: {
     fontSize: 18,
-    fontWeight: 'bold' as const,
-    color: COLORS.black,
-    marginTop: 16,
-    marginBottom: 8,
+    fontWeight: '600' as const,
+    marginTop: SPACING.lg,
+    marginBottom: SPACING.sm,
   },
   emptySubtext: {
     fontSize: 14,
-    color: COLORS.black,
-    textAlign: 'center',
+    textAlign: 'center' as const,
     lineHeight: 20,
   },
 });

@@ -14,7 +14,6 @@ import {
   Bell,
   Calendar,
   Users,
-  Heart,
   TrendingUp,
   MessageSquare,
   Settings,
@@ -23,7 +22,8 @@ import {
   X,
 } from 'lucide-react-native';
 import { useUser } from '@/hooks/user-context';
-import { COLORS } from '@/constants/colors';
+import { useTheme } from '@/hooks/theme-context';
+import { RADIUS, SHADOWS, SPACING } from '@/constants/colors';
 
 interface Notification {
   id: string;
@@ -38,6 +38,7 @@ interface Notification {
 
 export default function Notifications() {
   const { user } = useUser();
+  const { colors } = useTheme();
   const [pushEnabled, setPushEnabled] = useState(true);
   const [emailEnabled, setEmailEnabled] = useState(true);
   const [eventReminders, setEventReminders] = useState(true);
@@ -90,19 +91,19 @@ export default function Notifications() {
   const getNotificationIcon = (type: Notification['type']) => {
     switch (type) {
       case 'event':
-        return <Calendar size={20} color={COLORS.primary} />;
+        return <Calendar size={20} color={colors.primary} />;
       case 'new_promoter_event':
-        return <Calendar size={20} color={COLORS.primary} />;
+        return <Calendar size={20} color={colors.primary} />;
       case 'follower':
-        return <Users size={20} color={COLORS.info} />;
+        return <Users size={20} color={colors.info} />;
       case 'ticket':
-        return <Check size={20} color={COLORS.success} />;
+        return <Check size={20} color={colors.success} />;
       case 'promotion':
-        return <TrendingUp size={20} color={COLORS.warning} />;
+        return <TrendingUp size={20} color={colors.warning} />;
       case 'system':
-        return <Settings size={20} color={COLORS.gray} />;
+        return <Settings size={20} color={colors.textSecondary} />;
       default:
-        return <Bell size={20} color={COLORS.gray} />;
+        return <Bell size={20} color={colors.textSecondary} />;
     }
   };
 
@@ -176,28 +177,28 @@ export default function Notifications() {
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Stack.Screen 
         options={{
           headerShown: true,
           title: `Notificações ${unreadCount > 0 ? `(${unreadCount})` : ''}`,
-          headerStyle: { backgroundColor: COLORS.header },
-          headerTintColor: COLORS.headerText,
-          headerTitleStyle: { fontWeight: 'bold' as const },
+          headerStyle: { backgroundColor: colors.primary },
+          headerTintColor: colors.white,
+          headerTitleStyle: { fontWeight: '600' as const },
           headerLeft: () => (
             <TouchableOpacity onPress={() => router.back()}>
-              <ArrowLeft size={24} color={COLORS.headerText} />
+              <ArrowLeft size={24} color={colors.white} />
             </TouchableOpacity>
           ),
           headerRight: () => (
             <View style={styles.headerRight}>
               {unreadCount > 0 && (
                 <TouchableOpacity onPress={markAllAsRead}>
-                  <Check size={24} color={COLORS.headerText} />
+                  <Check size={24} color={colors.white} />
                 </TouchableOpacity>
               )}
               <TouchableOpacity onPress={clearAll}>
-                <Trash2 size={24} color={COLORS.headerText} />
+                <Trash2 size={24} color={colors.white} />
               </TouchableOpacity>
             </View>
           ),
@@ -205,88 +206,85 @@ export default function Notifications() {
       />
       
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Settings Section */}
-        <View style={styles.settingsSection}>
-          <Text style={styles.sectionTitle}>Configurações</Text>
+        <View style={[styles.settingsSection, { backgroundColor: colors.card }, SHADOWS.sm]}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Configurações</Text>
           
-          <View style={styles.settingItem}>
+          <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
             <View style={styles.settingLeft}>
-              <Bell size={20} color={COLORS.primary} />
-              <Text style={styles.settingText}>Notificações Push</Text>
+              <Bell size={20} color={colors.primary} />
+              <Text style={[styles.settingText, { color: colors.text }]}>Notificações Push</Text>
             </View>
             <Switch
               value={pushEnabled}
               onValueChange={setPushEnabled}
-              trackColor={{ false: COLORS.lightGray, true: COLORS.primary }}
-              thumbColor={pushEnabled ? COLORS.white : COLORS.gray}
+              trackColor={{ false: colors.border, true: colors.primary }}
+              thumbColor={colors.white}
             />
           </View>
 
-          <View style={styles.settingItem}>
+          <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
             <View style={styles.settingLeft}>
-              <MessageSquare size={20} color={COLORS.info} />
-              <Text style={styles.settingText}>Notificações por Email</Text>
+              <MessageSquare size={20} color={colors.info} />
+              <Text style={[styles.settingText, { color: colors.text }]}>Notificações por Email</Text>
             </View>
             <Switch
               value={emailEnabled}
               onValueChange={setEmailEnabled}
-              trackColor={{ false: COLORS.lightGray, true: COLORS.primary }}
-              thumbColor={emailEnabled ? COLORS.white : COLORS.gray}
+              trackColor={{ false: colors.border, true: colors.primary }}
+              thumbColor={colors.white}
             />
           </View>
 
-          <View style={styles.settingItem}>
+          <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
             <View style={styles.settingLeft}>
-              <Calendar size={20} color={COLORS.success} />
-              <Text style={styles.settingText}>Lembretes de Eventos</Text>
+              <Calendar size={20} color={colors.success} />
+              <Text style={[styles.settingText, { color: colors.text }]}>Lembretes de Eventos</Text>
             </View>
             <Switch
               value={eventReminders}
               onValueChange={setEventReminders}
-              trackColor={{ false: COLORS.lightGray, true: COLORS.primary }}
-              thumbColor={eventReminders ? COLORS.white : COLORS.gray}
+              trackColor={{ false: colors.border, true: colors.primary }}
+              thumbColor={colors.white}
             />
           </View>
 
-          <View style={styles.settingItem}>
+          <View style={[styles.settingItem, { borderBottomColor: colors.border }]}>
             <View style={styles.settingLeft}>
-              <Users size={20} color={COLORS.warning} />
-              <Text style={styles.settingText}>Atualizações de Seguidores</Text>
+              <Users size={20} color={colors.warning} />
+              <Text style={[styles.settingText, { color: colors.text }]}>Atualizações de Seguidores</Text>
             </View>
             <Switch
               value={followerUpdates}
               onValueChange={setFollowerUpdates}
-              trackColor={{ false: COLORS.lightGray, true: COLORS.primary }}
-              thumbColor={followerUpdates ? COLORS.white : COLORS.gray}
+              trackColor={{ false: colors.border, true: colors.primary }}
+              thumbColor={colors.white}
             />
           </View>
         </View>
 
-        {/* Promoter Actions */}
         {user?.userType === 'promoter' && (
-          <View style={styles.promoterSection}>
-            <Text style={styles.sectionTitle}>Ações do Promotor</Text>
+          <View style={[styles.promoterSection, { backgroundColor: colors.card }, SHADOWS.sm]}>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Ações do Promotor</Text>
             <TouchableOpacity 
-              style={styles.actionButton}
+              style={[styles.actionButton, { backgroundColor: colors.primary }]}
               onPress={sendMessageToFollowers}
             >
-              <MessageSquare size={20} color={COLORS.white} />
-              <Text style={styles.actionButtonText}>Enviar Mensagem aos Seguidores</Text>
+              <MessageSquare size={20} color={colors.white} />
+              <Text style={[styles.actionButtonText, { color: colors.white }]}>Enviar Mensagem aos Seguidores</Text>
             </TouchableOpacity>
           </View>
         )}
 
-        {/* Notifications List */}
-        <View style={styles.notificationsSection}>
-          <Text style={styles.sectionTitle}>
+        <View style={[styles.notificationsSection, { backgroundColor: colors.card }, SHADOWS.sm]}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>
             Notificações Recentes {unreadCount > 0 && `(${unreadCount} não lidas)`}
           </Text>
           
           {notifications.length === 0 ? (
             <View style={styles.emptyState}>
-              <Bell size={48} color={COLORS.gray} />
-              <Text style={styles.emptyText}>Nenhuma notificação</Text>
-              <Text style={styles.emptySubtext}>
+              <Bell size={48} color={colors.textSecondary} />
+              <Text style={[styles.emptyText, { color: colors.text }]}>Nenhuma notificação</Text>
+              <Text style={[styles.emptySubtext, { color: colors.textSecondary }]}>
                 Você receberá notificações sobre eventos, seguidores e atualizações aqui
               </Text>
             </View>
@@ -296,7 +294,8 @@ export default function Notifications() {
                 key={notification.id}
                 style={[
                   styles.notificationItem,
-                  !notification.read && styles.unreadNotification
+                  { borderBottomColor: colors.border },
+                  !notification.read && { backgroundColor: colors.surface }
                 ]}
                 onPress={() => {
                   markAsRead(notification.id);
@@ -306,20 +305,21 @@ export default function Notifications() {
                 }}
               >
                 <View style={styles.notificationLeft}>
-                  <View style={styles.notificationIcon}>
+                  <View style={[styles.notificationIcon, { backgroundColor: colors.surface }]}>
                     {getNotificationIcon(notification.type)}
                   </View>
                   <View style={styles.notificationContent}>
                     <Text style={[
                       styles.notificationTitle,
+                      { color: colors.text },
                       !notification.read && styles.unreadText
                     ]}>
                       {notification.title}
                     </Text>
-                    <Text style={styles.notificationMessage}>
+                    <Text style={[styles.notificationMessage, { color: colors.textSecondary }]}>
                       {notification.message}
                     </Text>
-                    <Text style={styles.notificationTime}>
+                    <Text style={[styles.notificationTime, { color: colors.textLight }]}>
                       {formatTimestamp(notification.timestamp)}
                     </Text>
                   </View>
@@ -327,13 +327,13 @@ export default function Notifications() {
                 
                 <View style={styles.notificationActions}>
                   {!notification.read && (
-                    <View style={styles.unreadDot} />
+                    <View style={[styles.unreadDot, { backgroundColor: colors.primary }]} />
                   )}
                   <TouchableOpacity
                     style={styles.deleteButton}
                     onPress={() => deleteNotification(notification.id)}
                   >
-                    <X size={16} color={COLORS.gray} />
+                    <X size={16} color={colors.textSecondary} />
                   </TouchableOpacity>
                 </View>
               </TouchableOpacity>
@@ -348,87 +348,83 @@ export default function Notifications() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   scrollView: {
     flex: 1,
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold' as const,
-    color: COLORS.headerText,
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    backgroundColor: COLORS.header,
+    fontWeight: '600' as const,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.lg,
   },
   settingsSection: {
-    backgroundColor: COLORS.card,
-    marginBottom: 20,
+    marginHorizontal: SPACING.lg,
+    marginTop: SPACING.lg,
+    marginBottom: SPACING.lg,
+    borderRadius: RADIUS.lg,
+    overflow: 'hidden',
   },
   settingItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.lg,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
   },
   settingLeft: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
+    gap: SPACING.md,
   },
   settingText: {
     fontSize: 16,
-    color: COLORS.text,
   },
   promoterSection: {
-    backgroundColor: COLORS.card,
-    marginBottom: 20,
+    marginHorizontal: SPACING.lg,
+    marginBottom: SPACING.lg,
+    borderRadius: RADIUS.lg,
+    overflow: 'hidden',
   },
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: COLORS.primary,
-    marginHorizontal: 20,
-    marginBottom: 20,
-    paddingVertical: 16,
-    borderRadius: 8,
-    gap: 12,
+    marginHorizontal: SPACING.lg,
+    marginBottom: SPACING.lg,
+    paddingVertical: SPACING.lg,
+    borderRadius: RADIUS.md,
+    gap: SPACING.md,
+    ...SHADOWS.md,
   },
   actionButtonText: {
     fontSize: 16,
-    fontWeight: 'bold' as const,
-    color: COLORS.white,
+    fontWeight: '600' as const,
   },
   notificationsSection: {
-    backgroundColor: COLORS.card,
-    marginBottom: 20,
+    marginHorizontal: SPACING.lg,
+    marginBottom: SPACING.xl,
+    borderRadius: RADIUS.lg,
+    overflow: 'hidden',
   },
   notificationItem: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.lg,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
-  },
-  unreadNotification: {
-    backgroundColor: COLORS.surface,
   },
   notificationLeft: {
     flexDirection: 'row',
     flex: 1,
-    gap: 12,
+    gap: SPACING.md,
   },
   notificationIcon: {
     width: 40,
     height: 40,
-    borderRadius: 20,
-    backgroundColor: COLORS.lightGray,
+    borderRadius: RADIUS.full,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -437,55 +433,49 @@ const styles = StyleSheet.create({
   },
   notificationTitle: {
     fontSize: 16,
-    color: COLORS.text,
     marginBottom: 4,
   },
   unreadText: {
-    fontWeight: 'bold' as const,
+    fontWeight: '600' as const,
   },
   notificationMessage: {
     fontSize: 14,
-    color: COLORS.textSecondary,
     marginBottom: 4,
     lineHeight: 20,
   },
   notificationTime: {
     fontSize: 12,
-    color: COLORS.gray,
   },
   notificationActions: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: SPACING.sm,
   },
   unreadDot: {
     width: 8,
     height: 8,
-    borderRadius: 4,
-    backgroundColor: COLORS.primary,
+    borderRadius: RADIUS.xs,
   },
   deleteButton: {
-    padding: 4,
+    padding: SPACING.xs,
   },
   emptyState: {
     alignItems: 'center',
-    padding: 40,
+    padding: SPACING.xxxl,
   },
   emptyText: {
     fontSize: 18,
-    fontWeight: 'bold' as const,
-    color: COLORS.text,
-    marginTop: 16,
-    marginBottom: 8,
+    fontWeight: '600' as const,
+    marginTop: SPACING.lg,
+    marginBottom: SPACING.sm,
   },
   emptySubtext: {
     fontSize: 14,
-    color: COLORS.textSecondary,
-    textAlign: 'center',
+    textAlign: 'center' as const,
     lineHeight: 20,
   },
   headerRight: {
     flexDirection: 'row',
-    gap: 16,
+    gap: SPACING.lg,
   },
 });

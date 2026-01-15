@@ -24,7 +24,8 @@ import {
   Lock,
 } from 'lucide-react-native';
 import { useUser } from '@/hooks/user-context';
-import { COLORS } from '@/constants/colors';
+import { useTheme } from '@/hooks/theme-context';
+import { RADIUS, SHADOWS, SPACING } from '@/constants/colors';
 
 const getLanguageName = (code?: string) => {
   const languages: Record<string, string> = {
@@ -48,6 +49,7 @@ const getLanguageName = (code?: string) => {
 
 export default function Settings() {
   const { user, logout } = useUser();
+  const { colors } = useTheme();
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [locationEnabled, setLocationEnabled] = useState(true);
 
@@ -80,62 +82,60 @@ export default function Settings() {
     showArrow = true,
     rightComponent 
   }: any) => (
-    <TouchableOpacity style={styles.settingItem} onPress={onPress}>
+    <TouchableOpacity style={[styles.settingItem, { borderBottomColor: colors.border }]} onPress={onPress}>
       <View style={styles.settingLeft}>
-        <View style={styles.settingIcon}>
-          <Icon size={20} color={COLORS.primary} />
+        <View style={[styles.settingIcon, { backgroundColor: colors.primary + '15' }]}>
+          <Icon size={20} color={colors.primary} />
         </View>
         <View style={styles.settingContent}>
-          <Text style={styles.settingTitle}>{title}</Text>
-          {subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
+          <Text style={[styles.settingTitle, { color: colors.text }]}>{title}</Text>
+          {subtitle && <Text style={[styles.settingSubtitle, { color: colors.textSecondary }]}>{subtitle}</Text>}
         </View>
       </View>
       <View style={styles.settingRight}>
         {rightComponent && rightComponent}
-        {showArrow && <ChevronRight size={20} color={COLORS.black} />}
+        {showArrow && <ChevronRight size={20} color={colors.textSecondary} />}
       </View>
     </TouchableOpacity>
   );
 
   const SectionHeader = ({ title }: { title: string }) => (
-    <Text style={styles.sectionHeader}>{title}</Text>
+    <Text style={[styles.sectionHeader, { color: colors.text }]}>{title}</Text>
   );
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Stack.Screen 
         options={{
           headerShown: true,
           title: 'Definições',
-          headerStyle: { backgroundColor: COLORS.header },
-          headerTintColor: COLORS.headerText,
-          headerTitleStyle: { fontWeight: 'bold' as const },
+          headerStyle: { backgroundColor: colors.primary },
+          headerTintColor: colors.white,
+          headerTitleStyle: { fontWeight: '600' as const },
           headerLeft: () => (
             <TouchableOpacity onPress={() => router.back()}>
-              <ArrowLeft size={24} color={COLORS.headerText} />
+              <ArrowLeft size={24} color={colors.white} />
             </TouchableOpacity>
           ),
         }} 
       />
       
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-        {/* Profile Section */}
-        <View style={styles.profileSection}>
-          <View style={styles.profileAvatar}>
-            <User size={40} color={COLORS.white} />
+        <View style={[styles.profileSection, { backgroundColor: colors.card }, SHADOWS.sm]}>
+          <View style={[styles.profileAvatar, { backgroundColor: colors.primary }]}>
+            <User size={40} color={colors.white} />
           </View>
           <View style={styles.profileInfo}>
-            <Text style={styles.profileName}>{user?.name || 'Utilizador'}</Text>
-            <Text style={styles.profileEmail}>{user?.email}</Text>
-            <Text style={styles.profileType}>
+            <Text style={[styles.profileName, { color: colors.text }]}>{user?.name || 'Utilizador'}</Text>
+            <Text style={[styles.profileEmail, { color: colors.textSecondary }]}>{user?.email}</Text>
+            <Text style={[styles.profileType, { color: colors.primary }]}>
               {user?.userType === 'promoter' ? 'Promotor' : 'Cliente'}
             </Text>
           </View>
         </View>
 
-        {/* Account Settings */}
         <SectionHeader title="Conta" />
-        <View style={styles.section}>
+        <View style={[styles.section, { backgroundColor: colors.card }, SHADOWS.sm]}>
           <SettingItem
             icon={User}
             title="Editar Perfil"
@@ -158,9 +158,8 @@ export default function Settings() {
           )}
         </View>
 
-        {/* Notifications */}
         <SectionHeader title="Notificações" />
-        <View style={styles.section}>
+        <View style={[styles.section, { backgroundColor: colors.card }, SHADOWS.sm]}>
           <SettingItem
             icon={Bell}
             title="Notificações Push"
@@ -170,8 +169,8 @@ export default function Settings() {
               <Switch
                 value={notificationsEnabled}
                 onValueChange={setNotificationsEnabled}
-                trackColor={{ false: COLORS.border, true: COLORS.primary }}
-                thumbColor={COLORS.white}
+                trackColor={{ false: colors.border, true: colors.primary }}
+                thumbColor={colors.white}
               />
             }
           />
@@ -183,9 +182,8 @@ export default function Settings() {
           />
         </View>
 
-        {/* App Settings */}
         <SectionHeader title="Aplicação" />
-        <View style={styles.section}>
+        <View style={[styles.section, { backgroundColor: colors.card }, SHADOWS.sm]}>
           <SettingItem
             icon={Globe}
             title="Idioma"
@@ -201,16 +199,15 @@ export default function Settings() {
               <Switch
                 value={locationEnabled}
                 onValueChange={setLocationEnabled}
-                trackColor={{ false: COLORS.border, true: COLORS.primary }}
-                thumbColor={COLORS.white}
+                trackColor={{ false: colors.border, true: colors.primary }}
+                thumbColor={colors.white}
               />
             }
           />
         </View>
 
-        {/* Privacy & Security */}
         <SectionHeader title="Privacidade e Segurança" />
-        <View style={styles.section}>
+        <View style={[styles.section, { backgroundColor: colors.card }, SHADOWS.sm]}>
           <SettingItem
             icon={Shield}
             title="Privacidade e Dados"
@@ -225,18 +222,15 @@ export default function Settings() {
           />
         </View>
 
-
-
-        {/* Logout */}
-        <View style={styles.section}>
+        <View style={[styles.section, { backgroundColor: colors.card }, SHADOWS.sm]}>
           <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <LogOut size={20} color={COLORS.primary} />
-            <Text style={styles.logoutText}>Terminar Sessão</Text>
+            <LogOut size={20} color={colors.error} />
+            <Text style={[styles.logoutText, { color: colors.error }]}>Terminar Sessão</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Versão 1.0.0</Text>
+          <Text style={[styles.footerText, { color: colors.textSecondary }]}>Versão 1.0.0</Text>
         </View>
       </ScrollView>
     </View>
@@ -246,7 +240,6 @@ export default function Settings() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
   },
   scrollView: {
     flex: 1,
@@ -254,58 +247,55 @@ const styles = StyleSheet.create({
   profileSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 20,
-    backgroundColor: COLORS.card,
-    marginBottom: 20,
+    padding: SPACING.xl,
+    margin: SPACING.lg,
+    borderRadius: RADIUS.lg,
   },
   profileAvatar: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: COLORS.primary,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: SPACING.lg,
   },
   profileInfo: {
     flex: 1,
   },
   profileName: {
     fontSize: 18,
-    fontWeight: 'bold' as const,
-    color: COLORS.black,
+    fontWeight: '600' as const,
     marginBottom: 4,
   },
   profileEmail: {
     fontSize: 14,
-    color: COLORS.black,
-    marginBottom: 2,
+    marginBottom: 4,
   },
   profileType: {
     fontSize: 12,
-    color: COLORS.primary,
-    fontWeight: 'bold' as const,
+    fontWeight: '600' as const,
   },
   sectionHeader: {
-    fontSize: 16,
-    fontWeight: 'bold' as const,
-    color: COLORS.headerText,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    backgroundColor: COLORS.header,
+    fontSize: 13,
+    fontWeight: '600' as const,
+    textTransform: 'uppercase' as const,
+    letterSpacing: 0.5,
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.md,
   },
   section: {
-    backgroundColor: COLORS.card,
-    marginBottom: 20,
+    marginHorizontal: SPACING.lg,
+    marginBottom: SPACING.lg,
+    borderRadius: RADIUS.lg,
+    overflow: 'hidden',
   },
   settingItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.lg,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
   },
   settingLeft: {
     flexDirection: 'row',
@@ -313,49 +303,45 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   settingIcon: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: `${COLORS.primary}20`,
+    width: 36,
+    height: 36,
+    borderRadius: RADIUS.sm,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: SPACING.md,
   },
   settingContent: {
     flex: 1,
   },
   settingTitle: {
     fontSize: 16,
-    color: COLORS.black,
+    fontWeight: '500' as const,
     marginBottom: 2,
   },
   settingSubtitle: {
-    fontSize: 12,
-    color: COLORS.black,
+    fontSize: 13,
   },
   settingRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: SPACING.sm,
   },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
-    gap: 12,
+    paddingVertical: SPACING.lg,
+    gap: SPACING.md,
   },
   logoutText: {
     fontSize: 16,
-    color: COLORS.primary,
-    fontWeight: 'bold' as const,
+    fontWeight: '600' as const,
   },
   footer: {
-    padding: 20,
+    padding: SPACING.xl,
     alignItems: 'center',
   },
   footerText: {
     fontSize: 12,
-    color: COLORS.black,
   },
 });

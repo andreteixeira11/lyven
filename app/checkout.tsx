@@ -6,12 +6,15 @@ import { CreditCard, CheckCircle, X, Phone, Building2 } from "lucide-react-nativ
 import { useState } from "react";
 import * as Haptics from 'expo-haptics';
 import { useUser } from "@/hooks/user-context";
+import { useTheme } from "@/hooks/theme-context";
+import { RADIUS, SHADOWS, SPACING } from "@/constants/colors";
 
 type PaymentMethod = 'card' | 'mbway' | 'multibanco';
 
 export default function CheckoutScreen() {
   const { cartItems, getTotalPrice, completePurchase } = useCart();
   const { user } = useUser();
+  const { colors } = useTheme();
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedPayment, setSelectedPayment] = useState<PaymentMethod>('card');
   const [showPaymentDetails, setShowPaymentDetails] = useState(false);
@@ -176,121 +179,145 @@ export default function CheckoutScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <Stack.Screen 
         options={{
           title: 'Finalizar Compra',
           headerShown: true,
           headerStyle: {
-            backgroundColor: '#FFFFFF',
+            backgroundColor: colors.primary,
           },
-          headerTintColor: '#0099a8',
+          headerTintColor: colors.white,
           headerTitleStyle: {
-            fontWeight: 'bold' as const,
+            fontWeight: '600' as const,
           },
         }} 
       />
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Resumo do Pedido</Text>
+        <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }, SHADOWS.sm]}>
+          <Text style={[styles.sectionTitle, { color: colors.primary }]}>Resumo do Pedido</Text>
           {cartItems.map((item) => {
             const event = getEventById(item.eventId);
             const ticketType = getTicketType(item.eventId, item.ticketTypeId);
             if (!event || !ticketType) return null;
 
             return (
-              <View key={`${item.eventId}-${item.ticketTypeId}`} style={styles.orderItem}>
+              <View key={`${item.eventId}-${item.ticketTypeId}`} style={[styles.orderItem, { borderBottomColor: colors.border }]}>
                 <View style={styles.orderItemInfo}>
-                  <Text style={styles.eventName}>{event.title}</Text>
-                  <Text style={styles.ticketInfo}>
+                  <Text style={[styles.eventName, { color: colors.text }]}>{event.title}</Text>
+                  <Text style={[styles.ticketInfo, { color: colors.textSecondary }]}>
                     {ticketType.name} • {item.quantity}x €{item.price}
                   </Text>
                 </View>
-                <Text style={styles.itemTotal}>€{(item.price * item.quantity).toFixed(2)}</Text>
+                <Text style={[styles.itemTotal, { color: colors.primary }]}>€{(item.price * item.quantity).toFixed(2)}</Text>
               </View>
             );
           })}
         </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Método de Pagamento</Text>
+        <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }, SHADOWS.sm]}>
+          <Text style={[styles.sectionTitle, { color: colors.primary }]}>Método de Pagamento</Text>
           
           <TouchableOpacity 
-            style={[styles.paymentMethod, selectedPayment === 'card' && styles.paymentMethodSelected]}
+            style={[
+              styles.paymentMethod, 
+              { backgroundColor: colors.background, borderColor: colors.border },
+              selectedPayment === 'card' && { borderColor: colors.primary, backgroundColor: colors.primaryLight }
+            ]}
             onPress={() => setSelectedPayment('card')}
           >
-            <CreditCard size={24} color={selectedPayment === 'card' ? "#0099a8" : "#666"} />
+            <CreditCard size={24} color={selectedPayment === 'card' ? colors.primary : colors.textSecondary} />
             <View style={styles.paymentInfo}>
-              <Text style={[styles.paymentTitle, selectedPayment === 'card' && styles.paymentTitleSelected]}>
+              <Text style={[
+                styles.paymentTitle, 
+                { color: colors.textSecondary },
+                selectedPayment === 'card' && { color: colors.primary }
+              ]}>
                 Cartão de Crédito/Débito
               </Text>
-              <Text style={styles.paymentSubtitle}>Visa, Mastercard, American Express</Text>
+              <Text style={[styles.paymentSubtitle, { color: colors.textLight }]}>Visa, Mastercard, American Express</Text>
             </View>
-            {selectedPayment === 'card' && <CheckCircle size={20} color="#0099a8" />}
+            {selectedPayment === 'card' && <CheckCircle size={20} color={colors.primary} />}
           </TouchableOpacity>
 
           <TouchableOpacity 
-            style={[styles.paymentMethod, selectedPayment === 'mbway' && styles.paymentMethodSelected]}
+            style={[
+              styles.paymentMethod, 
+              { backgroundColor: colors.background, borderColor: colors.border },
+              selectedPayment === 'mbway' && { borderColor: colors.primary, backgroundColor: colors.primaryLight }
+            ]}
             onPress={() => setSelectedPayment('mbway')}
           >
-            <Phone size={24} color={selectedPayment === 'mbway' ? "#0099a8" : "#666"} />
+            <Phone size={24} color={selectedPayment === 'mbway' ? colors.primary : colors.textSecondary} />
             <View style={styles.paymentInfo}>
-              <Text style={[styles.paymentTitle, selectedPayment === 'mbway' && styles.paymentTitleSelected]}>
+              <Text style={[
+                styles.paymentTitle, 
+                { color: colors.textSecondary },
+                selectedPayment === 'mbway' && { color: colors.primary }
+              ]}>
                 MB WAY
               </Text>
-              <Text style={styles.paymentSubtitle}>Pagamento instantâneo</Text>
+              <Text style={[styles.paymentSubtitle, { color: colors.textLight }]}>Pagamento instantâneo</Text>
             </View>
-            {selectedPayment === 'mbway' && <CheckCircle size={20} color="#0099a8" />}
+            {selectedPayment === 'mbway' && <CheckCircle size={20} color={colors.primary} />}
           </TouchableOpacity>
 
           <TouchableOpacity 
-            style={[styles.paymentMethod, selectedPayment === 'multibanco' && styles.paymentMethodSelected]}
+            style={[
+              styles.paymentMethod, 
+              { backgroundColor: colors.background, borderColor: colors.border },
+              selectedPayment === 'multibanco' && { borderColor: colors.primary, backgroundColor: colors.primaryLight }
+            ]}
             onPress={() => setSelectedPayment('multibanco')}
           >
-            <Building2 size={24} color={selectedPayment === 'multibanco' ? "#0099a8" : "#666"} />
+            <Building2 size={24} color={selectedPayment === 'multibanco' ? colors.primary : colors.textSecondary} />
             <View style={styles.paymentInfo}>
-              <Text style={[styles.paymentTitle, selectedPayment === 'multibanco' && styles.paymentTitleSelected]}>
+              <Text style={[
+                styles.paymentTitle, 
+                { color: colors.textSecondary },
+                selectedPayment === 'multibanco' && { color: colors.primary }
+              ]}>
                 Multibanco
               </Text>
-              <Text style={styles.paymentSubtitle}>Referência para pagamento</Text>
+              <Text style={[styles.paymentSubtitle, { color: colors.textLight }]}>Referência para pagamento</Text>
             </View>
-            {selectedPayment === 'multibanco' && <CheckCircle size={20} color="#0099a8" />}
+            {selectedPayment === 'multibanco' && <CheckCircle size={20} color={colors.primary} />}
           </TouchableOpacity>
         </View>
 
         {selectedPayment === 'card' && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Dados do Cartão</Text>
+          <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }, SHADOWS.sm]}>
+            <Text style={[styles.sectionTitle, { color: colors.primary }]}>Dados do Cartão</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: colors.background, borderColor: colors.border, color: colors.text }]}
               placeholder="Número do Cartão"
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.textSecondary}
               value={cardNumber}
               onChangeText={(text) => setCardNumber(formatCardNumber(text))}
               keyboardType="numeric"
               maxLength={19}
             />
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: colors.background, borderColor: colors.border, color: colors.text }]}
               placeholder="Nome no Cartão"
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.textSecondary}
               value={cardName}
               onChangeText={setCardName}
             />
             <View style={styles.inputRow}>
               <TextInput
-                style={[styles.input, styles.inputHalf]}
+                style={[styles.input, styles.inputHalf, { backgroundColor: colors.background, borderColor: colors.border, color: colors.text }]}
                 placeholder="MM/AA"
-                placeholderTextColor="#999"
+                placeholderTextColor={colors.textSecondary}
                 value={cardExpiry}
                 onChangeText={(text) => setCardExpiry(formatExpiry(text))}
                 keyboardType="numeric"
                 maxLength={5}
               />
               <TextInput
-                style={[styles.input, styles.inputHalf]}
+                style={[styles.input, styles.inputHalf, { backgroundColor: colors.background, borderColor: colors.border, color: colors.text }]}
                 placeholder="CVV"
-                placeholderTextColor="#999"
+                placeholderTextColor={colors.textSecondary}
                 value={cardCvv}
                 onChangeText={setCardCvv}
                 keyboardType="numeric"
@@ -302,60 +329,60 @@ export default function CheckoutScreen() {
         )}
 
         {selectedPayment === 'mbway' && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Dados MB WAY</Text>
+          <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }, SHADOWS.sm]}>
+            <Text style={[styles.sectionTitle, { color: colors.primary }]}>Dados MB WAY</Text>
             <TextInput
-              style={styles.input}
+              style={[styles.input, { backgroundColor: colors.background, borderColor: colors.border, color: colors.text }]}
               placeholder="Número de Telemóvel (9 dígitos)"
-              placeholderTextColor="#999"
+              placeholderTextColor={colors.textSecondary}
               value={mbwayPhone}
               onChangeText={setMbwayPhone}
               keyboardType="phone-pad"
               maxLength={9}
             />
-            <Text style={styles.infoText}>
+            <Text style={[styles.infoText, { color: colors.textSecondary }]}>
               Receberá uma notificação no seu telemóvel para confirmar o pagamento.
             </Text>
           </View>
         )}
 
         {selectedPayment === 'multibanco' && (
-          <View style={styles.section}>
-            <Text style={styles.infoText}>
+          <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }, SHADOWS.sm]}>
+            <Text style={[styles.infoText, { color: colors.textSecondary }]}>
               Após clicar em confirmar, receberá uma referência Multibanco para efetuar o pagamento.
               Os bilhetes serão disponibilizados após a confirmação do pagamento.
             </Text>
           </View>
         )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Detalhes do Pagamento</Text>
+        <View style={[styles.section, { backgroundColor: colors.card, borderColor: colors.border }, SHADOWS.sm]}>
+          <Text style={[styles.sectionTitle, { color: colors.primary }]}>Detalhes do Pagamento</Text>
           <View style={styles.priceRow}>
-            <Text style={styles.priceLabel}>Subtotal</Text>
-            <Text style={styles.priceValue}>€{subtotal.toFixed(2)}</Text>
+            <Text style={[styles.priceLabel, { color: colors.textSecondary }]}>Subtotal</Text>
+            <Text style={[styles.priceValue, { color: colors.text }]}>€{subtotal.toFixed(2)}</Text>
           </View>
           <View style={styles.priceRow}>
-            <Text style={styles.priceLabel}>Taxa de Serviço (10%)</Text>
-            <Text style={styles.priceValue}>€{serviceFee.toFixed(2)}</Text>
+            <Text style={[styles.priceLabel, { color: colors.textSecondary }]}>Taxa de Serviço (10%)</Text>
+            <Text style={[styles.priceValue, { color: colors.text }]}>€{serviceFee.toFixed(2)}</Text>
           </View>
-          <View style={[styles.priceRow, styles.totalRow]}>
-            <Text style={styles.totalLabel}>Total</Text>
-            <Text style={styles.totalValue}>€{total.toFixed(2)}</Text>
+          <View style={[styles.priceRow, styles.totalRow, { borderTopColor: colors.primary }]}>
+            <Text style={[styles.totalLabel, { color: colors.primary }]}>Total</Text>
+            <Text style={[styles.totalValue, { color: colors.primary }]}>€{total.toFixed(2)}</Text>
           </View>
         </View>
 
-        <Text style={styles.terms}>
+        <Text style={[styles.terms, { color: colors.textSecondary }]}>
           Ao finalizar a compra, concorda com os Termos de Uso e Política de Privacidade.
         </Text>
       </ScrollView>
 
-      <View style={styles.footer}>
+      <View style={[styles.footer, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
         <TouchableOpacity 
-          style={[styles.purchaseButton, isProcessing && styles.purchaseButtonDisabled]}
+          style={[styles.purchaseButton, { backgroundColor: colors.primary }, isProcessing && styles.purchaseButtonDisabled]}
           onPress={handlePurchase}
           disabled={isProcessing}
         >
-          <Text style={styles.purchaseButtonText}>
+          <Text style={[styles.purchaseButtonText, { color: colors.white }]}>
             {isProcessing ? 'A Processar...' : `Confirmar Pagamento €${total.toFixed(2)}`}
           </Text>
         </TouchableOpacity>
@@ -367,48 +394,48 @@ export default function CheckoutScreen() {
         animationType="slide"
       >
         <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
             <TouchableOpacity 
               style={styles.modalClose}
               onPress={() => setShowPaymentDetails(false)}
             >
-              <X size={24} color="#666" />
+              <X size={24} color={colors.textSecondary} />
             </TouchableOpacity>
 
-            <View style={styles.modalIcon}>
-              <Building2 size={48} color="#0099a8" />
+            <View style={[styles.modalIcon, { backgroundColor: colors.primaryLight }]}>
+              <Building2 size={48} color={colors.primary} />
             </View>
 
-            <Text style={styles.modalTitle}>Referência Multibanco</Text>
-            <Text style={styles.modalSubtitle}>
+            <Text style={[styles.modalTitle, { color: colors.primary }]}>Referência Multibanco</Text>
+            <Text style={[styles.modalSubtitle, { color: colors.textSecondary }]}>
               Utilize os dados abaixo para efetuar o pagamento
             </Text>
 
-            <View style={styles.referenceContainer}>
-              <View style={styles.referenceRow}>
-                <Text style={styles.referenceLabel}>Entidade</Text>
-                <Text style={styles.referenceValue}>{multibancoEntity}</Text>
+            <View style={[styles.referenceContainer, { backgroundColor: colors.primaryLight, borderColor: colors.primary }]}>
+              <View style={[styles.referenceRow, { borderBottomColor: colors.border }]}>
+                <Text style={[styles.referenceLabel, { color: colors.textSecondary }]}>Entidade</Text>
+                <Text style={[styles.referenceValue, { color: colors.primary }]}>{multibancoEntity}</Text>
               </View>
-              <View style={styles.referenceRow}>
-                <Text style={styles.referenceLabel}>Referência</Text>
-                <Text style={styles.referenceValue}>{multibancoReference}</Text>
+              <View style={[styles.referenceRow, { borderBottomColor: colors.border }]}>
+                <Text style={[styles.referenceLabel, { color: colors.textSecondary }]}>Referência</Text>
+                <Text style={[styles.referenceValue, { color: colors.primary }]}>{multibancoReference}</Text>
               </View>
-              <View style={styles.referenceRow}>
-                <Text style={styles.referenceLabel}>Montante</Text>
-                <Text style={styles.referenceValue}>€{total.toFixed(2)}</Text>
+              <View style={[styles.referenceRow, { borderBottomColor: colors.border }]}>
+                <Text style={[styles.referenceLabel, { color: colors.textSecondary }]}>Montante</Text>
+                <Text style={[styles.referenceValue, { color: colors.primary }]}>€{total.toFixed(2)}</Text>
               </View>
             </View>
 
-            <Text style={styles.modalInfo}>
+            <Text style={[styles.modalInfo, { color: colors.textSecondary }]}>
               Esta referência é válida por 24 horas. Os seus bilhetes serão disponibilizados
               assim que o pagamento for confirmado.
             </Text>
 
             <TouchableOpacity 
-              style={styles.modalButton}
+              style={[styles.modalButton, { backgroundColor: colors.primary }]}
               onPress={handleMultibancoConfirm}
             >
-              <Text style={styles.modalButtonText}>Entendido</Text>
+              <Text style={[styles.modalButtonText, { color: colors.white }]}>Entendido</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -420,32 +447,27 @@ export default function CheckoutScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   content: {
     flex: 1,
-    padding: 20,
+    padding: SPACING.xl,
   },
   section: {
-    backgroundColor: '#F0F9FA',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 20,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    marginBottom: SPACING.xl,
     borderWidth: 1,
-    borderColor: '#E0E0E0',
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: 'bold' as const,
-    color: '#0099a8',
-    marginBottom: 16,
+    fontWeight: '600' as const,
+    marginBottom: SPACING.lg,
   },
   orderItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 12,
+    paddingVertical: SPACING.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
   },
   orderItemInfo: {
     flex: 1,
@@ -453,214 +475,176 @@ const styles = StyleSheet.create({
   eventName: {
     fontSize: 16,
     fontWeight: '600' as const,
-    color: '#0099a8',
   },
   ticketInfo: {
     fontSize: 14,
-    color: '#666',
     marginTop: 4,
   },
   itemTotal: {
     fontSize: 16,
-    fontWeight: 'bold' as const,
-    color: '#0099a8',
+    fontWeight: '600' as const,
   },
   paymentMethod: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderRadius: 12,
+    padding: SPACING.lg,
+    borderRadius: RADIUS.md,
     borderWidth: 2,
-    borderColor: '#E0E0E0',
-    marginBottom: 12,
-  },
-  paymentMethodSelected: {
-    borderColor: '#0099a8',
-    backgroundColor: '#F0F9FA',
+    marginBottom: SPACING.md,
   },
   paymentInfo: {
     flex: 1,
-    marginLeft: 12,
+    marginLeft: SPACING.md,
   },
   paymentTitle: {
     fontSize: 16,
     fontWeight: '600' as const,
-    color: '#666',
-  },
-  paymentTitleSelected: {
-    color: '#0099a8',
   },
   paymentSubtitle: {
     fontSize: 13,
-    color: '#999',
     marginTop: 2,
   },
   input: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    borderRadius: RADIUS.md,
     padding: 14,
     fontSize: 16,
-    color: '#000',
     borderWidth: 1,
-    borderColor: '#E0E0E0',
-    marginBottom: 12,
+    marginBottom: SPACING.md,
   },
   inputRow: {
     flexDirection: 'row',
-    gap: 12,
+    gap: SPACING.md,
   },
   inputHalf: {
     flex: 1,
   },
   infoText: {
     fontSize: 13,
-    color: '#666',
     lineHeight: 20,
   },
   priceRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 8,
+    paddingVertical: SPACING.sm,
   },
   priceLabel: {
     fontSize: 14,
-    color: '#666',
   },
   priceValue: {
     fontSize: 14,
-    color: '#000',
     fontWeight: '600' as const,
   },
   totalRow: {
     borderTopWidth: 2,
-    borderTopColor: '#0099a8',
-    marginTop: 8,
-    paddingTop: 16,
+    marginTop: SPACING.sm,
+    paddingTop: SPACING.lg,
   },
   totalLabel: {
     fontSize: 18,
-    fontWeight: 'bold' as const,
-    color: '#0099a8',
+    fontWeight: '600' as const,
   },
   totalValue: {
     fontSize: 20,
-    fontWeight: 'bold' as const,
-    color: '#0099a8',
+    fontWeight: '700' as const,
   },
   terms: {
     fontSize: 12,
-    color: '#666',
-    textAlign: 'center',
-    marginVertical: 20,
-    paddingHorizontal: 20,
+    textAlign: 'center' as const,
+    marginVertical: SPACING.xl,
+    paddingHorizontal: SPACING.xl,
     lineHeight: 18,
   },
   footer: {
-    backgroundColor: '#FFFFFF',
-    padding: 16,
+    padding: SPACING.lg,
     borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
   },
   purchaseButton: {
-    backgroundColor: '#0099a8',
-    paddingVertical: 16,
-    borderRadius: 12,
+    paddingVertical: SPACING.lg,
+    borderRadius: RADIUS.md,
     alignItems: 'center',
+    ...SHADOWS.md,
   },
   purchaseButtonDisabled: {
     opacity: 0.6,
   },
   purchaseButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold' as const,
+    fontSize: 17,
+    fontWeight: '600' as const,
   },
   modalOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: SPACING.xl,
   },
   modalContent: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 24,
+    borderRadius: RADIUS.xl,
+    padding: SPACING.xxl,
     width: '100%',
     maxWidth: 400,
   },
   modalClose: {
-    position: 'absolute',
-    top: 16,
-    right: 16,
+    position: 'absolute' as const,
+    top: SPACING.lg,
+    right: SPACING.lg,
     zIndex: 1,
   },
   modalIcon: {
     width: 80,
     height: 80,
     borderRadius: 40,
-    backgroundColor: '#F0F9FA',
     justifyContent: 'center',
     alignItems: 'center',
-    alignSelf: 'center',
-    marginBottom: 20,
+    alignSelf: 'center' as const,
+    marginBottom: SPACING.xl,
   },
   modalTitle: {
     fontSize: 24,
-    fontWeight: 'bold' as const,
-    color: '#0099a8',
-    textAlign: 'center',
-    marginBottom: 8,
+    fontWeight: '700' as const,
+    textAlign: 'center' as const,
+    marginBottom: SPACING.sm,
   },
   modalSubtitle: {
     fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 24,
+    textAlign: 'center' as const,
+    marginBottom: SPACING.xxl,
   },
   referenceContainer: {
-    backgroundColor: '#F0F9FA',
-    borderRadius: 12,
-    padding: 20,
-    marginBottom: 20,
+    borderRadius: RADIUS.md,
+    padding: SPACING.xl,
+    marginBottom: SPACING.xl,
     borderWidth: 1,
-    borderColor: '#0099a8',
   },
   referenceRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: SPACING.md,
     borderBottomWidth: 1,
-    borderBottomColor: '#E0E0E0',
   },
   referenceLabel: {
     fontSize: 14,
-    color: '#666',
     fontWeight: '500' as const,
   },
   referenceValue: {
     fontSize: 18,
-    color: '#0099a8',
-    fontWeight: 'bold' as const,
+    fontWeight: '700' as const,
   },
   modalInfo: {
     fontSize: 13,
-    color: '#666',
-    textAlign: 'center',
+    textAlign: 'center' as const,
     lineHeight: 20,
-    marginBottom: 24,
+    marginBottom: SPACING.xxl,
   },
   modalButton: {
-    backgroundColor: '#0099a8',
     paddingVertical: 14,
-    borderRadius: 12,
+    borderRadius: RADIUS.md,
     alignItems: 'center',
+    ...SHADOWS.md,
   },
   modalButtonText: {
-    color: '#FFFFFF',
     fontSize: 16,
-    fontWeight: 'bold' as const,
+    fontWeight: '600' as const,
   },
 });
