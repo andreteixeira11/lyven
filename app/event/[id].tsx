@@ -622,7 +622,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingTop: Platform.OS === 'ios' ? 0 : 10,
+    paddingTop: Platform.OS === 'ios' ? 10 : 16,
+    marginTop: 10,
   },
   headerButton: {
     width: moderateScale(40),

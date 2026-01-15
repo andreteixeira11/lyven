@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,8 @@ import {
   TouchableOpacity,
   Image,
   Alert,
+  PanResponder,
+  Animated,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { 
@@ -81,12 +83,44 @@ interface UserTicket {
   friendsGoing?: number;
 }
 
+const SWIPE_THRESHOLD = 50;
+
 function NormalUserTicketsContent() {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   const { cartItems, removeFromCart, updateQuantity, getTotalPrice, getTotalItems } = useCart();
   const { tab } = useLocalSearchParams<{ tab?: string }>();
   const [selectedTab, setSelectedTab] = useState<'upcoming' | 'past' | 'cart'>('upcoming');
+  const translateX = useRef(new Animated.Value(0)).current;
+
+  const tabs: ('upcoming' | 'past' | 'cart')[] = ['upcoming', 'past', 'cart'];
+
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, gestureState) => {
+        return Math.abs(gestureState.dx) > 10 && Math.abs(gestureState.dy) < 30;
+      },
+      onPanResponderMove: (_, gestureState) => {
+        translateX.setValue(gestureState.dx);
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        const currentIndex = tabs.indexOf(selectedTab);
+        
+        if (gestureState.dx < -SWIPE_THRESHOLD && currentIndex < tabs.length - 1) {
+          setSelectedTab(tabs[currentIndex + 1]);
+        } else if (gestureState.dx > SWIPE_THRESHOLD && currentIndex > 0) {
+          setSelectedTab(tabs[currentIndex - 1]);
+        }
+        
+        Animated.spring(translateX, {
+          toValue: 0,
+          useNativeDriver: true,
+          tension: 100,
+          friction: 10,
+        }).start();
+      },
+    })
+  ).current;
 
   useEffect(() => {
     if (tab === 'cart') {
@@ -440,7 +474,11 @@ function NormalUserTicketsContent() {
         </TouchableOpacity>
       </View>
 
-      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+      <Animated.View 
+        style={[styles.swipeContainer, { transform: [{ translateX }] }]}
+        {...panResponder.panHandlers}
+      >
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         <View style={styles.content}>
           {selectedTab === 'upcoming' ? (
             <>
@@ -574,6 +612,7 @@ function NormalUserTicketsContent() {
           )}
         </View>
       </ScrollView>
+      </Animated.View>
     </View>
   );
 }
@@ -754,6 +793,9 @@ export default function TicketsScreen() {
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  swipeContainer: {
     flex: 1,
   },
   header: {
