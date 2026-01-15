@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -30,7 +30,7 @@ import { useTheme } from '@/hooks/theme-context';
 import { useCart } from '@/hooks/cart-context';
 import AuthGuard from '@/components/AuthGuard';
 import CreateEvent from '@/app/create-event';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import QRCode from '@/components/QRCode';
 
 interface PendingAd {
@@ -85,7 +85,14 @@ function NormalUserTicketsContent() {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
   const { cartItems, removeFromCart, updateQuantity, getTotalPrice, getTotalItems } = useCart();
+  const { tab } = useLocalSearchParams<{ tab?: string }>();
   const [selectedTab, setSelectedTab] = useState<'upcoming' | 'past' | 'cart'>('upcoming');
+
+  useEffect(() => {
+    if (tab === 'cart') {
+      setSelectedTab('cart');
+    }
+  }, [tab]);
   const [selectedQRTicket, setSelectedQRTicket] = useState<string | null>(null);
   
   const [userTickets] = useState<UserTicket[]>([
