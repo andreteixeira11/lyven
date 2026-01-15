@@ -52,6 +52,9 @@ export interface CartItem {
   ticketTypeId: string;
   quantity: number;
   price: number;
+  eventTitle?: string;
+  eventImage?: string;
+  ticketTypeName?: string;
 }
 
 export interface PurchasedTicket {

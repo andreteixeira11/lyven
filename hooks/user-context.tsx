@@ -100,31 +100,29 @@ export const [UserProvider, useUser] = createContextHook(() => {
       isOnboardingComplete: true,
     };
     
-    try {
-      const language = userData.preferences?.language;
-      const supportedLanguage = language === 'pt' || language === 'en' ? language : 'pt';
-      
-      await trpcClient.users.updateOnboarding.mutate({
-        id: user.id,
-        phone: userData.phone,
-        interests: userData.interests,
-        locationCity: userData.location?.city,
-        locationRegion: userData.location?.region,
-        locationLatitude: userData.location?.latitude,
-        locationLongitude: userData.location?.longitude,
-        preferencesNotifications: userData.preferences?.notifications,
-        preferencesLanguage: supportedLanguage,
-        preferencesPriceMin: userData.preferences?.priceRange?.min,
-        preferencesPriceMax: userData.preferences?.priceRange?.max,
-        preferencesEventTypes: userData.preferences?.eventTypes,
-      });
-      
-      console.log('✅ Onboarding atualizado no backend');
-    } catch (error) {
-      console.error('❌ Erro ao atualizar onboarding no backend:', error);
-    }
-    
     await saveUser(updatedUser);
+    
+    const language = userData.preferences?.language;
+    const supportedLanguage = language === 'pt' || language === 'en' ? language : 'pt';
+    
+    trpcClient.users.updateOnboarding.mutate({
+      id: user.id,
+      phone: userData.phone,
+      interests: userData.interests,
+      locationCity: userData.location?.city,
+      locationRegion: userData.location?.region,
+      locationLatitude: userData.location?.latitude,
+      locationLongitude: userData.location?.longitude,
+      preferencesNotifications: userData.preferences?.notifications,
+      preferencesLanguage: supportedLanguage,
+      preferencesPriceMin: userData.preferences?.priceRange?.min,
+      preferencesPriceMax: userData.preferences?.priceRange?.max,
+      preferencesEventTypes: userData.preferences?.eventTypes,
+    }).then(() => {
+      console.log('✅ Onboarding sincronizado com backend');
+    }).catch((error) => {
+      console.error('❌ Erro ao sincronizar onboarding com backend:', error);
+    });
   }, [user]);
 
   const switchUserType = useCallback(async (userType: UserType) => {

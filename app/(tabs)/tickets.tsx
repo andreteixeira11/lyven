@@ -19,10 +19,15 @@ import {
   ChevronRight,
   Users,
   Ticket,
+  ShoppingCart,
+  Trash2,
+  Minus,
+  Plus,
 } from 'lucide-react-native';
 import { COLORS } from '@/constants/colors';
 import { useUser } from '@/hooks/user-context';
 import { useTheme } from '@/hooks/theme-context';
+import { useCart } from '@/hooks/cart-context';
 import AuthGuard from '@/components/AuthGuard';
 import CreateEvent from '@/app/create-event';
 import { router } from 'expo-router';
@@ -79,7 +84,8 @@ interface UserTicket {
 function NormalUserTicketsContent() {
   const insets = useSafeAreaInsets();
   const { colors } = useTheme();
-  const [selectedTab, setSelectedTab] = useState<'upcoming' | 'past'>('upcoming');
+  const { cartItems, removeFromCart, updateQuantity, getTotalPrice, getTotalItems } = useCart();
+  const [selectedTab, setSelectedTab] = useState<'upcoming' | 'past' | 'cart'>('upcoming');
   const [selectedQRTicket, setSelectedQRTicket] = useState<string | null>(null);
   
   const [userTickets] = useState<UserTicket[]>([
@@ -404,6 +410,27 @@ function NormalUserTicketsContent() {
             Passado
           </Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={[
+            styles.tab,
+            selectedTab === 'cart' && [styles.tabActive, { borderBottomColor: colors.primary }]
+          ]}
+          onPress={() => setSelectedTab('cart')}
+        >
+          <View style={styles.cartTabContent}>
+            <Text style={[
+              styles.tabText,
+              { color: selectedTab === 'cart' ? colors.text : colors.textSecondary }
+            ]}>
+              Carrinho
+            </Text>
+            {getTotalItems() > 0 && (
+              <View style={[styles.cartBadge, { backgroundColor: colors.primary }]}>
+                <Text style={styles.cartBadgeText}>{getTotalItems()}</Text>
+              </View>
+            )}
+          </View>
+        </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
@@ -437,7 +464,7 @@ function NormalUserTicketsContent() {
                 </View>
               )}
             </>
-          ) : (
+          ) : selectedTab === 'past' ? (
             <>
               {pastTickets.length > 0 ? (
                 pastTickets.map(ticket => (
@@ -450,6 +477,90 @@ function NormalUserTicketsContent() {
                   <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
                     Seus ingressos usados aparecerão aqui
                   </Text>
+                </View>
+              )}
+            </>
+          ) : (
+            <>
+              {cartItems.length > 0 ? (
+                <>
+                  {cartItems.map(item => (
+                    <View key={`${item.eventId}-${item.ticketTypeId}`} style={[styles.cartItemCard, { backgroundColor: colors.card }]}>
+                      <Image source={{ uri: item.eventImage || 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800' }} style={styles.cartItemImage} />
+                      <View style={styles.cartItemInfo}>
+                        <Text style={[styles.cartItemTitle, { color: colors.text }]} numberOfLines={2}>
+                          {item.eventTitle}
+                        </Text>
+                        <Text style={[styles.cartItemType, { color: colors.textSecondary }]}>
+                          {item.ticketTypeName}
+                        </Text>
+                        <Text style={[styles.cartItemPrice, { color: colors.primary }]}>
+                          €{(item.price * item.quantity).toFixed(2)}
+                        </Text>
+                      </View>
+                      <View style={styles.cartItemActions}>
+                        <View style={styles.quantityControls}>
+                          <TouchableOpacity
+                            style={[styles.quantityButton, { backgroundColor: colors.border }]}
+                            onPress={() => updateQuantity(item.eventId, item.ticketTypeId, item.quantity - 1)}
+                          >
+                            <Minus size={16} color={colors.text} />
+                          </TouchableOpacity>
+                          <Text style={[styles.quantityText, { color: colors.text }]}>{item.quantity}</Text>
+                          <TouchableOpacity
+                            style={[styles.quantityButton, { backgroundColor: colors.border }]}
+                            onPress={() => updateQuantity(item.eventId, item.ticketTypeId, item.quantity + 1)}
+                          >
+                            <Plus size={16} color={colors.text} />
+                          </TouchableOpacity>
+                        </View>
+                        <TouchableOpacity
+                          style={styles.removeButton}
+                          onPress={() => removeFromCart(item.eventId, item.ticketTypeId)}
+                        >
+                          <Trash2 size={18} color={colors.error} />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  ))}
+
+                  <View style={[styles.cartSummary, { backgroundColor: colors.card }]}>
+                    <View style={styles.cartSummaryRow}>
+                      <Text style={[styles.cartSummaryLabel, { color: colors.textSecondary }]}>Subtotal</Text>
+                      <Text style={[styles.cartSummaryValue, { color: colors.text }]}>€{getTotalPrice().toFixed(2)}</Text>
+                    </View>
+                    <View style={styles.cartSummaryRow}>
+                      <Text style={[styles.cartSummaryLabel, { color: colors.textSecondary }]}>Taxa de serviço</Text>
+                      <Text style={[styles.cartSummaryValue, { color: colors.text }]}>€{(getTotalPrice() * 0.05).toFixed(2)}</Text>
+                    </View>
+                    <View style={[styles.cartSummaryDivider, { backgroundColor: colors.border }]} />
+                    <View style={styles.cartSummaryRow}>
+                      <Text style={[styles.cartTotalLabel, { color: colors.text }]}>Total</Text>
+                      <Text style={[styles.cartTotalValue, { color: colors.primary }]}>€{(getTotalPrice() * 1.05).toFixed(2)}</Text>
+                    </View>
+                  </View>
+
+                  <TouchableOpacity
+                    style={[styles.checkoutButton, { backgroundColor: colors.primary }]}
+                    onPress={() => router.push('/checkout')}
+                  >
+                    <ShoppingCart size={20} color="#FFFFFF" />
+                    <Text style={styles.checkoutButtonText}>Finalizar Compra</Text>
+                  </TouchableOpacity>
+                </>
+              ) : (
+                <View style={styles.emptyState}>
+                  <ShoppingCart size={64} color={colors.textSecondary} />
+                  <Text style={[styles.emptyTitle, { color: colors.text }]}>Carrinho vazio</Text>
+                  <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
+                    Adicione ingressos ao seu carrinho para continuar
+                  </Text>
+                  <TouchableOpacity
+                    style={[styles.exploreButton, { backgroundColor: colors.primary }]}
+                    onPress={() => router.push('/(tabs)')}
+                  >
+                    <Text style={styles.exploreButtonText}>Explorar Eventos</Text>
+                  </TouchableOpacity>
                 </View>
               )}
             </>
@@ -964,6 +1075,127 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 15,
     fontWeight: '600' as const,
+  },
+  cartTabContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  cartBadge: {
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 5,
+  },
+  cartBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 11,
+    fontWeight: '700' as const,
+  },
+  cartItemCard: {
+    flexDirection: 'row',
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  cartItemImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 8,
+  },
+  cartItemInfo: {
+    flex: 1,
+    marginLeft: 12,
+    justifyContent: 'center',
+  },
+  cartItemTitle: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    marginBottom: 4,
+  },
+  cartItemType: {
+    fontSize: 12,
+    marginBottom: 4,
+  },
+  cartItemPrice: {
+    fontSize: 15,
+    fontWeight: '700' as const,
+  },
+  cartItemActions: {
+    alignItems: 'flex-end',
+    justifyContent: 'space-between',
+  },
+  quantityControls: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  quantityButton: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  quantityText: {
+    fontSize: 14,
+    fontWeight: '600' as const,
+    minWidth: 20,
+    textAlign: 'center' as const,
+  },
+  removeButton: {
+    padding: 8,
+  },
+  cartSummary: {
+    borderRadius: 12,
+    padding: 16,
+    marginTop: 8,
+    marginBottom: 16,
+  },
+  cartSummaryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  cartSummaryLabel: {
+    fontSize: 14,
+  },
+  cartSummaryValue: {
+    fontSize: 14,
+    fontWeight: '500' as const,
+  },
+  cartSummaryDivider: {
+    height: 1,
+    marginVertical: 12,
+  },
+  cartTotalLabel: {
+    fontSize: 16,
+    fontWeight: '700' as const,
+  },
+  cartTotalValue: {
+    fontSize: 18,
+    fontWeight: '700' as const,
+  },
+  checkoutButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    borderRadius: 12,
+    gap: 10,
+    marginBottom: 20,
+  },
+  checkoutButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '700' as const,
   },
   adminContent: {
     padding: 20,
