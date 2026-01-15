@@ -61,7 +61,7 @@ export default function LoginTesteScreen() {
           },
         ]
       );
-    } catch (error) {
+    } catch {
       Alert.alert('Erro', 'Não foi possível fazer login');
     }
   };

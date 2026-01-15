@@ -15,7 +15,6 @@ import {
   Users, 
   Calendar, 
   DollarSign, 
-  UserCheck,
   AlertCircle,
   User,
   LogOut,
@@ -27,8 +26,7 @@ import {
   BarChart3,
   Target,
   MapPin,
-  ChevronRight,
-  Menu,
+
   ChevronDown,
   Database,
 } from 'lucide-react-native';

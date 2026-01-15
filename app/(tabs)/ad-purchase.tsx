@@ -5,12 +5,11 @@ import {
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  TextInput,
   Alert,
   Image,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { router } from 'expo-router';
+
 import {
   Eye,
   CheckCircle,
@@ -463,15 +462,10 @@ function AdminAnalyticsContent() {
 }
 
 function PromoterAdPurchaseContent() {
-  const { user, promoterProfile } = useUser();
   const [currentStep, setCurrentStep] = useState<Step>('event');
   const [selectedEvent, setSelectedEvent] = useState<any | null>(null);
   const [selectedPackage, setSelectedPackage] = useState<AdPackage | null>(null);
   const [selectedDuration, setSelectedDuration] = useState<AdDuration>('7');
-  const [adTitle, setAdTitle] = useState<string>('');
-  const [adDescription, setAdDescription] = useState<string>('');
-  const [targetUrl, setTargetUrl] = useState<string>('');
-  const [imageUrl, setImageUrl] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const calculateTotalPrice = () => {
@@ -528,10 +522,6 @@ function PromoterAdPurchaseContent() {
     setSelectedEvent(null);
     setSelectedPackage(null);
     setSelectedDuration('7');
-    setAdTitle('');
-    setAdDescription('');
-    setTargetUrl('');
-    setImageUrl('');
   };
 
   const handleSubmitAd = async () => {
@@ -807,92 +797,6 @@ function PromoterAdPurchaseContent() {
           </View>
         </View>
       </View>
-    </View>
-  );
-
-  const renderContentStep = () => (
-    <View style={styles.stepContent}>
-      <Text style={styles.stepTitle}>Conteúdo do Anúncio</Text>
-      <Text style={styles.stepSubtitle}>
-        Crie o conteúdo que será exibido no seu anúncio
-      </Text>
-      
-      <View style={styles.inputGroup}>
-        <Text style={styles.inputLabel}>Título do Anúncio *</Text>
-        <TextInput
-          style={styles.textInput}
-          value={adTitle}
-          onChangeText={setAdTitle}
-          placeholder="Ex: Festival de Música Eletrônica"
-          placeholderTextColor={COLORS.textSecondary}
-          maxLength={50}
-        />
-        <Text style={styles.charCount}>{adTitle.length}/50</Text>
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.inputLabel}>Descrição *</Text>
-        <TextInput
-          style={[styles.textInput, styles.textArea]}
-          value={adDescription}
-          onChangeText={setAdDescription}
-          placeholder="Descreva seu evento de forma atrativa..."
-          placeholderTextColor={COLORS.textSecondary}
-          multiline
-          numberOfLines={3}
-          maxLength={150}
-        />
-        <Text style={styles.charCount}>{adDescription.length}/150</Text>
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.inputLabel}>URL da Imagem *</Text>
-        <TextInput
-          style={styles.textInput}
-          value={imageUrl}
-          onChangeText={setImageUrl}
-          placeholder="https://exemplo.com/imagem.jpg"
-          placeholderTextColor={COLORS.textSecondary}
-          keyboardType="url"
-        />
-        <Text style={styles.inputHint}>
-          Recomendamos imagens com resolução mínima de 1200x630px
-        </Text>
-      </View>
-
-      <View style={styles.inputGroup}>
-        <Text style={styles.inputLabel}>Link de Destino</Text>
-        <TextInput
-          style={styles.textInput}
-          value={targetUrl}
-          onChangeText={setTargetUrl}
-          placeholder="https://exemplo.com (opcional)"
-          placeholderTextColor={COLORS.textSecondary}
-          keyboardType="url"
-        />
-        <Text style={styles.inputHint}>
-          Para onde os usuários serão direcionados ao clicar no anúncio
-        </Text>
-      </View>
-
-      {imageUrl ? (
-        <View style={styles.previewContainer}>
-          <Text style={styles.previewTitle}>Pré-visualização</Text>
-          <View style={styles.adPreview}>
-            <Image 
-              source={{ uri: imageUrl }} 
-              style={styles.previewImage}
-              resizeMode="cover"
-            />
-            <View style={styles.previewContent}>
-              <Text style={styles.previewAdTitle}>{adTitle || 'Título do Anúncio'}</Text>
-              <Text style={styles.previewAdDescription}>
-                {adDescription || 'Descrição do anúncio aparecerá aqui...'}
-              </Text>
-            </View>
-          </View>
-        </View>
-      ) : null}
     </View>
   );
 

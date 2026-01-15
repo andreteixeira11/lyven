@@ -56,7 +56,7 @@ export default function Security() {
           },
         },
       ]);
-    } catch (error) {
+    } catch {
       Alert.alert('Erro', 'Não foi possível alterar a palavra-passe');
     } finally {
       setIsLoading(false);

@@ -47,7 +47,7 @@ export default function EditProfile() {
           onPress: () => router.back(),
         },
       ]);
-    } catch (error) {
+    } catch {
       Alert.alert('Erro', 'Não foi possível atualizar o perfil');
     } finally {
       setIsLoading(false);

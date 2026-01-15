@@ -167,7 +167,7 @@ export default function AdPurchase() {
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
       setCurrentStep('confirmation');
-    } catch (error) {
+    } catch {
       Alert.alert('Erro', 'Ocorreu um erro ao enviar o anúncio. Tente novamente.');
     } finally {
       setIsSubmitting(false);

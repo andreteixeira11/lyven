@@ -16,7 +16,6 @@ import {
   Search, 
   Filter,
   MapPin,
-  Users,
   DollarSign,
   Eye,
   MoreVertical,

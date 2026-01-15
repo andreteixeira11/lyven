@@ -136,7 +136,7 @@ export default function TestSeedScreen() {
                 2. Vá até a página de Perfil
               </Text>
               <Text style={[styles.nextStepsText, { color: colors.textSecondary }]}>
-                3. Clique em "A seguir"
+                3. Clique em &quot;A seguir&quot;
               </Text>
               <Text style={[styles.nextStepsText, { color: colors.textSecondary }]}>
                 4. Você deverá ver 3 promotores que o João segue

@@ -543,7 +543,7 @@ export async function seedDatabase() {
   for (const follow of testFollows) {
     try {
       await db.insert(following).values(follow).onConflictDoNothing();
-    } catch (error) {
+    } catch {
       console.log('Follow já existe ou erro:', follow.id);
     }
   }

@@ -24,7 +24,6 @@ import {
   Euro,
   Moon,
   Sun,
-  Bell,
   UserPlus,
 } from 'lucide-react-native';
 import { useUser } from '@/hooks/user-context';

@@ -121,7 +121,7 @@ export default function EmailPreferences() {
           onPress: () => router.back(),
         },
       ]);
-    } catch (error) {
+    } catch {
       Alert.alert('Erro', 'Não foi possível guardar as preferências');
     } finally {
       setIsLoading(false);

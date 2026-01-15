@@ -16,7 +16,6 @@ import {
   Filter,
   UserCheck,
   UserX,
-  Crown,
   Calendar,
   Mail,
   Phone,
@@ -25,10 +24,8 @@ import {
   User,
   LogOut,
   Star,
-  DollarSign,
   Eye,
-  TrendingUp,
-  Award
+  TrendingUp
 } from 'lucide-react-native';
 import { COLORS } from '@/constants/colors';
 import { useUser } from '@/hooks/user-context';

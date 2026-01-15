@@ -1,5 +1,5 @@
 import { StyleSheet, Text, View, ScrollView, TouchableOpacity, Image } from 'react-native';
-import { Heart, Calendar, Bell, Clock, MapPin, Star, Share2, ChevronLeft } from 'lucide-react-native';
+import { Heart, Calendar, Bell, Clock, MapPin, Star, Share2 } from 'lucide-react-native';
 import { useFavorites } from '@/hooks/favorites-context';
 import { mockEvents } from '@/mocks/events';
 import { router, Stack } from 'expo-router';
@@ -7,12 +7,12 @@ import { useMemo } from 'react';
 import { useTheme } from '@/hooks/theme-context';
 
 export default function FavoritesScreen() {
-  const { favorites, isFavorite, removeFromFavorites, hasReminder, shareEvent, addToCalendar } = useFavorites();
-  const { colors, isDark } = useTheme();
+  const { isFavorite, removeFromFavorites, hasReminder, shareEvent, addToCalendar } = useFavorites();
+  const { colors } = useTheme();
   
   const favoriteEvents = useMemo(() => {
     return mockEvents.filter(event => isFavorite(event.id));
-  }, [favorites, isFavorite]);
+  }, [isFavorite]);
   
   const upcomingEvents = useMemo(() => {
     const now = new Date();
@@ -38,12 +38,7 @@ export default function FavoritesScreen() {
     }).format(date);
   };
 
-  const formatDateShort = (date: Date) => {
-    return new Intl.DateTimeFormat('pt-PT', {
-      day: 'numeric',
-      month: 'short'
-    }).format(date);
-  };
+  
 
   const handleRemoveFromFavorites = async (eventId: string) => {
     await removeFromFavorites(eventId);
