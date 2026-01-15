@@ -69,7 +69,7 @@ const darkColors: ThemeColors = {
 };
 
 export const [ThemeProvider, useTheme] = createContextHook(() => {
-  const [theme, setTheme] = useState<Theme>('system');
+  const [theme, setTheme] = useState<Theme>('light');
   const [colorScheme, setColorScheme] = useState<ColorSchemeName>(
     Appearance.getColorScheme()
   );

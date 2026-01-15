@@ -46,21 +46,8 @@ export default function CheckoutScreen() {
   }, [stepIndex, progressAnim]);
 
   const animateStepChange = useCallback((newStep: CheckoutStep) => {
-    Animated.sequence([
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 150,
-        useNativeDriver: true,
-      }),
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 150,
-        useNativeDriver: true,
-      }),
-    ]).start();
-    
-    setTimeout(() => setCurrentStep(newStep), 150);
-  }, [fadeAnim]);
+    setCurrentStep(newStep);
+  }, []);
 
   const formatCardNumber = (text: string) => {
     const cleaned = text.replace(/\s/g, '');
