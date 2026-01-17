@@ -94,7 +94,7 @@
         }
       ],
       [
-        "expo-notifications",
+     
         {
           "icon": "./local/assets/notification_icon.png",
           "color": "#ffffff",
